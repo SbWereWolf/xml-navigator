@@ -5,7 +5,7 @@ namespace SbWereWolf\XmlNavigator;
 use Exception;
 use SimpleXMLElement;
 
-class BrowserFabric
+class NavigatorFabric
 {
     private SimpleXMLElement $xml;
 

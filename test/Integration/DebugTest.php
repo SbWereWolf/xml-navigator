@@ -8,8 +8,8 @@
 namespace Integration;
 
 use PHPUnit\Framework\TestCase;
-use SbWereWolf\XmlNavigator\BrowserFabric;
 use SbWereWolf\XmlNavigator\Converter;
+use SbWereWolf\XmlNavigator\NavigatorFabric;
 use SimpleXMLElement;
 
 class DebugTest extends TestCase
@@ -34,13 +34,18 @@ class DebugTest extends TestCase
     <qwe>last occurrence</qwe>
 </doc>
 XML;
-        $fabric = new BrowserFabric($xml);
+
+        $fabric = new NavigatorFabric($xml);
         $navigator = $fabric->make();
 
         /* get element name */
-        echo $navigator->name(); /* doc */
+        echo $navigator->name();
+        /* doc */
+
         /* get element value */
-        echo $navigator->value(); /* 666 */
+        echo $navigator->value();
+        /* 666 */
+
         /* get list of nested elements */
         echo var_export($navigator->elements(), true);
         /*
@@ -54,8 +59,13 @@ XML;
 
         /* get nested element */
         $nested = $navigator->pull('b');
-        echo $nested->name(); /* b */
-        echo $nested->value(); /* 0000 */
+
+        echo $nested->name();
+        /* b */
+
+        echo $nested->value();
+        /* 0000 */
+
         /* get list of element attributes */
         echo var_export($nested->attribs(), true);
         /*
@@ -63,8 +73,11 @@ XML;
             0 => 'attr4',
         )
         */
+
         /* get attribute value */
-        echo $nested->get('attr4'); /* 55 */
+        echo $nested->get('attr4');
+        /* 55 */
+
         echo var_export($nested->elements(), true);
         /*
         array (
