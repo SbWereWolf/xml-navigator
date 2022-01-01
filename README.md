@@ -5,6 +5,12 @@ Xml Navigator is library for navigation through xml.
 With Navigator you able to get xml-element name, it attributes, nested
 elements, and nested elements that occur multiple times.
 
+## How To Install
+
+`composer require sbwerewolf/xml-navigator`
+
+## About Xml Navigator
+
 Xml Navigator base on SimpleXMLElement.
 
 Navigator can provide XML-document as array or as object.
