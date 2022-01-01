@@ -9,10 +9,12 @@ namespace Integration;
 
 use PHPUnit\Framework\TestCase;
 use SbWereWolf\XmlNavigator\BrowserFabric;
+use SbWereWolf\XmlNavigator\Converter;
+use SimpleXMLElement;
 
 class DebugTest extends TestCase
 {
-    public function testWithSuccess()
+    public function testXmlNavigator()
     {
         $xml = <<<XML
 <doc>666
@@ -84,6 +86,34 @@ XML;
         qwe[1] => second occurrence
         qwe[2] => last occurrence
         */
+
+        $this->assertTrue(true);
+    }
+
+    public function testConverter()
+    {
+        $xml = <<<XML
+<doc>666
+    <a attr1="22">
+        <a2 attr3="aaa"/>
+    </a>
+    <b attr4="55">
+        <c>ccc
+            <d/>
+        </c>
+        0000
+    </b>
+    <t/>
+    <t/>
+    <qwe>first occurrence</qwe>
+    <qwe>second occurrence</qwe>
+    <qwe>last occurrence</qwe>
+</doc>
+XML;
+        $xmlObj = new SimpleXMLElement($xml);
+        $converter = new Converter($xmlObj);
+        $arrayRepresentationOfXml = $converter->toArray();
+        echo var_export($arrayRepresentationOfXml, true);
 
         $this->assertTrue(true);
     }
