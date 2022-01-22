@@ -24,9 +24,14 @@ Converter can use to convert XML-document to array, example:
 ```php
         $xml = <<<XML
 <complex>
+    <a empty=""/>
     <b val="x"/>
     <b val="y"/>
     <b val="z"/>
+    <c>0</c>
+    <c v="o"/>
+    <c/>
+    <different/>
 </complex>
 XML;
 
