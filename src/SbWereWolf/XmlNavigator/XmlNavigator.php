@@ -1,18 +1,42 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SbWereWolf\XmlNavigator;
 
+use Generator;
+use InvalidArgumentException;
 use LanguageSpecific\ArrayHandler;
 use LanguageSpecific\IArrayHandler;
 
 class XmlNavigator implements IXmlNavigator
 {
-    public IArrayHandler $handler;
-    public string $name;
+    /**
+     * @var IArrayHandler|ArrayHandler
+     */
+    private IArrayHandler $handler;
 
+    /** Name of xml element
+     * @var string
+     */
+    private string $name;
+
+    /**
+     * @param array $data
+     */
     public function __construct(array $data)
     {
-        $this->name = key($data);
+        $name = key($data);
+        if ('string' !== gettype($name)) {
+            throw new InvalidArgumentException(
+                'input array MUST BE like' .
+                ' [ `element name`=>array( `*value`=>string,' .
+                '`*attributes`=>[],`*elements`=>[],`*multiple`=>[] )' .
+                ' ]',
+                -666
+            );
+        }
+        $this->name = $name;
         $this->handler = new ArrayHandler(current($data));
     }
 
@@ -25,7 +49,7 @@ class XmlNavigator implements IXmlNavigator
         return $attribs;
     }
 
-    /**
+    /** get content of element with given index ($key)
      * @param string $key
      * @return mixed|null
      */
@@ -73,15 +97,12 @@ class XmlNavigator implements IXmlNavigator
         return $result;
     }
 
-    /**
-     * @return string
-     */
     public function name(): string
     {
         return $this->name;
     }
 
-    public function hasValue(): string
+    public function hasValue(): bool
     {
         return $this->handler->has(IConverter::VALUE);
     }
@@ -101,7 +122,7 @@ class XmlNavigator implements IXmlNavigator
         return $this->handler->has(IConverter::MULTIPLE);
     }
 
-    public function next()
+    public function next(): Generator
     {
         $elements = $this->handler->pull(IConverter::MULTIPLE);
         foreach ($elements->pulling() as $index => $element) {

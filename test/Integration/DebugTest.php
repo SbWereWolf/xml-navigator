@@ -5,6 +5,8 @@
  * 30.07.2021, 5:46
  */
 
+declare(strict_types=1);
+
 namespace Integration;
 
 use PHPUnit\Framework\TestCase;

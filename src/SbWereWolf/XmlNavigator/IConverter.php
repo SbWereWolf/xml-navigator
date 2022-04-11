@@ -9,5 +9,8 @@ interface IConverter
     public const ELEMENTS = '*elements';
     public const MULTIPLE = '*multiple';
 
+    /** get array representation of xml document
+     * @return array
+     */
     public function toArray(): array;
 }

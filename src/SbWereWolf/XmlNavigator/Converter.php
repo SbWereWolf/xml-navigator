@@ -4,20 +4,21 @@ declare(strict_types=1);
 
 namespace SbWereWolf\XmlNavigator;
 
+use Generator;
 use SimpleXMLElement;
 
 class Converter implements IConverter
 {
     private SimpleXMLElement $xml;
 
+    /**
+     * @param SimpleXMLElement $xml
+     */
     public function __construct(SimpleXMLElement $xml)
     {
         $this->xml = $xml;
     }
 
-    /**
-     * @return array
-     */
     public function toArray(): array
     {
         $result = [];
@@ -29,6 +30,11 @@ class Converter implements IConverter
         return $result;
     }
 
+    /** Get array representation of next nested element
+     * @param SimpleXMLElement $xml
+     * @param array $collection
+     * @return Generator
+     */
     private static function yieldChild(
         SimpleXMLElement $xml,
         array $collection = []

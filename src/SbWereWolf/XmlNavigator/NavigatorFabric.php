@@ -1,17 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SbWereWolf\XmlNavigator;
 
-use Exception;
 use SimpleXMLElement;
 
 class NavigatorFabric implements INavigatorFabric
 {
     private SimpleXMLElement $xml;
 
-    /**
-     * @throws Exception
-     */
     public function setSimpleXmlElement(SimpleXMLElement $xml): static
     {
         $this->xml = $xml;
