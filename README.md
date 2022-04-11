@@ -16,11 +16,38 @@ Xml Navigator base on SimpleXMLElement.
 
 Navigator can provide XML-document as array or as object.
 
-## XML-document as array
+## How to use
+
+- Create exemplar of NavigatorFabric
+- with Using setXml(string $xml) or using
+setSimpleXmlElement(SimpleXMLElement $xml) pass xml to Fabric
+- Create Converter with makeConverter() method and with using
+toArray() method, obtain representation of xml document as array
+- Or create Navigator with makeNavigator() method and using Navigator
+API, perform needed actions
+ 
+## Navigator API
+- `name(): string;` // get xml element name
+- `hasValue(): string;` // true if xml element has value
+- `value(): string;` // the value of xml element
+- `hasAttribs(): bool;` // true if xml element has attributes
+- `attribs(): array;` // get all attributes of xml element
+- `get(string $name = null): string;` // get value of attribute $name
+- `hasElements(): bool;` // true if xml element has nested elements
+- `elements(): array;` // get all elements of xml element
+- `pull(string $name): IXmlNavigator;` // get Navigator for nested
+element
+- `isMultiple(): bool;` // true if xml element is multiple
+- `next();` // get next one of multiple nested xml element
+
+## Use cases
+
+### XML-document as array
 
 Converter implements array approach.
 
 Converter can use to convert XML-document to array, example:
+
 ```php
         $xml = <<<XML
 <complex>
@@ -34,6 +61,28 @@ Converter can use to convert XML-document to array, example:
     <different/>
 </complex>
 XML;
+/* array representation is
+complex][*elements][a]
+complex][*elements][a][*attributes]
+complex][*elements][a][*attributes][empty]
+complex][*elements][different]
+complex][*elements][b]
+complex][*elements][b][*multiple]
+complex][*elements][b][*multiple][0]
+complex][*elements][b][*multiple][0][*attributes]
+complex][*elements][b][*multiple][0][*attributes][val]=>x
+complex][*elements][b][*multiple][1][*attributes]
+complex][*elements][b][*multiple][1][*attributes][val]=y
+complex][*elements][b][*multiple][2][*attributes]
+complex][*elements][b][*multiple][2][*attributes][val]=z
+complex][*elements][c][*multiple]
+complex][*elements][c][*multiple][0]
+complex][*elements][c][*multiple][0][*value]=0
+complex][*elements][c][*multiple][1]
+complex][*elements][c][*multiple][1][*attributes]
+complex][*elements][c][*multiple][1][*attributes][v]=o
+complex][*elements][c][*multiple][2]
+ * */
 
         $fabric = (new NavigatorFabric())->setXml($xml);
         $converter = $fabric->makeConverter();
@@ -82,15 +131,37 @@ XML;
                     ),
                   ),
                 ),
-              ),              
+              ),
+              'c' =>
+              array (
+                '*multiple' =>
+                array (
+                  0 =>
+                  array (
+                    '*value' => '0',
+                  ),
+                  1 =>
+                  array (
+                    '*attributes' =>
+                    array (
+                      'v' => 'o',
+                    ),
+                  ),
+                  2 =>
+                  array (
+                  ),
+                ),
+              ),
             ),
           ),
         )
         */
 ```
+
 You should use constants of interface
 `\SbWereWolf\XmlNavigator\IConverter` for access to value, attributes,
 elements.
+
 ```php
     public const VALUE = '*value';
     public const ATTRIBUTES = '*attributes';
@@ -98,7 +169,7 @@ elements.
     public const MULTIPLE = '*multiple';
 ```
 
-## XML-document as object
+### XML-document as object
 
 XmlNavigator implements object-oriented approach.
 
