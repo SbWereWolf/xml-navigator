@@ -19,10 +19,10 @@ Navigator can provide XML-document as array or as object.
 ## How to use
 
 - Create exemplar of NavigatorFabric
-- with Using setXml(string $xml) or using
-setSimpleXmlElement(SimpleXMLElement $xml) pass xml to Fabric
+- with using setXml(string $xml) or using
+  setSimpleXmlElement(SimpleXMLElement $xml) pass xml to Fabric
 - Create Converter with makeConverter() method and with using
-toArray() method, obtain representation of xml document as array
+  toArray() method, obtain representation of xml document as array
 - Or create Navigator with makeNavigator() method and using Navigator
 API, perform needed actions
  
@@ -254,6 +254,67 @@ XML;
         /*
         b[0] => x; b[1] => y; b[2] => z;
         */
+```
+
+### Known bugs
+
+Working with SimpleXMLElement you may have some discomfort when you
+process with XML document having different namespaces
+
+In this case you may try something like this:
+
+```php
+        $content = <<<XML
+<QueryResult xmlns=
+"urn://x-artefacts-smev-gov-ru/services/service-adapter/types">
+    <Message
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:type="RequestMessageType">
+        <RequestContent>
+            <content>
+                <MessagePrimaryContent>
+                    <rprn:Query xmlns:rprn=
+                    "urn://rpn.gov.ru/services/smev/cites/1.0.0">
+                        <rprn:Search>
+                            <rprn:SearchNumber Number="00AA000000"/>
+                        </rprn:Search>
+                    </rprn:Query>
+                </MessagePrimaryContent>
+            </content>
+        </RequestContent>
+    </Message>
+</QueryResult>
+XML;
+
+$xml = simplexml_load_string($content);
+$xml = $xml
+    ->Message
+    ->RequestContent
+    ->content
+    ->MessagePrimaryContent;
+$xml = $xml
+    ->children(
+        'urn://rpn.gov.ru/services/smev/cites/1.0.0'
+    );
+
+$gotIt = false;
+foreach ($xml->getNamespaces() as $prefix => $namespace) {
+    if ($namespace === 'urn://rpn.gov.ru/services/smev/cites/1.0.0') {
+        $gotIt = true;
+        break;
+    }
+}
+
+$arrayRepresentationOfXml = [];
+if ($gotIt) {
+    $nodeText = $xml->saveXML();
+    $nodeText = str_replace($prefix . ':', '', $nodeText);
+    $pureXml = simplexml_load_string($nodeText);
+
+    $fabric = (new NavigatorFabric())->setXml($pureXml);
+    $converter = $fabric->makeConverter();    
+    $arrayRepresentationOfXml = $converter->toArray();
+}
 ```
 
 # Contacts
