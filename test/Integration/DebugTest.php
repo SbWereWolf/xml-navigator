@@ -192,4 +192,113 @@ XML;
 
         $this->assertTrue(true);
     }
+
+    public function testRemoveDefaultNamespace()
+    {
+        $content = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<QueryResult
+        xmlns="urn://x-artefacts-smev-gov-ru/services/service-adapter/types">
+    <Message
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:type="RequestMessageType">
+        <RequestContent>
+            <content>
+                <MessagePrimaryContent>
+                    <ns:Query
+                            xmlns:ns="urn://rpn.gov.ru/services/smev/cites/1.0.0"
+                            xmlns="urn://x-artefacts-smev-gov-ru/services/message-exchange/types/basic/1.2"
+                    >
+                        <ns:Search>
+                            <ns:SearchNumber Number="22RU003983DV"/>
+                        </ns:Search>
+                    </ns:Query>
+                </MessagePrimaryContent>
+            </content>
+        </RequestContent>
+    </Message>
+</QueryResult>
+';
+        $targetNs = 'urn://rpn.gov.ru/services/smev/cites/1.0.0';
+
+        $xml = simplexml_load_string($content);
+        $xml = $xml
+            ->Message
+            ->RequestContent
+            ->content
+            ->MessagePrimaryContent;
+        $xml = $xml
+            ->children(
+                $targetNs
+            );
+
+        $nodeText = $xml->saveXML();
+        $xml = simplexml_load_string($nodeText);
+
+        $gotTargetNs = false;
+        $gotDefaultNs = false;
+        $defaultNs = '';
+        foreach ($xml->getDocNamespaces(true) as $prefix => $namespace) {
+            if ($namespace === $targetNs) {
+                $gotTargetNs = true;
+                $targetPrefix = $prefix;
+            }
+            if ($prefix === '') {
+                $gotDefaultNs = true;
+                $defaultNs = $namespace;
+            }
+        }
+        if ($gotTargetNs && $gotDefaultNs) {
+            $nodeText = str_replace(
+                "xmlns=\"{$defaultNs}\"",
+                '',
+                $nodeText
+            );
+        }
+
+        $data = [];
+        if ($gotTargetNs) {
+            $nodeText = str_replace($targetPrefix . ':', '', $nodeText);
+
+            $fabric = (new NavigatorFabric())->setXml($nodeText);
+            $converter = $fabric->makeConverter();
+            $data = $converter->toArray();
+        }
+
+        $sample = print_r($data, true);
+
+        /*
+
+Array
+(
+    [Query] => Array
+        (
+            [*elements] => Array
+                (
+                    [Search] => Array
+                        (
+                            [*elements] => Array
+                                (
+                                    [SearchNumber] => Array
+                                        (
+                                            [*attributes] => Array
+                                                (
+                                                    [Number] => 22RU003983DV
+                                                )
+
+                                        )
+
+                                )
+
+                        )
+
+                )
+
+        )
+
+)
+
+        */
+
+        $this->assertTrue(true);
+    }
 }

@@ -256,12 +256,13 @@ XML;
         */
 ```
 
-### Known bugs
+### Known bug 1
 
 Working with SimpleXMLElement you may have some discomfort when you
 process with XML document having different namespaces
 
-In this case you may try something like this:
+In this case you may remove prefix of namespace.
+Try something like this:
 
 ```php
         $content = <<<XML
@@ -286,17 +287,21 @@ In this case you may try something like this:
 </QueryResult>
 XML;
 
+// convert XML text to object
 $xml = simplexml_load_string($content);
 $xml = $xml
     ->Message
     ->RequestContent
     ->content
     ->MessagePrimaryContent;
+    
+// get elements of required namespace
 $xml = $xml
     ->children(
         'urn://rpn.gov.ru/services/smev/cites/1.0.0'
     );
 
+// get prefix of required namespace
 $gotIt = false;
 foreach ($xml->getNamespaces() as $prefix => $namespace) {
     if ($namespace === 'urn://rpn.gov.ru/services/smev/cites/1.0.0') {
@@ -307,13 +312,135 @@ foreach ($xml->getNamespaces() as $prefix => $namespace) {
 
 $arrayRepresentationOfXml = [];
 if ($gotIt) {
+    // convert element XML to text
     $nodeText = $xml->saveXML();
+    // remove prefix of required namespace
     $nodeText = str_replace($prefix . ':', '', $nodeText);
     $pureXml = simplexml_load_string($nodeText);
-
+    // now we can convert XML to array with property element names
     $fabric = (new NavigatorFabric())->setXml($pureXml);
     $converter = $fabric->makeConverter();    
     $arrayRepresentationOfXml = $converter->toArray();
+}
+```
+
+### Known bug 2
+
+When your XML document has default namespace, and you remove prefix of
+some namespace, you got error message like:
+"simplexml_load_string(): Entity: line 1: parser error :
+Attribute xmlns redefined"
+
+XML before remove prefix:
+
+```xml
+<MessagePrimaryContent>
+    <ns:Query
+            xmlns:ns="urn://rpn.gov.ru/services/smev/cites/1.0.0"
+            xmlns="urn://x-artefacts-smev-gov-ru/services/"
+    >
+        <ns:Search>
+            <ns:SearchNumber Number="22RU003983DV"/>
+        </ns:Search>
+    </ns:Query>
+</MessagePrimaryContent>
+```
+
+XML after remove prefix:
+
+```xml
+<MessagePrimaryContent>
+    <Query
+            xmlns="urn://rpn.gov.ru/services/smev/cites/1.0.0"
+            xmlns="urn://x-artefacts-smev-gov-ru/services/message-exchange/types/basic/1.2"
+    >
+        <Search>
+            <SearchNumber Number="22RU003983DV"/>
+        </Search>
+    </Query>
+</MessagePrimaryContent>
+```
+
+XML has two declaration of xmlns without some prefix,
+this results in the error
+
+For prevent the error, you need to remove declaration of default
+namespace, like this:
+
+```php
+$content = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<QueryResult
+        xmlns="urn://x-artefacts-smev-gov-ru/services/service-adapter/types">
+    <Message
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:type="RequestMessageType">
+        <RequestContent>
+            <content>
+                <MessagePrimaryContent>
+                    <ns:Query
+                            xmlns:ns="urn://rpn.gov.ru/services/"
+                            xmlns="urn://x-artefacts-smev-gov-ru/"
+                    >
+                        <ns:Search>
+                            <ns:SearchNumber Number="22RU003983DV"/>
+                        </ns:Search>
+                    </ns:Query>
+                </MessagePrimaryContent>
+            </content>
+        </RequestContent>
+    </Message>
+</QueryResult>
+';
+// required namespace
+$targetNs = 'urn://rpn.gov.ru/services/';
+
+// convert XML text to object
+$xml = simplexml_load_string($content);
+$xml = $xml
+    ->Message
+    ->RequestContent
+    ->content
+    ->MessagePrimaryContent;
+    
+// get element of required namespace
+$xml = $xml->children($targetNs);
+
+//convert XML object of required element of required namespace to text
+$nodeText = $xml->saveXML();
+// backward convertation to XML object
+$xml = simplexml_load_string($nodeText);
+
+
+$gotTargetNs = false;
+$targetPrefix='';
+$gotDefaultNs = false;
+$defaultNs = '';
+foreach ($xml->getDocNamespaces(true) as $prefix => $namespace) {
+    //get prefix of required namespace
+    if ($namespace === $targetNs) {
+        $gotTargetNs = true;
+        $targetPrefix = $prefix;
+    }
+    //get default namespace
+    if ($prefix === '') {
+        $gotDefaultNs = true;
+        $defaultNs = $namespace;
+    }
+}
+if ($gotDefaultNs) {
+    // remove default namespace
+    $nodeText = str_replace("xmlns=\"{$defaultNs}\"",'',$nodeText);
+}
+
+$data = [];
+if ($gotTargetNs) {
+    // remove prefix of required namespace
+    $nodeText = str_replace($targetPrefix . ':', '', $nodeText);
+
+    // convert XML object to array
+    $fabric = (new NavigatorFabric())->setXml($nodeText);
+    $converter = $fabric->makeConverter();
+    $data = $converter->toArray();
 }
 ```
 
