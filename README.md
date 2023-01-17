@@ -62,26 +62,26 @@ Converter can use to convert XML-document to array, example:
 </complex>
 XML;
 /* array representation is
-complex][*elements][a]
-complex][*elements][a][*attributes]
-complex][*elements][a][*attributes][empty]
-complex][*elements][different]
-complex][*elements][b]
-complex][*elements][b][*multiple]
-complex][*elements][b][*multiple][0]
-complex][*elements][b][*multiple][0][*attributes]
-complex][*elements][b][*multiple][0][*attributes][val]=>x
-complex][*elements][b][*multiple][1][*attributes]
-complex][*elements][b][*multiple][1][*attributes][val]=y
-complex][*elements][b][*multiple][2][*attributes]
-complex][*elements][b][*multiple][2][*attributes][val]=z
-complex][*elements][c][*multiple]
-complex][*elements][c][*multiple][0]
-complex][*elements][c][*multiple][0][*value]=0
-complex][*elements][c][*multiple][1]
-complex][*elements][c][*multiple][1][*attributes]
-complex][*elements][c][*multiple][1][*attributes][v]=o
-complex][*elements][c][*multiple][2]
+[complex][*elements][a]
+[complex][*elements][a][*attributes]
+[complex][*elements][a][*attributes][empty]
+[complex][*elements][different]
+[complex][*elements][b]
+[complex][*elements][b][*multiple]
+[complex][*elements][b][*multiple][0]
+[complex][*elements][b][*multiple][0][*attributes]
+[complex][*elements][b][*multiple][0][*attributes][val]=>x
+[complex][*elements][b][*multiple][1][*attributes]
+[complex][*elements][b][*multiple][1][*attributes][val]=y
+[complex][*elements][b][*multiple][2][*attributes]
+[complex][*elements][b][*multiple][2][*attributes][val]=z
+[complex][*elements][c][*multiple]
+[complex][*elements][c][*multiple][0]
+[complex][*elements][c][*multiple][0][*value]=0
+[complex][*elements][c][*multiple][1]
+[complex][*elements][c][*multiple][1][*attributes]
+[complex][*elements][c][*multiple][1][*attributes][v]=o
+[complex][*elements][c][*multiple][2]
  * */
 
         $fabric = (new NavigatorFabric())->setXml($xml);
