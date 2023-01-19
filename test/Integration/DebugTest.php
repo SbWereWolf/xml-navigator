@@ -10,8 +10,10 @@ declare(strict_types=1);
 namespace Integration;
 
 use PHPUnit\Framework\TestCase;
+use SbWereWolf\XmlNavigator\FastXmlToArray;
 use SbWereWolf\XmlNavigator\IXmlNavigator;
 use SbWereWolf\XmlNavigator\NavigatorFabric;
+use XMLReader;
 
 class DebugTest extends TestCase
 {
@@ -229,6 +231,27 @@ XML;
   ),
 )
         */
+
+        $this->assertTrue(true);
+    }
+
+    public function testFastXmlToArray()
+    {
+        $xml = <<<XML
+<complex>
+    <a empty=""/>
+    <b val="x"/>
+    <b val="y"/>
+    <b val="z"/>
+    <c>0</c>
+    <c v="o"/>
+    <c/>
+    <different/>
+</complex>
+XML;
+
+        $result = FastXmlToArray::convert(XMLReader::XML($xml));
+        echo var_export($result, true);
 
         $this->assertTrue(true);
     }

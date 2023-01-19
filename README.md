@@ -12,13 +12,11 @@ Navigator can provide XML-document as array or as object.
 
 ```php
 $xml = '<outer any="123"><inner1>some text</inner1></outer>';
-(new \SbWereWolf\XmlNavigator\Converter(XMLReader::XML($xml)))
-->toNormalizedArray();
+$result = 
+\SbWereWolf\XmlNavigator\FastXmlToArray::convert(\XMLReader::XML($xml));
 echo json_encode($result, JSON_PRETTY_PRINT);
 ```
-
 Output:
-
 ```json
 {
   "elems": [
@@ -94,6 +92,7 @@ use SbWereWolf\XmlNavigator\NavigatorFabric;
 </complex>
 XML;
 /* array representation will be
+
 ['elems'][0]['name'] => 'complex'
 
 ['elems'][0]['elems'][0]['name'] => 'a'
@@ -125,7 +124,6 @@ XML;
 
 ['elems'][0]['elems'][7]['name'] => 'different'
 ['elems'][0]['elems'][7]['elems'] => []
-
  * */
 
         $fabric = (new NavigatorFabric())->makeFromXmlString($xml);
