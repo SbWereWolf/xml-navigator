@@ -21,6 +21,6 @@
     },
     "require": {
         "sbwerewolf/language-specific": "^8.0",
-        "ext-simplexml": "*"
+        "ext-xmlreader": "*"
     }
 }

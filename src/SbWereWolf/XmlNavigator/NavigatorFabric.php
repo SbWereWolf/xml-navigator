@@ -4,34 +4,83 @@ declare(strict_types=1);
 
 namespace SbWereWolf\XmlNavigator;
 
-use SimpleXMLElement;
+use RuntimeException;
+use XMLReader;
 
 class NavigatorFabric implements INavigatorFabric
 {
-    private SimpleXMLElement $xml;
+    private string $xmlString = '';
+    private string $xmlUri = '';
+    /**
+     * @var null
+     */
+    private $enc;
+    private int $flags;
 
-    public function setSimpleXmlElement(SimpleXMLElement $xml): static
+    /**
+     * @param $encoding
+     * @param int $flags
+     */
+    public function __construct($encoding = null, int $flags = 0,)
     {
-        $this->xml = $xml;
+        $this->enc = $encoding;
+        $this->flags = $flags;
+    }
+
+    /* @inheritdoc */
+    public function makeFromXmlString(string $xml): INavigatorFabric
+    {
+        $this->xmlString = $xml;
+        $this->xmlUri = '';
+
         return $this;
     }
 
-    public function setXml(string $xml): static
+    /* @inheritdoc */
+    public function makeFromXmlUri(string $uri): INavigatorFabric
     {
-        $this->xml = new SimpleXMLElement($xml);
+        $this->xmlString = '';
+        $this->xmlUri = $uri;
+
         return $this;
     }
 
+    /** Make instance of Converter
+     * @return IConverter
+     */
     public function makeConverter(): IConverter
     {
-        return new Converter($this->xml);
+        $reader = new XMLReader();
+        if ($this->xmlString !== '') {
+            $reader = XMLReader::XML(
+                $this->xmlString,
+                $this->enc,
+                $this->flags,
+            );
+        }
+        if ($this->xmlUri !== '') {
+            $reader = XMLReader::open(
+                $this->xmlUri,
+                $this->enc,
+                $this->flags,
+            );
+        }
+
+        return new Converter($reader);
     }
 
+    /** Make instance of XmlNavigator
+     * @return IXmlNavigator
+     */
     public function makeNavigator(): IXmlNavigator
     {
         $converter = $this->makeConverter();
-        $data = $converter->toArray();
+        $data = $converter->toNormalizedArray();
 
-        return new XmlNavigator($data);
+        if (!count($data[IConverter::ELEMS])) {
+            throw new RuntimeException('XML do not has any elements');
+        }
+
+        return new XmlNavigator($data[IConverter::ELEMS][0]);
     }
 }

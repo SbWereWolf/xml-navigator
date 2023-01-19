@@ -1,44 +1,64 @@
-# Xml Navigator
+## About Xml Navigator
 
-Xml Navigator is library for navigation through xml.
+Xml Navigator base on XMLReader.
 
-With the Navigator you are able to get xml-element name, it
-attributes, nested elements, and nested elements that occur multiple
-times.
+Navigator can provide XML-document as array or as object.
 
 ## How To Install
 
 `composer require sbwerewolf/xml-navigator`
 
-## About Xml Navigator
-
-Xml Navigator base on SimpleXMLElement.
-
-Navigator can provide XML-document as array or as object.
-
 ## How to use
 
-- Create exemplar of NavigatorFabric
-- with using setXml(string $xml) or using
-  setSimpleXmlElement(SimpleXMLElement $xml) pass xml to Fabric
-- Create Converter with makeConverter() method and with using
-  toArray() method, obtain representation of xml document as array
-- Or create Navigator with makeNavigator() method and using Navigator
-API, perform needed actions
- 
+```php
+$xml = '<outer any="123"><inner1>some text</inner1></outer>';
+$result = (new \SbWereWolf\XmlNavigator\NavigatorFabric())
+    ->makeFromXmlString($xml)
+    ->makeConverter()
+    ->toNormalizedArray();
+echo json_encode($result, JSON_PRETTY_PRINT);
+```
+
+Output:
+
+```json
+{
+  "elems": [
+    {
+      "name": "outer",
+      "attribs": {
+        "any": "123"
+      },
+      "elems": [
+        {
+          "name": "inner1",
+          "val": "some text",
+          "elems": []
+        }
+      ]
+    }
+  ]
+}
+```
+
 ## Navigator API
-- `name(): string;` // get xml element name
-- `hasValue(): string;` // true if xml element has value
-- `value(): string;` // the value of xml element
-- `hasAttribs(): bool;` // true if xml element has attributes
-- `attribs(): array;` // get all attributes of xml element
-- `get(string $name = null): string;` // get value of attribute $name
-- `hasElements(): bool;` // true if xml element has nested elements
-- `elements(): array;` // get all elements of xml element
-- `pull(string $name): IXmlNavigator;` // get Navigator for nested
-element
-- `isMultiple(): bool;` // true if xml element is multiple
-- `next();` // get next one of multiple nested xml element
+
+- `name(): string;` // Returns the name of XML element
+- `hasValue(): bool;` // Returns true if XML element has value
+- `value(): string;` // Returns the value of XML element
+- `hasAttributes(): bool;` // Returns true if XML element has
+  attributes
+- `attributes(): array;` // Returns names of all attributes of xml
+  element
+- `get(string $name = null): string;` // Get value of attribute with
+  the `$name`, if `$name` is not defined, than returns value of random
+  attribute
+- `hasElements(): bool;` // Returns true if XML element has nested
+  elements
+- `elements(): array;` // Returns names of all nested elements
+- `public function pull(string $name = ''): Generator` // Pull
+  IXmlNavigator for nested element, if `$name` is defined, than pull
+  elements with the `$name`
 
 ## Use cases
 
@@ -46,9 +66,23 @@ element
 
 Converter implements array approach.
 
+You should use constants of interface
+`\SbWereWolf\XmlNavigator\IConverter` for access to value, attributes,
+elements.
+
+```php
+    public const NAME = 'name';
+    public const VAL = 'val';
+    public const ATTRIBS = 'attribs';
+    public const ELEMS = 'elems';
+```
+
 Converter can use to convert XML-document to array, example:
 
 ```php
+use SbWereWolf\XmlNavigator\IXmlNavigator;
+use SbWereWolf\XmlNavigator\NavigatorFabric;
+
         $xml = <<<XML
 <complex>
     <a empty=""/>
@@ -61,112 +95,136 @@ Converter can use to convert XML-document to array, example:
     <different/>
 </complex>
 XML;
-/* array representation is
-[complex][*elements][a]
-[complex][*elements][a][*attributes]
-[complex][*elements][a][*attributes][empty]
-[complex][*elements][different]
-[complex][*elements][b]
-[complex][*elements][b][*multiple]
-[complex][*elements][b][*multiple][0]
-[complex][*elements][b][*multiple][0][*attributes]
-[complex][*elements][b][*multiple][0][*attributes][val]=>x
-[complex][*elements][b][*multiple][1][*attributes]
-[complex][*elements][b][*multiple][1][*attributes][val]=y
-[complex][*elements][b][*multiple][2][*attributes]
-[complex][*elements][b][*multiple][2][*attributes][val]=z
-[complex][*elements][c][*multiple]
-[complex][*elements][c][*multiple][0]
-[complex][*elements][c][*multiple][0][*value]=0
-[complex][*elements][c][*multiple][1]
-[complex][*elements][c][*multiple][1][*attributes]
-[complex][*elements][c][*multiple][1][*attributes][v]=o
-[complex][*elements][c][*multiple][2]
+/* array representation will be
+['elems'][0]['name'] => 'complex'
+
+['elems'][0]['elems'][0]['name'] => 'a'
+['elems'][0]['elems'][0]['attribs'] => ['empty' => '']
+['elems'][0]['elems'][0]['elems'] => []
+
+['elems'][0]['elems'][1]['name'] => 'b'
+['elems'][0]['elems'][1]['attribs'] => ['val' => 'x']
+['elems'][0]['elems'][1]['elems'] => []
+
+['elems'][0]['elems'][2]['name'] => 'b'
+['elems'][0]['elems'][2]['attribs'] => ['val' => 'y']
+['elems'][0]['elems'][2]['elems'] => []
+
+['elems'][0]['elems'][3]['name'] => 'b'
+['elems'][0]['elems'][3]['attribs'] => ['val' => 'z']
+['elems'][0]['elems'][3]['elems'] => []
+
+['elems'][0]['elems'][4]['name'] => 'c'
+['elems'][0]['elems'][4]['val'] => 0
+['elems'][0]['elems'][4]['elems'] => []
+
+['elems'][0]['elems'][5]['name'] => 'c'
+['elems'][0]['elems'][5]['attribs'] => ['v' => '0']
+['elems'][0]['elems'][5]['elems'] => []
+
+['elems'][0]['elems'][6]['name'] => 'c'
+['elems'][0]['elems'][6]['elems'] => []
+
+['elems'][0]['elems'][7]['name'] => 'different'
+['elems'][0]['elems'][7]['elems'] => []
+
  * */
 
-        $fabric = (new NavigatorFabric())->setXml($xml);
+        $fabric = (new NavigatorFabric())->makeFromXmlString($xml);
         $converter = $fabric->makeConverter();
         
-        $arrayRepresentationOfXml = $converter->toArray();
+        $arrayRepresentationOfXml = $converter->toNormalizedArray();
         echo var_export($arrayRepresentationOfXml, true);
-        /*
+
+array (
+  'elems' => 
+  array (
+    0 => 
+    array (
+      'name' => 'complex',
+      'elems' => 
+      array (
+        0 => 
         array (
-          'complex' =>
+          'name' => 'a',
+          'attribs' => 
           array (
-            '*elements' =>
-            array (
-              'a' =>
-              array (
-                '*attributes' =>
-                array (
-                  'empty' => '',
-                ),
-              ),
-              'different' =>
-              array (
-              ),
-              'b' =>
-              array (
-                '*multiple' =>
-                array (
-                  0 =>
-                  array (
-                    '*attributes' =>
-                    array (
-                      'val' => 'x',
-                    ),
-                  ),
-                  1 =>
-                  array (
-                    '*attributes' =>
-                    array (
-                      'val' => 'y',
-                    ),
-                  ),
-                  2 =>
-                  array (
-                    '*attributes' =>
-                    array (
-                      'val' => 'z',
-                    ),
-                  ),
-                ),
-              ),
-              'c' =>
-              array (
-                '*multiple' =>
-                array (
-                  0 =>
-                  array (
-                    '*value' => '0',
-                  ),
-                  1 =>
-                  array (
-                    '*attributes' =>
-                    array (
-                      'v' => 'o',
-                    ),
-                  ),
-                  2 =>
-                  array (
-                  ),
-                ),
-              ),
-            ),
+            'empty' => '',
           ),
-        )
-        */
-```
-
-You should use constants of interface
-`\SbWereWolf\XmlNavigator\IConverter` for access to value, attributes,
-elements.
-
-```php
-    public const VALUE = '*value';
-    public const ATTRIBUTES = '*attributes';
-    public const ELEMENTS = '*elements';
-    public const MULTIPLE = '*multiple';
+          'elems' => 
+          array (
+          ),
+        ),
+        1 => 
+        array (
+          'name' => 'b',
+          'attribs' => 
+          array (
+            'val' => 'x',
+          ),
+          'elems' => 
+          array (
+          ),
+        ),
+        2 => 
+        array (
+          'name' => 'b',
+          'attribs' => 
+          array (
+            'val' => 'y',
+          ),
+          'elems' => 
+          array (
+          ),
+        ),
+        3 => 
+        array (
+          'name' => 'b',
+          'attribs' => 
+          array (
+            'val' => 'z',
+          ),
+          'elems' => 
+          array (
+          ),
+        ),
+        4 => 
+        array (
+          'name' => 'c',
+          'val' => '0',
+          'elems' => 
+          array (
+          ),
+        ),
+        5 => 
+        array (
+          'name' => 'c',
+          'attribs' => 
+          array (
+            'v' => 'o',
+          ),
+          'elems' => 
+          array (
+          ),
+        ),
+        6 => 
+        array (
+          'name' => 'c',
+          'elems' => 
+          array (
+          ),
+        ),
+        7 => 
+        array (
+          'name' => 'different',
+          'elems' => 
+          array (
+          ),
+        ),
+      ),
+    ),
+  ),
+)
 ```
 
 ### XML-document as object
@@ -174,8 +232,11 @@ elements.
 XmlNavigator implements object-oriented approach.
 
 ```php
+use SbWereWolf\XmlNavigator\IXmlNavigator;
+use SbWereWolf\XmlNavigator\NavigatorFabric;
+
         $xml = <<<XML
-<doc attrib="a" option="o" >666
+<doc attrib="a" option="o" >
     <base/>
     <valuable>element value</valuable>
     <complex>
@@ -191,21 +252,19 @@ XmlNavigator implements object-oriented approach.
 </doc>
 XML;
 
-        $xmlObj = new SimpleXMLElement($xml);
-        $fabric = (new NavigatorFabric())
-            ->setSimpleXmlElement($xmlObj);
+        $fabric = (new NavigatorFabric())->makeFromXmlString($xml);
         $navigator = $fabric->makeNavigator();
 
         /* get element name */
-        echo $navigator->name();
+        echo $navigator->name() . PHP_EOL;
         /* doc */
 
         /* get element value */
-        echo $navigator->value();
-        /* 666 */
+        echo $navigator->value() . PHP_EOL;
+        /* '' */
 
         /* get list of attributes */
-        echo var_export($navigator->attribs(), true);
+        echo var_export($navigator->attributes(), true) . PHP_EOL;
         /*
         array (
           0 => 'attrib',
@@ -214,11 +273,11 @@ XML;
         */
 
         /* get attribute value */
-        echo $navigator->get('attrib');
+        echo $navigator->get('attrib') . PHP_EOL;
         /* a */
 
         /* get list of nested elements */
-        echo var_export($navigator->elements(), true);
+        echo var_export($navigator->elements(), true) . PHP_EOL;
         /*
         array (
           0 => 'base',
@@ -227,221 +286,53 @@ XML;
         )
         */
 
+        /* get desired nested element */
+        /** @var IXmlNavigator $elem */
+        $elem = $navigator->pull('valuable')->current();
+        echo $elem->name() . PHP_EOL;
+        /* valuable */
+
+        /* get all nested elements */
+        foreach ($navigator->pull() as $pulled) {
+            /** @var IXmlNavigator $pulled */
+            echo $pulled->name() . PHP_EOL;
+            /* base */
+            /* valuable */
+            /* complex */
+        }
+
         /* get nested element */
-        $nested = $navigator->pull('complex');
-
-        echo $nested->name();
-        /* complex */
-
-        echo var_export($nested->elements(), true);
+        /** @var IXmlNavigator $nested */
+        $nested = $navigator->pull('complex')->current();
+        /* get names of all elements of nested element */
+        echo var_export($nested->elements(), true) . PHP_EOL;
         /*
         array (
           0 => 'a',
-          1 => 'different',
+          1 => 'b',
           2 => 'b',
-          3 => 'c',
+          3 => 'b',
+          4 => 'c',
+          5 => 'c',
+          6 => 'c',
+          7 => 'different',
         )
         */
 
-        /* get nested elements of nested element */
-        $multiple = $navigator->pull('complex')->pull('b');
-        
-        /* get nested elements that occur multiple times */
-        foreach ($multiple->next() as $index => $instance) {
-            echo " {$instance->name()}[$index]" .
-                " => {$instance->get('val')};";
+        /* pull all elements with name `b` */
+        foreach ($nested->pull('b') as $b) {
+            /** @var IXmlNavigator $b */
+            echo ' element with name' .
+                ' `' . $b->name() .
+                '` have attribute `val` with value' .
+                ' `' . $b->get('val') . '`' .
+                PHP_EOL;
         }
         /*
-        b[0] => x; b[1] => y; b[2] => z;
+        element with name `b` have attribute `val` with value `x`
+        element with name `b` have attribute `val` with value `y`
+        element with name `b` have attribute `val` with value `z`
         */
-```
-
-### Known bug 1
-
-Working with SimpleXMLElement you may have some discomfort when you
-process with XML document having different namespaces
-
-In this case you may remove prefix of namespace.
-Try something like this:
-
-```php
-        $content = <<<XML
-<QueryResult xmlns=
-"urn://x-artefacts-smev-gov-ru/services/service-adapter/types">
-    <Message
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:type="RequestMessageType">
-        <RequestContent>
-            <content>
-                <MessagePrimaryContent>
-                    <rprn:Query xmlns:rprn=
-                    "urn://rpn.gov.ru/services/smev/cites/1.0.0">
-                        <rprn:Search>
-                            <rprn:SearchNumber Number="00AA000000"/>
-                        </rprn:Search>
-                    </rprn:Query>
-                </MessagePrimaryContent>
-            </content>
-        </RequestContent>
-    </Message>
-</QueryResult>
-XML;
-
-// convert XML text to object
-$xml = simplexml_load_string($content);
-$xml = $xml
-    ->Message
-    ->RequestContent
-    ->content
-    ->MessagePrimaryContent;
-    
-// get elements of required namespace
-$xml = $xml
-    ->children(
-        'urn://rpn.gov.ru/services/smev/cites/1.0.0'
-    );
-
-// get prefix of required namespace
-$gotIt = false;
-foreach ($xml->getNamespaces() as $prefix => $namespace) {
-    if ($namespace === 'urn://rpn.gov.ru/services/smev/cites/1.0.0') {
-        $gotIt = true;
-        break;
-    }
-}
-
-$arrayRepresentationOfXml = [];
-if ($gotIt) {
-    // convert element XML to text
-    $nodeText = $xml->saveXML();
-    // remove prefix of required namespace
-    $nodeText = str_replace($prefix . ':', '', $nodeText);
-    $pureXml = simplexml_load_string($nodeText);
-    // now we can convert XML to array with property element names
-    $fabric = (new NavigatorFabric())->setXml($pureXml);
-    $converter = $fabric->makeConverter();    
-    $arrayRepresentationOfXml = $converter->toArray();
-}
-```
-
-### Known bug 2
-
-When your XML document has default namespace, and you remove prefix of
-some namespace, you got error message like:
-"simplexml_load_string(): Entity: line 1: parser error :
-Attribute xmlns redefined"
-
-XML before remove prefix:
-
-```xml
-<MessagePrimaryContent>
-    <ns:Query
-            xmlns:ns="urn://rpn.gov.ru/services/smev/cites/1.0.0"
-            xmlns="urn://x-artefacts-smev-gov-ru/services/"
-    >
-        <ns:Search>
-            <ns:SearchNumber Number="22RU003983DV"/>
-        </ns:Search>
-    </ns:Query>
-</MessagePrimaryContent>
-```
-
-XML after remove prefix:
-
-```xml
-<MessagePrimaryContent>
-    <Query
-            xmlns="urn://rpn.gov.ru/services/smev/cites/1.0.0"
-            xmlns="urn://x-artefacts-smev-gov-ru/services/message-exchange/types/basic/1.2"
-    >
-        <Search>
-            <SearchNumber Number="22RU003983DV"/>
-        </Search>
-    </Query>
-</MessagePrimaryContent>
-```
-
-XML has two declaration of xmlns without some prefix,
-this results in the error
-
-For prevent the error, you need to remove declaration of default
-namespace, like this:
-
-```php
-$content = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<QueryResult
-        xmlns="urn://x-artefacts-smev-gov-ru/services/service-adapter/types">
-    <Message
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xsi:type="RequestMessageType">
-        <RequestContent>
-            <content>
-                <MessagePrimaryContent>
-                    <ns:Query
-                            xmlns:ns="urn://rpn.gov.ru/services/"
-                            xmlns="urn://x-artefacts-smev-gov-ru/"
-                    >
-                        <ns:Search>
-                            <ns:SearchNumber Number="22RU003983DV"/>
-                        </ns:Search>
-                    </ns:Query>
-                </MessagePrimaryContent>
-            </content>
-        </RequestContent>
-    </Message>
-</QueryResult>
-';
-// required namespace
-$targetNs = 'urn://rpn.gov.ru/services/';
-
-// convert XML text to object
-$xml = simplexml_load_string($content);
-$xml = $xml
-    ->Message
-    ->RequestContent
-    ->content
-    ->MessagePrimaryContent;
-    
-// get element of required namespace
-$xml = $xml->children($targetNs);
-
-//convert XML object of required element of required namespace to text
-$nodeText = $xml->saveXML();
-// backward convertation to XML object
-$xml = simplexml_load_string($nodeText);
-
-
-$gotTargetNs = false;
-$targetPrefix='';
-$gotDefaultNs = false;
-$defaultNs = '';
-foreach ($xml->getDocNamespaces(true) as $prefix => $namespace) {
-    //get prefix of required namespace
-    if ($namespace === $targetNs) {
-        $gotTargetNs = true;
-        $targetPrefix = $prefix;
-    }
-    //get default namespace
-    if ($prefix === '') {
-        $gotDefaultNs = true;
-        $defaultNs = $namespace;
-    }
-}
-if ($gotDefaultNs) {
-    // remove default namespace
-    $nodeText = str_replace("xmlns=\"{$defaultNs}\"",'',$nodeText);
-}
-
-$data = [];
-if ($gotTargetNs) {
-    // remove prefix of required namespace
-    $nodeText = str_replace($targetPrefix . ':', '', $nodeText);
-
-    // convert XML object to array
-    $fabric = (new NavigatorFabric())->setXml($nodeText);
-    $converter = $fabric->makeConverter();
-    $data = $converter->toArray();
-}
 ```
 
 # Contacts
@@ -453,4 +344,5 @@ phone +7-902-272-65-35
 Telegram @sbwerewolf
 ```
 
-[Telegram chat with me](https://t.me/SbWereWolf) 
+[Telegram chat with me](https://t.me/SbWereWolf)
+[WhatsApp chat with me](https://wa.me/79022726535) 
