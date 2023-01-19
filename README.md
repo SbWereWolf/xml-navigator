@@ -12,10 +12,8 @@ Navigator can provide XML-document as array or as object.
 
 ```php
 $xml = '<outer any="123"><inner1>some text</inner1></outer>';
-$result = (new \SbWereWolf\XmlNavigator\NavigatorFabric())
-    ->makeFromXmlString($xml)
-    ->makeConverter()
-    ->toNormalizedArray();
+(new \SbWereWolf\XmlNavigator\Converter(XMLReader::XML($xml)))
+->toNormalizedArray();
 echo json_encode($result, JSON_PRETTY_PRINT);
 ```
 
