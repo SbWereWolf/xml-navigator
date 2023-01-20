@@ -150,7 +150,6 @@ XmlNavigator implements object-oriented approach.
 
 ```php
 use SbWereWolf\XmlNavigator\IXmlNavigator;
-use SbWereWolf\XmlNavigator\NavigatorFabric;
 
         $xml = <<<XML
 <doc attrib="a" option="o" >
@@ -169,8 +168,12 @@ use SbWereWolf\XmlNavigator\NavigatorFabric;
 </doc>
 XML;
 
-        $fabric = (new NavigatorFabric())->makeFromXmlString($xml);
-        $navigator = $fabric->makeNavigator();
+        $content =
+            \SbWereWolf\XmlNavigator\FastXmlToArray::convert($xml);
+        $navigator = 
+            new \SbWereWolf\XmlNavigator\XmlNavigator(
+                $content[IFastXmlToArray::ELEMS][0]
+            );
 
         /* get element name */
         echo $navigator->name() . PHP_EOL;
@@ -251,6 +254,11 @@ XML;
         element with name `b` have attribute `val` with value `z`
         */
 ```
+
+# Advanced using
+
+[Unit tests](test/Integration/DebugTest.php) have more examples of
+using, please investigate them.
 
 # Contacts
 
