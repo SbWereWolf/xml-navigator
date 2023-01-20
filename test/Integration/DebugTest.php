@@ -10,38 +10,146 @@ declare(strict_types=1);
 namespace Integration;
 
 use PHPUnit\Framework\TestCase;
+use SbWereWolf\XmlNavigator\Converter;
 use SbWereWolf\XmlNavigator\FastXmlToArray;
 use SbWereWolf\XmlNavigator\IXmlNavigator;
-use SbWereWolf\XmlNavigator\NavigatorFabric;
-use XMLReader;
+use SbWereWolf\XmlNavigator\XmlNavigator;
 
 class DebugTest extends TestCase
 {
     public function testXmlNavigator()
     {
-        $xml = <<<XML
-<doc attrib="a" option="o" >
-    <base/>
-    <valuable>element value</valuable>
-    <complex>
-        <a empty=""/>
-        <b val="x"/>
-        <b val="y"/>
-        <b val="z"/>
-        <c>0</c>
-        <c v="o"/>
-        <c/>
-        <different/>
-    </complex>
-</doc>
-XML;
-
-        $fabric = (new NavigatorFabric())->makeFromXmlString($xml);
-        $navigator = $fabric->makeNavigator();
+        $xmlContent =
+            array(
+                'elems' =>
+                    array(
+                        0 =>
+                            array(
+                                'name' => 'complex',
+                                'attribs' =>
+                                    array(
+                                        'str' => 'text',
+                                        'number' => '-3.9',
+                                    ),
+                                'elems' =>
+                                    array(
+                                        0 =>
+                                            array(
+                                                'name' => 'empty',
+                                                'elems' =>
+                                                    array(),
+                                            ),
+                                        1 =>
+                                            array(
+                                                'name' => 'ONLY_VALUE',
+                                                'val' =>
+                                                    'element has only' .
+                                                    ' value',
+                                                'elems' =>
+                                                    array(),
+                                            ),
+                                        2 =>
+                                            array(
+                                                'name' => 'a',
+                                                'attribs' =>
+                                                    array(
+                                                        'element_has' .
+                                                        '_empty_' .
+                                                        'attribute' =>
+                                                            '',
+                                                    ),
+                                                'elems' =>
+                                                    array(),
+                                            ),
+                                        3 =>
+                                            array(
+                                                'name' => 'b',
+                                                'attribs' =>
+                                                    array(
+                                                        'val' => 'x',
+                                                        'attr' => '-3',
+                                                    ),
+                                                'elems' =>
+                                                    array(),
+                                            ),
+                                        4 =>
+                                            array(
+                                                'name' => 'b',
+                                                'attribs' =>
+                                                    array(
+                                                        'val' => 'y',
+                                                        'y' => 'val',
+                                                    ),
+                                                'elems' =>
+                                                    array(),
+                                            ),
+                                        5 =>
+                                            array(
+                                                'name' => 'b',
+                                                'attribs' =>
+                                                    array(
+                                                        'val' => 'z',
+                                                    ),
+                                                'elems' =>
+                                                    array(),
+                                            ),
+                                        6 =>
+                                            array(
+                                                'name' => 'c',
+                                                'val' => '0',
+                                                'elems' =>
+                                                    array(),
+                                            ),
+                                        7 =>
+                                            array(
+                                                'name' => 'c',
+                                                'attribs' =>
+                                                    array(
+                                                        'a' => 'v',
+                                                    ),
+                                                'elems' =>
+                                                    array(),
+                                            ),
+                                        8 =>
+                                            array(
+                                                'name' => 'c',
+                                                'elems' =>
+                                                    array(),
+                                            ),
+                                        9 =>
+                                            array(
+                                                'name' => 'nested',
+                                                'elems' =>
+                                                    array(
+                                                        0 => array(
+                                                            'name' => 'any',
+                                                            'attribs' =>
+                                                                array(
+                                                                    'val' => '1',
+                                                                ),
+                                                            'elems' =>
+                                                                array(),
+                                                        ),
+                                                        1 => array(
+                                                            'name' => 'any',
+                                                            'attribs' =>
+                                                                array(
+                                                                    'val' => '2',
+                                                                ),
+                                                            'elems' =>
+                                                                array(),
+                                                        ),
+                                                    ),
+                                            ),
+                                    ),
+                            ),
+                    ),
+            );
+        $navigator = new XmlNavigator($xmlContent['elems'][0]);
 
         /* get element name */
         echo $navigator->name() . PHP_EOL;
-        /* doc */
+        /* complex */
 
         /* get element value */
         echo $navigator->value() . PHP_EOL;
@@ -51,207 +159,176 @@ XML;
         echo var_export($navigator->attributes(), true) . PHP_EOL;
         /*
         array (
-          0 => 'attrib',
-          1 => 'option',
+          0 => 'str',
+          1 => 'number',
         )
         */
 
         /* get attribute value */
-        echo $navigator->get('attrib') . PHP_EOL;
-        /* a */
+        echo $navigator->get('str') . PHP_EOL;
+        /* text */
 
         /* get list of nested elements */
         echo var_export($navigator->elements(), true) . PHP_EOL;
         /*
         array (
-          0 => 'base',
-          1 => 'valuable',
-          2 => 'complex',
+          0 => 'empty',
+          1 => 'ONLY_VALUE',
+          2 => 'a',
+          3 => 'b',
+          4 => 'b',
+          5 => 'b',
+          6 => 'c',
+          7 => 'c',
+          8 => 'c',
+          9 => 'nested',
         )
         */
 
         /* get desired nested element */
-        $elem = $navigator->pull('valuable')->current();
+        $elem = $navigator->pull()->current();
         echo $elem->name() . PHP_EOL;
-        /* valuable */
+        /* empty */
 
         /* get all nested elements */
         foreach ($navigator->pull() as $pulled) {
             /** @var IXmlNavigator $pulled */
             echo $pulled->name() . PHP_EOL;
-            /* base */
-            /* valuable */
-            /* complex */
+            /*
+            empty
+            ONLY_VALUE
+            a
+            b
+            b
+            b
+            c
+            c
+            c
+            nested
+            */
         }
 
         /* get nested element */
         /** @var IXmlNavigator $nested */
-        $nested = $navigator->pull('complex')->current();
+        $nested = $navigator->pull('nested')->current();
         /* get names of all elements of nested element */
         echo var_export($nested->elements(), true) . PHP_EOL;
         /*
         array (
-          0 => 'a',
-          1 => 'b',
-          2 => 'b',
-          3 => 'b',
-          4 => 'c',
-          5 => 'c',
-          6 => 'c',
-          7 => 'different',
+          0 => 'any',
+          1 => 'any',
         )
         */
 
-        /* get all elements with name `b` */
-        foreach ($nested->pull('b') as $b) {
-            /** @var IXmlNavigator $b */
+        /* get all elements with name `any` */
+        foreach ($nested->pull('any') as $any) {
+            /** @var IXmlNavigator $any */
             echo ' element with name' .
-                ' `' . $b->name() .
+                ' `' . $any->name() .
                 '` have attribute `val` with value' .
-                ' `' . $b->get('val') . '`' .
+                ' `' . $any->get('val') . '`' .
                 PHP_EOL;
             /*
-            element with name `b` have attribute `val` with value `x`
-            element with name `b` have attribute `val` with value `y`
-            element with name `b` have attribute `val` with value `z`
+            element with name `any` have attribute `val` with value `1`
+            element with name `any` have attribute `val` with value `2`
             */
         }
 
         $this->assertTrue(true);
     }
 
-    public function testConverter()
+    public function testConverterXmlStructure()
     {
         $xml = <<<XML
 <complex>
-    <a empty=""/>
-    <b val="x"/>
-    <b val="y"/>
+    <empty/>
+    <ONLY_VALUE>element has only value</ONLY_VALUE>
+    <a element_has_empty_attribute=""/>
+    <b val="x" attr="-3"/>
+    <b val="y" y="val"/>
     <b val="z"/>
     <c>0</c>
-    <c v="o"/>
+    <c a="v"/>
     <c/>
-    <different/>
 </complex>
 XML;
 
-        $fabric = (new NavigatorFabric())
-            ->makeFromXmlString($xml);
-        $converter = $fabric->makeConverter();
-        $arrayRepresentationOfXml = $converter->toNormalizedArray();
-        echo var_export($arrayRepresentationOfXml, true);
+        $arrayRepresentationOfXml =
+            (new Converter())->xmlStructure($xml);
+        var_export($arrayRepresentationOfXml);
         /*
-        array (
-  'elems' =>
-  array (
-    0 =>
-    array (
-      'name' => 'complex',
-      'elems' =>
-      array (
-        0 =>
-        array (
-          'name' => 'a',
-          'attribs' =>
-          array (
-            'empty' => '',
-          ),
-          'elems' =>
-          array (
-          ),
-        ),
-        1 =>
-        array (
-          'name' => 'b',
-          'attribs' =>
-          array (
-            'val' => 'x',
-          ),
-          'elems' =>
-          array (
-          ),
-        ),
-        2 =>
-        array (
-          'name' => 'b',
-          'attribs' =>
-          array (
-            'val' => 'y',
-          ),
-          'elems' =>
-          array (
-          ),
-        ),
-        3 =>
-        array (
-          'name' => 'b',
-          'attribs' =>
-          array (
-            'val' => 'z',
-          ),
-          'elems' =>
-          array (
-          ),
-        ),
-        4 =>
-        array (
-          'name' => 'c',
-          'val' => '0',
-          'elems' =>
-          array (
-          ),
-        ),
-        5 =>
-        array (
-          'name' => 'c',
-          'attribs' =>
-          array (
-            'v' => 'o',
-          ),
-          'elems' =>
-          array (
-          ),
-        ),
-        6 =>
-        array (
-          'name' => 'c',
-          'elems' =>
-          array (
-          ),
-        ),
-        7 =>
-        array (
-          'name' => 'different',
-          'elems' =>
-          array (
-          ),
-        ),
-      ),
-    ),
-  ),
-)
+
         */
 
         $this->assertTrue(true);
     }
 
-    public function testFastXmlToArray()
+    public function testConverterPrettyPrint()
     {
         $xml = <<<XML
 <complex>
-    <a empty=""/>
-    <b val="x"/>
-    <b val="y"/>
+    <empty/>
+    <ONLY_VALUE>element has only value</ONLY_VALUE>
+    <a element_has_empty_attribute=""/>
+    <b val="x" attr="-3"/>
+    <b val="y" y="val"/>
     <b val="z"/>
     <c>0</c>
-    <c v="o"/>
+    <c a="v"/>
     <c/>
-    <different/>
 </complex>
 XML;
 
-        $result = FastXmlToArray::convert(XMLReader::XML($xml));
-        echo var_export($result, true);
+        $arrayRepresentationOfXml =
+            (new Converter())->prettyPrint($xml);
+        var_export($arrayRepresentationOfXml);
+        /*
+
+        */
+
+        $this->assertTrue(true);
+    }
+
+    public function testFastXmlToArrayConvert()
+    {
+        $xml = <<<XML
+<complex>
+    <empty/>
+    <ONLY_VALUE>element has only value</ONLY_VALUE>
+    <a element_has_empty_attribute=""/>
+    <b val="x" attr="-3"/>
+    <b val="y" y="val"/>
+    <b val="z"/>
+    <c>0</c>
+    <c a="v"/>
+    <c/>
+</complex>
+XML;
+
+        $result = FastXmlToArray::convert($xml);
+        var_export($result);
+
+        $this->assertTrue(true);
+    }
+
+    public function testFastXmlToArrayPrettyPrint()
+    {
+        $xml = <<<XML
+<complex>
+    <empty/>
+    <ONLY_VALUE>element has only value</ONLY_VALUE>
+    <a element_has_empty_attribute=""/>
+    <b val="x" attr="-3"/>
+    <b val="y" y="val"/>
+    <b val="z"/>
+    <c>0</c>
+    <c a="v"/>
+    <c/>
+</complex>
+XML;
+
+        $result = FastXmlToArray::prettyPrint($xml);
+        var_export($result);
 
         $this->assertTrue(true);
     }

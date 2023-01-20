@@ -11,29 +11,32 @@ Navigator can provide XML-document as array or as object.
 ## How to use
 
 ```php
-$xml = '<outer any="123"><inner1>some text</inner1></outer>';
-$result = 
-\SbWereWolf\XmlNavigator\FastXmlToArray::convert(\XMLReader::XML($xml));
+$xml =<<<XML
+<outer any_attrib="attribute value">
+    <inner>element value</inner>
+    <nested nested-attrib="nested attribute value">nested element value</nested>
+</outer>
+XML;
+$result =
+    \SbWereWolf\XmlNavigator\FastXmlToArray::prettyPrint($xml);
 echo json_encode($result, JSON_PRETTY_PRINT);
 ```
 Output:
+
 ```json
 {
-  "elems": [
-    {
-      "name": "outer",
-      "attribs": {
-        "any": "123"
-      },
-      "elems": [
-        {
-          "name": "inner1",
-          "val": "some text",
-          "elems": []
-        }
-      ]
+  "outer": {
+    "@attributes": {
+      "any_attrib": "attribute value"
+    },
+    "inner": "element value",
+    "nested": {
+      "@value": "nested element value",
+      "@attributes": {
+        "nested-attrib": "nested attribute value"
+      }
     }
-  ]
+  }
 }
 ```
 
@@ -52,9 +55,9 @@ Output:
 - `hasElements(): bool;` // Returns true if XML element has nested
   elements
 - `elements(): array;` // Returns names of all nested elements
-- `public function pull(string $name = ''): Generator` // Pull
-  IXmlNavigator for nested element, if `$name` is defined, than pull
-  elements with the `$name`
+- `pull(string $name = ''): Generator` // Pull IXmlNavigator for
+  nested element, if `$name` is defined, than pull elements with the
+  `$name`
 
 ## Use cases
 
@@ -62,23 +65,9 @@ Output:
 
 Converter implements array approach.
 
-You should use constants of interface
-`\SbWereWolf\XmlNavigator\IConverter` for access to value, attributes,
-elements.
-
-```php
-    public const NAME = 'name';
-    public const VAL = 'val';
-    public const ATTRIBS = 'attribs';
-    public const ELEMS = 'elems';
-```
-
 Converter can use to convert XML-document to array, example:
 
 ```php
-use SbWereWolf\XmlNavigator\IXmlNavigator;
-use SbWereWolf\XmlNavigator\NavigatorFabric;
-
         $xml = <<<XML
 <complex>
     <a empty=""/>
@@ -91,133 +80,65 @@ use SbWereWolf\XmlNavigator\NavigatorFabric;
     <different/>
 </complex>
 XML;
-/* array representation will be
 
-['elems'][0]['name'] => 'complex'
-
-['elems'][0]['elems'][0]['name'] => 'a'
-['elems'][0]['elems'][0]['attribs'] => ['empty' => '']
-['elems'][0]['elems'][0]['elems'] => []
-
-['elems'][0]['elems'][1]['name'] => 'b'
-['elems'][0]['elems'][1]['attribs'] => ['val' => 'x']
-['elems'][0]['elems'][1]['elems'] => []
-
-['elems'][0]['elems'][2]['name'] => 'b'
-['elems'][0]['elems'][2]['attribs'] => ['val' => 'y']
-['elems'][0]['elems'][2]['elems'] => []
-
-['elems'][0]['elems'][3]['name'] => 'b'
-['elems'][0]['elems'][3]['attribs'] => ['val' => 'z']
-['elems'][0]['elems'][3]['elems'] => []
-
-['elems'][0]['elems'][4]['name'] => 'c'
-['elems'][0]['elems'][4]['val'] => 0
-['elems'][0]['elems'][4]['elems'] => []
-
-['elems'][0]['elems'][5]['name'] => 'c'
-['elems'][0]['elems'][5]['attribs'] => ['v' => '0']
-['elems'][0]['elems'][5]['elems'] => []
-
-['elems'][0]['elems'][6]['name'] => 'c'
-['elems'][0]['elems'][6]['elems'] => []
-
-['elems'][0]['elems'][7]['name'] => 'different'
-['elems'][0]['elems'][7]['elems'] => []
- * */
-
-        $fabric = (new NavigatorFabric())->makeFromXmlString($xml);
-        $converter = $fabric->makeConverter();
-        
-        $arrayRepresentationOfXml = $converter->toNormalizedArray();
-        echo var_export($arrayRepresentationOfXml, true);
+        $converter = new \SbWereWolf\XmlNavigator\Converter();
+        $arrayRepresentationOfXml = 
+        $converter->prettyPrint($xml);
+        echo var_export($arrayRepresentationOfXml);
 
 array (
-  'elems' => 
+  'complex' => 
   array (
-    0 => 
+    'a' => 
     array (
-      'name' => 'complex',
-      'elems' => 
+      '@attributes' => 
       array (
-        0 => 
+        'empty' => '',
+      ),
+    ),
+    'b' => 
+    array (
+      0 => 
+      array (
+        '@attributes' => 
         array (
-          'name' => 'a',
-          'attribs' => 
-          array (
-            'empty' => '',
-          ),
-          'elems' => 
-          array (
-          ),
-        ),
-        1 => 
-        array (
-          'name' => 'b',
-          'attribs' => 
-          array (
-            'val' => 'x',
-          ),
-          'elems' => 
-          array (
-          ),
-        ),
-        2 => 
-        array (
-          'name' => 'b',
-          'attribs' => 
-          array (
-            'val' => 'y',
-          ),
-          'elems' => 
-          array (
-          ),
-        ),
-        3 => 
-        array (
-          'name' => 'b',
-          'attribs' => 
-          array (
-            'val' => 'z',
-          ),
-          'elems' => 
-          array (
-          ),
-        ),
-        4 => 
-        array (
-          'name' => 'c',
-          'val' => '0',
-          'elems' => 
-          array (
-          ),
-        ),
-        5 => 
-        array (
-          'name' => 'c',
-          'attribs' => 
-          array (
-            'v' => 'o',
-          ),
-          'elems' => 
-          array (
-          ),
-        ),
-        6 => 
-        array (
-          'name' => 'c',
-          'elems' => 
-          array (
-          ),
-        ),
-        7 => 
-        array (
-          'name' => 'different',
-          'elems' => 
-          array (
-          ),
+          'val' => 'x',
         ),
       ),
+      1 => 
+      array (
+        '@attributes' => 
+        array (
+          'val' => 'y',
+        ),
+      ),
+      2 => 
+      array (
+        '@attributes' => 
+        array (
+          'val' => 'z',
+        ),
+      ),
+    ),
+    'c' => 
+    array (
+      0 => 
+      array (
+        '@value' => '0',
+      ),
+      1 => 
+      array (
+        '@attributes' => 
+        array (
+          'v' => 'o',
+        ),
+      ),
+      2 => 
+      array (
+      ),
+    ),
+    'different' => 
+    array (
     ),
   ),
 )

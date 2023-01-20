@@ -15,14 +15,28 @@ class XmlNavigator implements IXmlNavigator
      * @var IArrayHandler
      */
     private IArrayHandler $handler;
+    /** @var string Индекс имени элемента */
+    private string $name;
+    /** @var string Индекс значения элемента */
+    private string $val;
+    /** @var string Индекс для атрибутов элемента */
+    private string $attribs;
+    /** @var string Индекс для вложенных элементов */
+    private string $elems;
 
     /**
      * @param array $data
      */
-    public function __construct(array $data)
-    {
-        $name = key($data);
-        if ('string' !== gettype($name)) {
+    public function __construct(
+        array $data,
+        string $name = IFastXmlToArray::NAME,
+        string $val = IFastXmlToArray::VAL,
+        string $attribs = IFastXmlToArray::ATTRIBS,
+        string $elems = IFastXmlToArray::ELEMS,
+    ) {
+        reset($data);
+        $first = key($data);
+        if ('string' !== gettype($first)) {
             throw new InvalidArgumentException(
                 'input array MUST BE like' .
                 ' [ `name`=>string, `val`=>string,' .
@@ -30,7 +44,7 @@ class XmlNavigator implements IXmlNavigator
                 -666
             );
         }
-        if ($name !== IConverter::NAME) {
+        if ($name !== $first) {
             throw new InvalidArgumentException(
                 'input array MUST BE like' .
                 ' [ `name`=>string, `val`=>string,' .
@@ -39,6 +53,11 @@ class XmlNavigator implements IXmlNavigator
             );
         }
 
+        $this->name = $name;
+        $this->val = $val;
+        $this->attribs = $attribs;
+        $this->elems = $elems;
+
         $this->handler = new ArrayHandler($data);
     }
 
@@ -46,21 +65,21 @@ class XmlNavigator implements IXmlNavigator
     public function attributes(): array
     {
         $content = (array)$this
-            ->getIndexContent(IConverter::ATTRIBS);
+            ->getIndexContent($this->attribs);
         $attribs = array_keys($content);
 
         return $attribs;
     }
 
-    /** get content of element with given index ($key)
-     * @param string $key
+    /** get content of data[] with given index
+     * @param string $index
      * @return mixed|null
      */
-    private function getIndexContent(string $key)
+    private function getIndexContent(string $index)
     {
         $content = null;
-        if ($this->handler->has($key)) {
-            $content = $this->handler->get($key)->asIs();
+        if ($this->handler->has($index)) {
+            $content = $this->handler->get($index)->asIs();
         }
         return $content;
     }
@@ -68,7 +87,7 @@ class XmlNavigator implements IXmlNavigator
     /* @inheritdoc */
     public function get(string $name = null): string
     {
-        $value = $this->handler->pull(IConverter::ATTRIBS)
+        $value = $this->handler->pull($this->attribs)
             ->get($name)->str();
 
         return $value;
@@ -78,8 +97,8 @@ class XmlNavigator implements IXmlNavigator
     public function elements(): array
     {
         $content = (array)$this
-            ->getIndexContent(IConverter::ELEMS);
-        $props = array_column($content, IConverter::NAME);
+            ->getIndexContent($this->elems);
+        $props = array_column($content, $this->name);
 
         return $props;
     }
@@ -87,14 +106,14 @@ class XmlNavigator implements IXmlNavigator
     /* @inheritdoc */
     public function pull(string $name = ''): Generator
     {
-        $elems = $this->handler->pull(IConverter::ELEMS)->raw();
+        $elems = $this->handler->pull($this->elems)->raw();
         foreach ($elems as $elem) {
             if ($name === '') {
                 $result = new static($elem);
 
                 yield $result;
             }
-            if ($elem[IConverter::NAME] === $name) {
+            if ($elem[$this->name] === $name) {
                 $result = new static($elem);
 
                 yield $result;
@@ -106,7 +125,7 @@ class XmlNavigator implements IXmlNavigator
     public function value(): string
     {
         $result = (string)$this
-            ->getIndexContent(IConverter::VAL);
+            ->getIndexContent($this->val);
 
         return $result;
     }
@@ -115,25 +134,25 @@ class XmlNavigator implements IXmlNavigator
     public function name(): string
     {
         return $this->handler
-            ->get(IConverter::NAME)
+            ->get($this->name)
             ->str();
     }
 
     /* @inheritdoc */
     public function hasValue(): bool
     {
-        return $this->handler->has(IConverter::VAL);
+        return $this->handler->has($this->val);
     }
 
     /* @inheritdoc */
     public function hasAttributes(): bool
     {
-        return $this->handler->has(IConverter::ATTRIBS);
+        return $this->handler->has($this->attribs);
     }
 
     /* @inheritdoc */
     public function hasElements(): bool
     {
-        return $this->handler->has(IConverter::ELEMS);
+        return $this->handler->has($this->elems);
     }
 }
