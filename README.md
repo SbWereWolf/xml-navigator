@@ -272,12 +272,12 @@ element with name `b` have attribute `val` with value `z`
 */
 ```
 
-# Advanced using
+## Advanced using
 
 [Unit tests](test/Integration/DebugTest.php) have more examples of
 using, please investigate them.
 
-# Contacts
+## Contacts
 
 ```
 Volkhin Nikolay
