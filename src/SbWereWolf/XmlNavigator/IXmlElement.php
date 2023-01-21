@@ -6,6 +6,9 @@ namespace SbWereWolf\XmlNavigator;
 
 use Generator;
 
+/**
+ * Интерфейс для объекта XML элемента
+ */
 interface IXmlElement
 {
     /** Returns the name of XML element
@@ -56,7 +59,7 @@ interface IXmlElement
      */
     public function elements(string $name = ''): array;
 
-    /** Pull IXmlNavigator for nested elements,
+    /** Pull IXmlElement for nested elements,
      * if $name is defined, than pull elements with the $name
      * @param string $name
      * @return IXmlElement

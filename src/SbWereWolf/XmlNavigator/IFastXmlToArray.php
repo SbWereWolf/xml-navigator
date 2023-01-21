@@ -7,14 +7,25 @@ namespace SbWereWolf\XmlNavigator;
 use Generator;
 use XMLReader;
 
+/**
+ * Интерфейс для статического преобразователя XML документа в PHP массив
+ */
 interface IFastXmlToArray
 {
+    /** @var string Индекс Имени в нормализованном виде */
     public const NAME = 'n';
+    /** @var string Индекс Значения в нормализованном виде */
     public const VALUE = 'v';
+    /** @var string Индекс Атрибутов в нормализованном виде */
     public const ATTRIBUTES = 'a';
+    /** @var string Индекс Последовательности вложенных элементов
+     * в нормализованном виде
+     */
     public const SEQUENCE = 's';
 
+    /** @var string Индекс для Значения в формате pretty print */
     public const VAL = '@value';
+    /** @var string Индекс для Атрибутов в формате pretty print */
     public const ATTR = '@attributes';
 
     /** Convert xml document into normalized array
@@ -24,7 +35,7 @@ interface IFastXmlToArray
      * @param string $name index for element name
      * @param string $val index for element value
      * @param string $attribs index for element attributes collection
-     * @param string $elems index for child elements collection
+     * @param string $seq index for child elements collection
      * @param string|null $encoding The document encoding or NULL
      * @param int $flags A bitmask of the LIBXML_* constants.
      * @return array
@@ -35,7 +46,7 @@ interface IFastXmlToArray
         string $name = IFastXmlToArray::NAME,
         string $val = IFastXmlToArray::VALUE,
         string $attribs = IFastXmlToArray::ATTRIBUTES,
-        string $elems = IFastXmlToArray::SEQUENCE,
+        string $seq = IFastXmlToArray::SEQUENCE,
         string $encoding = null,
         int $flags = LIBXML_BIGLINES | LIBXML_COMPACT,
     ): array;
@@ -65,6 +76,7 @@ interface IFastXmlToArray
      *         1 => value of TEXT node, or attributes of ELEMENT node
      *     ]
      * ]
+     * @param XMLReader $reader
      * @return Generator
      */
     public static function nextElement(XMLReader $reader): Generator;

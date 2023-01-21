@@ -10,11 +10,12 @@ use JsonSerializable;
 use LanguageSpecific\ArrayHandler;
 use LanguageSpecific\IArrayHandler;
 
+/**
+ * Объект для XML элемента
+ */
 class XmlElement implements IXmlElement, JsonSerializable
 {
-    /**
-     * @var IArrayHandler
-     */
+    /** @var IArrayHandler Массив со свойствами XML элемента */
     private IArrayHandler $handler;
     /** @var string Индекс имени элемента */
     private string $name;
@@ -26,7 +27,11 @@ class XmlElement implements IXmlElement, JsonSerializable
     private string $seq;
 
     /**
-     * @param array $data
+     * @param array $data Массив со свойствами XML элемента
+     * @param string $name Индекс для имени
+     * @param string $val Индекс для значения
+     * @param string $attr Индекс для атрибутов
+     * @param string $seq Индекс для вложенных элементов
      */
     public function __construct(
         array $data,
@@ -76,6 +81,7 @@ class XmlElement implements IXmlElement, JsonSerializable
         if ($this->handler->has($index)) {
             $content = $this->handler->get($index)->asIs();
         }
+
         return $content;
     }
 

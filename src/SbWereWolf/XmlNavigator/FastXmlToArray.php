@@ -9,8 +9,12 @@ use InvalidArgumentException;
 use JetBrains\PhpStorm\ArrayShape;
 use XMLReader;
 
+/**
+ * Статический конвертор XML документа в PHP массив
+ */
 class FastXmlToArray implements IFastXmlToArray
 {
+    /** @var string Индекс для уровня вложенности элемента */
     private const DEPTH = 'depth';
 
     /* @inheritdoc */
@@ -21,7 +25,7 @@ class FastXmlToArray implements IFastXmlToArray
         string $name = IFastXmlToArray::NAME,
         string $val = IFastXmlToArray::VALUE,
         string $attribs = IFastXmlToArray::ATTRIBUTES,
-        string $elems = IFastXmlToArray::SEQUENCE,
+        string $seq = IFastXmlToArray::SEQUENCE,
         string $encoding = null,
         int $flags = LIBXML_BIGLINES | LIBXML_COMPACT,
     ): array {
@@ -39,7 +43,7 @@ class FastXmlToArray implements IFastXmlToArray
             $name,
             $val,
             $attribs,
-            $elems,
+            $seq,
         );
 
         return $result;
@@ -76,7 +80,6 @@ class FastXmlToArray implements IFastXmlToArray
     public static function nextElement(XMLReader $reader): Generator
     {
         $path = [];
-        /** @var XMLReader $reader */
         while ($reader->read()) {
             $result = [];
             if (
@@ -342,11 +345,9 @@ class FastXmlToArray implements IFastXmlToArray
 
             if (
                 key_exists($name, $ptr) &&
-                (!is_array($ptr[$name]) ||
-                    (
-                        is_array($ptr[$name]) &&
-                        !key_exists(0, $ptr[$name])
-                    )
+                (
+                    !is_array($ptr[$name]) ||
+                    !key_exists(0, $ptr[$name])
                 )
             ) {
                 $first = $ptr[$name];

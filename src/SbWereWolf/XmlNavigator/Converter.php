@@ -6,37 +6,48 @@ namespace SbWereWolf\XmlNavigator;
 
 use JsonSerializable;
 
+/**
+ * Конвертор XML документа в PHP массив
+ */
 class Converter implements IConverter, JsonSerializable
 {
+    /** @var array Структура XML документа в нормализованном виде */
     private array $xmlStructure = [];
+    /** @var array  XML документа в виде удобном для чтения */
     private array $prettyXml = [];
+    /** @var string Индекс для Имени */
     private string $name;
+    /** @var string Индекс для Значения */
     private string $val;
+    /** @var string Индекс для Атрибутов */
     private string $attribs;
-    private string $elems;
+    /** @var string  Индекс для вложенных элементов */
+    private string $seq;
+    /** @var string|null Кодировка XML Документа */
     private ?string $encoding;
+    /** @var int Битовая маска из констант LIBXML_* */
     private int $flags;
 
     /**
-     * @param string $name
-     * @param string $val
-     * @param string $attribs
-     * @param string $elems
+     * @param string $name Индекс для имени
+     * @param string $val Индекс для значения
+     * @param string $attr Индекс для атрибутов
+     * @param string $seq Индекс для вложенных элементов
      * @param string|null $encoding
      * @param int $flags
      */
     public function __construct(
         string $name = IFastXmlToArray::NAME,
         string $val = IFastXmlToArray::VALUE,
-        string $attribs = IFastXmlToArray::ATTRIBUTES,
-        string $elems = IFastXmlToArray::SEQUENCE,
+        string $attr = IFastXmlToArray::ATTRIBUTES,
+        string $seq = IFastXmlToArray::SEQUENCE,
         string $encoding = null,
         int $flags = LIBXML_BIGLINES | LIBXML_COMPACT,
     ) {
         $this->name = $name;
         $this->val = $val;
-        $this->attribs = $attribs;
-        $this->elems = $elems;
+        $this->attribs = $attr;
+        $this->seq = $seq;
         $this->encoding = $encoding;
         $this->flags = $flags;
     }
@@ -74,7 +85,7 @@ class Converter implements IConverter, JsonSerializable
                     $this->name,
                     $this->val,
                     $this->attribs,
-                    $this->elems,
+                    $this->seq,
                     $this->encoding,
                     $this->flags,
                 );

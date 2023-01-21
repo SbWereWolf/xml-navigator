@@ -6,11 +6,18 @@ namespace SbWereWolf\XmlNavigator;
 
 use JsonSerializable;
 
+/**
+ * Объект для XML атрибута
+ */
 class XmlAttribute implements IXmlAttribute, JsonSerializable
 {
     private string $name;
     private string $value;
 
+    /**
+     * @param string $name Имя атрибута
+     * @param string $value Значение атрибута
+     */
     public function __construct(string $name, string $value,)
     {
         $this->name = $name;

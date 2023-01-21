@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace SbWereWolf\XmlNavigator;
 
+/**
+ * Интерфейс для объекта XML атрибута
+ */
 interface IXmlAttribute
 {
     /** Returns name of attribute */
