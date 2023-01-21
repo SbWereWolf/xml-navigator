@@ -6,10 +6,11 @@ namespace SbWereWolf\XmlNavigator;
 
 use Generator;
 use InvalidArgumentException;
+use JsonSerializable;
 use LanguageSpecific\ArrayHandler;
 use LanguageSpecific\IArrayHandler;
 
-class XmlNavigator implements IXmlNavigator
+class XmlElement implements IXmlElement, JsonSerializable
 {
     /**
      * @var IArrayHandler
@@ -20,9 +21,9 @@ class XmlNavigator implements IXmlNavigator
     /** @var string Индекс значения элемента */
     private string $val;
     /** @var string Индекс для атрибутов элемента */
-    private string $attribs;
+    private string $attr;
     /** @var string Индекс для вложенных элементов */
-    private string $elems;
+    private string $seq;
 
     /**
      * @param array $data
@@ -30,33 +31,24 @@ class XmlNavigator implements IXmlNavigator
     public function __construct(
         array $data,
         string $name = IFastXmlToArray::NAME,
-        string $val = IFastXmlToArray::VAL,
-        string $attribs = IFastXmlToArray::ATTRIBS,
-        string $elems = IFastXmlToArray::ELEMS,
+        string $val = IFastXmlToArray::VALUE,
+        string $attr = IFastXmlToArray::ATTRIBUTES,
+        string $seq = IFastXmlToArray::SEQUENCE,
     ) {
-        reset($data);
-        $first = key($data);
-        if ('string' !== gettype($first)) {
+        $keys = array_keys($data);
+        if (key_exists($name, $keys)) {
             throw new InvalidArgumentException(
                 'input array MUST BE like' .
-                ' [ `name`=>string, `val`=>string,' .
-                ' `attribs`=>[], `elems`=>[] ]',
+                ' [ `name`=>string, `value`=>string,' .
+                ' `attributes`=>[], `sequence`=>[] ]',
                 -666
-            );
-        }
-        if ($name !== $first) {
-            throw new InvalidArgumentException(
-                'input array MUST BE like' .
-                ' [ `name`=>string, `val`=>string,' .
-                ' `attribs`=>[], `elems`=>[] ]',
-                -667
             );
         }
 
         $this->name = $name;
         $this->val = $val;
-        $this->attribs = $attribs;
-        $this->elems = $elems;
+        $this->attr = $attr;
+        $this->seq = $seq;
 
         $this->handler = new ArrayHandler($data);
     }
@@ -64,16 +56,19 @@ class XmlNavigator implements IXmlNavigator
     /* @inheritdoc */
     public function attributes(): array
     {
-        $content = (array)$this
-            ->getIndexContent($this->attribs);
-        $attribs = array_keys($content);
+        $attributes = (array)$this->getIndexContent($this->attr);
 
-        return $attribs;
+        $result = [];
+        foreach ($attributes as $name => $value) {
+            $result[] = new XmlAttribute($name, $value);
+        }
+
+        return $result;
     }
 
-    /** get content of data[] with given index
+    /** Get content of XmlElement::$handler with given key $index
      * @param string $index
-     * @return mixed|null
+     * @return null|string|array
      */
     private function getIndexContent(string $index)
     {
@@ -87,28 +82,29 @@ class XmlNavigator implements IXmlNavigator
     /* @inheritdoc */
     public function get(string $name = null): string
     {
-        $value = $this->handler->pull($this->attribs)
+        $value = $this->handler->pull($this->attr)
             ->get($name)->str();
 
         return $value;
     }
 
     /* @inheritdoc */
-    public function elements(): array
+    public function elements(string $name = ''): array
     {
-        $content = (array)$this
-            ->getIndexContent($this->elems);
-        $props = array_column($content, $this->name);
+        $result = [];
+        foreach ($this->pull($name) as $xmlElement) {
+            $result[] = $xmlElement;
+        }
 
-        return $props;
+        return $result;
     }
 
     /* @inheritdoc */
     public function pull(string $name = ''): Generator
     {
-        $elems = $this->handler->pull($this->elems)->raw();
+        $elems = $this->handler->pull($this->seq)->raw();
         foreach ($elems as $elem) {
-            if ($name === '') {
+            if ('' === $name) {
                 $result = new static($elem);
 
                 yield $result;
@@ -138,6 +134,23 @@ class XmlNavigator implements IXmlNavigator
             ->str();
     }
 
+    /** Check existence of element with key $name
+     * inside XmlElement::$handler element with key $index
+     * @param string $index
+     * @param string $name
+     * @return bool
+     */
+    private function checkNameInsideIndex(
+        string $index,
+        string $name
+    ): bool {
+        $result = $this->handler->has($index);
+        if ($result && '' !== $name) {
+            $result = isset($this->handler->get($index)[$name]);
+        }
+        return $result;
+    }
+
     /* @inheritdoc */
     public function hasValue(): bool
     {
@@ -145,14 +158,26 @@ class XmlNavigator implements IXmlNavigator
     }
 
     /* @inheritdoc */
-    public function hasAttributes(): bool
+    public function hasAttribute(string $name = ''): bool
     {
-        return $this->handler->has($this->attribs);
+        $index = $this->attr;
+        $result = $this->checkNameInsideIndex($index, $name);
+
+        return $result;
     }
 
     /* @inheritdoc */
-    public function hasElements(): bool
+    public function hasElement(string $name = ''): bool
     {
-        return $this->handler->has($this->elems);
+        $index = $this->seq;
+        $result = $this->checkNameInsideIndex($index, $name);
+
+        return $result;
+    }
+
+    /* @inheritdoc */
+    public function jsonSerialize(): array
+    {
+        return get_object_vars($this);
     }
 }

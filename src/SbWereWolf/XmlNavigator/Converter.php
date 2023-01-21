@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace SbWereWolf\XmlNavigator;
 
-class Converter implements IConverter
+use JsonSerializable;
+
+class Converter implements IConverter, JsonSerializable
 {
     private array $xmlStructure = [];
     private array $prettyXml = [];
@@ -25,9 +27,9 @@ class Converter implements IConverter
      */
     public function __construct(
         string $name = IFastXmlToArray::NAME,
-        string $val = IFastXmlToArray::VAL,
-        string $attribs = IFastXmlToArray::ATTRIBS,
-        string $elems = IFastXmlToArray::ELEMS,
+        string $val = IFastXmlToArray::VALUE,
+        string $attribs = IFastXmlToArray::ATTRIBUTES,
+        string $elems = IFastXmlToArray::SEQUENCE,
         string $encoding = null,
         int $flags = LIBXML_BIGLINES | LIBXML_COMPACT,
     ) {
@@ -79,5 +81,11 @@ class Converter implements IConverter
         }
 
         return $this->xmlStructure;
+    }
+
+    /* @inheritdoc */
+    public function jsonSerialize(): array
+    {
+        return get_object_vars($this);
     }
 }

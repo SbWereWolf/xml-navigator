@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SbWereWolf\XmlNavigator;
 
 interface IConverter
 {
-    /** get array representation of xml document
+    /** Convert xml document into compact array
      * @return array
      */
     public function prettyPrint(
@@ -12,7 +14,7 @@ interface IConverter
         string $xmlUri = '',
     ): array;
 
-    /** get array representation of xml document
+    /** Convert xml document into normalized array
      * @return array
      */
     public function xmlStructure(

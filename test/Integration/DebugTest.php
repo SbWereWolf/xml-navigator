@@ -12,226 +12,400 @@ namespace Integration;
 use PHPUnit\Framework\TestCase;
 use SbWereWolf\XmlNavigator\Converter;
 use SbWereWolf\XmlNavigator\FastXmlToArray;
-use SbWereWolf\XmlNavigator\IXmlNavigator;
-use SbWereWolf\XmlNavigator\XmlNavigator;
+use SbWereWolf\XmlNavigator\IXmlElement;
+use SbWereWolf\XmlNavigator\XmlElement;
 
 class DebugTest extends TestCase
 {
+    private const PRETTY_PRINT =
+        array(
+            'complex' =>
+                array(
+                    'empty' =>
+                        array(),
+                    'ONLY_VALUE' => 'element has only value',
+                    'a' =>
+                        array(
+                            '@attributes' =>
+                                array(
+                                    'element_has_empty_attribute' => '',
+                                ),
+                        ),
+                    'b' =>
+                        array(
+                            0 =>
+                                array(
+                                    '@attributes' =>
+                                        array(
+                                            'val' => 'x',
+                                            'attr' => '-3',
+                                        ),
+                                ),
+                            1 =>
+                                array(
+                                    '@attributes' =>
+                                        array(
+                                            'val' => 'y',
+                                            'y' => 'val',
+                                        ),
+                                ),
+                            2 =>
+                                array(
+                                    '@attributes' =>
+                                        array(
+                                            'val' => 'z',
+                                        ),
+                                ),
+                        ),
+                    'c' =>
+                        array(
+                            0 =>
+                                array(
+                                    '@value' => '0',
+                                ),
+                            1 =>
+                                array(
+                                    '@attributes' =>
+                                        array(
+                                            'a' => 'v',
+                                        ),
+                                ),
+                            2 =>
+                                array(),
+                        ),
+                ),
+        );
+
+    private const CONVERTER_PRETTY_PRINT =
+        array(
+            'complex' =>
+                array(
+                    'empty' =>
+                        array(),
+                    'ONLY_VALUE' => 'element has only value',
+                    'a' =>
+                        array(
+                            'a' =>
+                                array(
+                                    'element_has_empty_attribute' => '',
+                                ),
+                        ),
+                    'b' =>
+                        array(
+                            0 =>
+                                array(
+                                    'a' =>
+                                        array(
+                                            'val' => 'x',
+                                            'attr' => '-3',
+                                        ),
+                                ),
+                            1 =>
+                                array(
+                                    'a' =>
+                                        array(
+                                            'val' => 'y',
+                                            'y' => 'val',
+                                        ),
+                                ),
+                            2 =>
+                                array(
+                                    'a' =>
+                                        array(
+                                            'val' => 'z',
+                                        ),
+                                ),
+                        ),
+                    'c' =>
+                        array(
+                            0 =>
+                                array(
+                                    'v' => '0',
+                                ),
+                            1 =>
+                                array(
+                                    'a' =>
+                                        array(
+                                            'a' => 'v',
+                                        ),
+                                ),
+                            2 =>
+                                array(),
+                        ),
+                ),
+        );
+
+    private const XML_STRUCTURE =
+        array(
+            'n' => 'complex',
+            's' =>
+                array(
+                    0 =>
+                        array(
+                            'n' => 'empty',
+                        ),
+                    1 =>
+                        array(
+                            'n' => 'ONLY_VALUE',
+                            'v' => 'element has only value',
+                        ),
+                    2 =>
+                        array(
+                            'n' => 'a',
+                            'a' =>
+                                array(
+                                    'element_has_empty_attribute' => '',
+                                ),
+                        ),
+                    3 =>
+                        array(
+                            'n' => 'b',
+                            'a' =>
+                                array(
+                                    'val' => 'x',
+                                    'attr' => '-3',
+                                ),
+                        ),
+                    4 =>
+                        array(
+                            'n' => 'b',
+                            'a' =>
+                                array(
+                                    'val' => 'y',
+                                    'y' => 'val',
+                                ),
+                        ),
+                    5 =>
+                        array(
+                            'n' => 'b',
+                            'a' =>
+                                array(
+                                    'val' => 'z',
+                                ),
+                        ),
+                    6 =>
+                        array(
+                            'n' => 'c',
+                            'v' => '0',
+                        ),
+                    7 =>
+                        array(
+                            'n' => 'c',
+                            'a' =>
+                                array(
+                                    'a' => 'v',
+                                ),
+                        ),
+                    8 =>
+                        array(
+                            'n' => 'c',
+                        ),
+                ),
+        );
+
     public function testXmlNavigator()
     {
         $xmlContent =
             array(
-                'elems' =>
+                'n' => 'complex',
+                'a' =>
+                    array(
+                        'str' => 'text',
+                        'number' => '-3.9',
+                    ),
+                's' =>
                     array(
                         0 =>
                             array(
-                                'name' => 'complex',
-                                'attribs' =>
+                                'n' => 'empty',
+                            ),
+                        1 =>
+                            array(
+                                'n' => 'ONLY_VALUE',
+                                'v' => 'element has only value',
+                            ),
+                        2 =>
+                            array(
+                                'n' => 'a',
+                                'a' =>
                                     array(
-                                        'str' => 'text',
-                                        'number' => '-3.9',
+                                        'element_has_empty_attribute' =>
+                                            '',
                                     ),
-                                'elems' =>
+                            ),
+                        3 =>
+                            array(
+                                'n' => 'b',
+                                'a' =>
                                     array(
-                                        0 =>
-                                            array(
-                                                'name' => 'empty',
-                                                'elems' =>
-                                                    array(),
-                                            ),
-                                        1 =>
-                                            array(
-                                                'name' => 'ONLY_VALUE',
-                                                'val' =>
-                                                    'element has only' .
-                                                    ' value',
-                                                'elems' =>
-                                                    array(),
-                                            ),
-                                        2 =>
-                                            array(
-                                                'name' => 'a',
-                                                'attribs' =>
-                                                    array(
-                                                        'element_has' .
-                                                        '_empty_' .
-                                                        'attribute' =>
-                                                            '',
-                                                    ),
-                                                'elems' =>
-                                                    array(),
-                                            ),
-                                        3 =>
-                                            array(
-                                                'name' => 'b',
-                                                'attribs' =>
-                                                    array(
-                                                        'val' => 'x',
-                                                        'attr' => '-3',
-                                                    ),
-                                                'elems' =>
-                                                    array(),
-                                            ),
-                                        4 =>
-                                            array(
-                                                'name' => 'b',
-                                                'attribs' =>
-                                                    array(
-                                                        'val' => 'y',
-                                                        'y' => 'val',
-                                                    ),
-                                                'elems' =>
-                                                    array(),
-                                            ),
-                                        5 =>
-                                            array(
-                                                'name' => 'b',
-                                                'attribs' =>
-                                                    array(
-                                                        'val' => 'z',
-                                                    ),
-                                                'elems' =>
-                                                    array(),
-                                            ),
-                                        6 =>
-                                            array(
-                                                'name' => 'c',
-                                                'val' => '0',
-                                                'elems' =>
-                                                    array(),
-                                            ),
-                                        7 =>
-                                            array(
-                                                'name' => 'c',
-                                                'attribs' =>
-                                                    array(
-                                                        'a' => 'v',
-                                                    ),
-                                                'elems' =>
-                                                    array(),
-                                            ),
-                                        8 =>
-                                            array(
-                                                'name' => 'c',
-                                                'elems' =>
-                                                    array(),
-                                            ),
-                                        9 =>
-                                            array(
-                                                'name' => 'nested',
-                                                'elems' =>
-                                                    array(
-                                                        0 => array(
-                                                            'name' => 'any',
-                                                            'attribs' =>
-                                                                array(
-                                                                    'val' => '1',
-                                                                ),
-                                                            'elems' =>
-                                                                array(),
-                                                        ),
-                                                        1 => array(
-                                                            'name' => 'any',
-                                                            'attribs' =>
-                                                                array(
-                                                                    'val' => '2',
-                                                                ),
-                                                            'elems' =>
-                                                                array(),
-                                                        ),
-                                                    ),
-                                            ),
+                                        'v' => 'x',
+                                        'attr' => '-3',
+                                    ),
+                            ),
+                        4 =>
+                            array(
+                                'n' => 'b',
+                                'a' =>
+                                    array(
+                                        'v' => 'y',
+                                        'y' => 'val',
+                                    ),
+                            ),
+                        5 =>
+                            array(
+                                'n' => 'b',
+                                'a' =>
+                                    array(
+                                        'v' => 'z',
+                                    ),
+                            ),
+                        6 =>
+                            array(
+                                'n' => 'c',
+                                'v' => '0',
+                            ),
+                        7 =>
+                            array(
+                                'n' => 'c',
+                                'a' =>
+                                    array(
+                                        'a' => 'v',
+                                    ),
+                            ),
+                        8 =>
+                            array(
+                                'n' => 'c',
+                            ),
+                        9 =>
+                            array(
+                                'n' => 'nested',
+                                's' =>
+                                    array(
+                                        0 => array(
+                                            'n' => 'any',
+                                            'a' =>
+                                                array(
+                                                    'val' => '1',
+                                                ),
+                                        ),
+                                        1 => array(
+                                            'n' => 'any',
+                                            'a' =>
+                                                array(
+                                                    'val' => '2',
+                                                ),
+                                        ),
                                     ),
                             ),
                     ),
             );
-        $navigator = new XmlNavigator($xmlContent['elems'][0]);
+        $navigator = new XmlElement($xmlContent);
 
         /* get element name */
-        echo $navigator->name() . PHP_EOL;
-        /* complex */
+        $exported = $navigator->name();
+        $this->assertEquals('complex', $exported);
 
         /* get element value */
-        echo $navigator->value() . PHP_EOL;
-        /* '' */
+        $exported = $navigator->value();
+        $this->assertEquals('', $exported);
 
         /* get list of attributes */
-        echo var_export($navigator->attributes(), true) . PHP_EOL;
-        /*
-        array (
-          0 => 'str',
-          1 => 'number',
-        )
-        */
+        $attributes = $navigator->attributes();
+        $expectedName =
+            array(
+                0 => 'str',
+                1 => 'number',
+            );
+        $expectedVal =
+            array(
+                0 => 'text',
+                1 => '-3.9',
+            );
+        foreach ($attributes as $i => $attribute) {
+            $name = $attribute->name();
+            $val = $attribute->value();
+            self::assertEquals($expectedName[$i], $name);
+            self::assertEquals($expectedVal[$i], $val);
+        }
 
         /* get attribute value */
-        echo $navigator->get('str') . PHP_EOL;
+        $val = $navigator->get('str');
+        self::assertEquals('text', $val);
         /* text */
 
         /* get list of nested elements */
-        echo var_export($navigator->elements(), true) . PHP_EOL;
-        /*
-        array (
-          0 => 'empty',
-          1 => 'ONLY_VALUE',
-          2 => 'a',
-          3 => 'b',
-          4 => 'b',
-          5 => 'b',
-          6 => 'c',
-          7 => 'c',
-          8 => 'c',
-          9 => 'nested',
-        )
-        */
+        $elements = $navigator->elements();
+
+        $expected =
+            array(
+                0 => 'empty',
+                1 => 'ONLY_VALUE',
+                2 => 'a',
+                3 => 'b',
+                4 => 'b',
+                5 => 'b',
+                6 => 'c',
+                7 => 'c',
+                8 => 'c',
+                9 => 'nested',
+            );
+        foreach ($elements as $i => $element) {
+            $name = $element->name();
+            self::assertEquals($expected[$i], $name);
+        }
 
         /* get desired nested element */
         $elem = $navigator->pull()->current();
-        echo $elem->name() . PHP_EOL;
-        /* empty */
+        $name = $elem->name();
+        self::assertEquals('empty', $name);
 
+        $expected = [
+            'empty',
+            'ONLY_VALUE',
+            'a',
+            'b',
+            'b',
+            'b',
+            'c',
+            'c',
+            'c',
+            'nested',
+        ];
         /* get all nested elements */
-        foreach ($navigator->pull() as $pulled) {
-            /** @var IXmlNavigator $pulled */
-            echo $pulled->name() . PHP_EOL;
-            /*
-            empty
-            ONLY_VALUE
-            a
-            b
-            b
-            b
-            c
-            c
-            c
-            nested
-            */
+        foreach ($navigator->pull() as $i => $pulled) {
+            /** @var IXmlElement $pulled */
+            $name = $pulled->name();
+            self::assertEquals($expected[$i], $name);
         }
-
+        $expected = [
+            'any',
+            'any',
+        ];
         /* get nested element */
-        /** @var IXmlNavigator $nested */
+        /** @var IXmlElement $nested */
         $nested = $navigator->pull('nested')->current();
         /* get names of all elements of nested element */
-        echo var_export($nested->elements(), true) . PHP_EOL;
-        /*
-        array (
-          0 => 'any',
-          1 => 'any',
-        )
-        */
+        $exported = $nested->elements();
+        foreach ($exported as $i => $item) {
+            $name = $item->name();
+            self::assertEquals($expected[$i], $name);
+        }
 
+        $expectedName = [
+            'any',
+            'any',
+        ];
+        $expectedVal = [
+            '1',
+            '2',
+        ];
         /* get all elements with name `any` */
-        foreach ($nested->pull('any') as $any) {
-            /** @var IXmlNavigator $any */
-            echo ' element with name' .
-                ' `' . $any->name() .
-                '` have attribute `val` with value' .
-                ' `' . $any->get('val') . '`' .
-                PHP_EOL;
-            /*
-            element with name `any` have attribute `val` with value `1`
-            element with name `any` have attribute `val` with value `2`
-            */
+        foreach ($nested->pull('any') as $i => $any) {
+            /** @var IXmlElement $any */
+            $name = $any->name();
+            $value = $any->get('val');
+            self::assertEquals($expectedName[$i], $name);
+            self::assertEquals($expectedVal[$i], $value);
         }
 
         $this->assertTrue(true);
@@ -255,12 +429,11 @@ XML;
 
         $arrayRepresentationOfXml =
             (new Converter())->xmlStructure($xml);
-        var_export($arrayRepresentationOfXml);
-        /*
 
-        */
-
-        $this->assertTrue(true);
+        self::assertEquals(
+            static::XML_STRUCTURE,
+            $arrayRepresentationOfXml
+        );
     }
 
     public function testConverterPrettyPrint()
@@ -281,12 +454,11 @@ XML;
 
         $arrayRepresentationOfXml =
             (new Converter())->prettyPrint($xml);
-        var_export($arrayRepresentationOfXml);
-        /*
 
-        */
-
-        $this->assertTrue(true);
+        self::assertEquals(
+            static::CONVERTER_PRETTY_PRINT,
+            $arrayRepresentationOfXml
+        );
     }
 
     public function testFastXmlToArrayConvert()
@@ -305,10 +477,12 @@ XML;
 </complex>
 XML;
 
-        $result = FastXmlToArray::convert($xml);
-        var_export($result);
+        $arrayRepresentationOfXml = FastXmlToArray::convert($xml);
 
-        $this->assertTrue(true);
+        self::assertEquals(
+            static::XML_STRUCTURE,
+            $arrayRepresentationOfXml
+        );
     }
 
     public function testFastXmlToArrayPrettyPrint()
@@ -327,9 +501,11 @@ XML;
 </complex>
 XML;
 
-        $result = FastXmlToArray::prettyPrint($xml);
-        var_export($result);
+        $arrayRepresentationOfXml = FastXmlToArray::prettyPrint($xml);
 
-        $this->assertTrue(true);
+        self::assertEquals(
+            static::PRETTY_PRINT,
+            $arrayRepresentationOfXml
+        );
     }
 }

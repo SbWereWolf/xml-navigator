@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SbWereWolf\XmlNavigator;
 
 use Generator;
@@ -12,14 +14,14 @@ class FastXmlToArray implements IFastXmlToArray
     private const DEPTH = 'depth';
 
     /* @inheritdoc */
-    #[ArrayShape([IFastXmlToArray::ELEMS => "array"])]
+    #[ArrayShape([IFastXmlToArray::NAME => "string"])]
     public static function convert(
         string $xmlText = '',
         string $xmlUri = '',
         string $name = IFastXmlToArray::NAME,
-        string $val = IFastXmlToArray::VAL,
-        string $attribs = IFastXmlToArray::ATTRIBS,
-        string $elems = IFastXmlToArray::ELEMS,
+        string $val = IFastXmlToArray::VALUE,
+        string $attribs = IFastXmlToArray::ATTRIBUTES,
+        string $elems = IFastXmlToArray::SEQUENCE,
         string $encoding = null,
         int $flags = LIBXML_BIGLINES | LIBXML_COMPACT,
     ): array {
@@ -47,8 +49,8 @@ class FastXmlToArray implements IFastXmlToArray
     public static function prettyPrint(
         string $xmlText = '',
         string $xmlUri = '',
-        string $val = IFastXmlToArray::VALUE,
-        string $attribs = IFastXmlToArray::ATTRIBUTES,
+        string $val = IFastXmlToArray::VAL,
+        string $attribs = IFastXmlToArray::ATTR,
         string $encoding = null,
         int $flags = LIBXML_BIGLINES | LIBXML_COMPACT,
     ): array {
@@ -112,12 +114,12 @@ class FastXmlToArray implements IFastXmlToArray
     }
 
     /**
-     * @param string $xmlText
-     * @param string $xmlUri
-     * @param string|null $encoding
-     * @param int $flags
-     * @param string $val
-     * @param string $attribs
+     * @param string $xmlText The text of XML document
+     * @param string $xmlUri Path or link to XML document
+     * @param string|null $encoding The document encoding or NULL
+     * @param int $flags A bitmask of the LIBXML_* constants.
+     * @param string $val index for element value
+     * @param string $attribs index for element attributes collection
      * @return array
      */
     private static function extractAllElements(
@@ -164,6 +166,8 @@ class FastXmlToArray implements IFastXmlToArray
 
     /**
      * @param XMLReader $reader
+     * @param string $valueIndex index for element value
+     * @param string $attributesIndex index for element attributes collection
      * @return array
      */
     private static function extractElementsWithDepth(
@@ -191,11 +195,16 @@ class FastXmlToArray implements IFastXmlToArray
                 $elems[key($elems)][$name][$valueIndex] = $data[1];
             }
         }
+
         return $elems;
     }
 
     /**
      * @param array $elems
+     * @param string $nameIndex index for element name
+     * @param string $valueIndex index for element value
+     * @param string $attributesIndex index for attributes collection
+     * @param string $elementsIndex index for child elements collection
      * @return array[]
      */
     private static function createTheHierarchyOfElements(
@@ -205,11 +214,10 @@ class FastXmlToArray implements IFastXmlToArray
         string $attributesIndex,
         string $elementsIndex,
     ): array {
-        $hierarchy = [];
         $prev = 0;
-        $result = [$elementsIndex => []];
-        $ptr = &$result[$elementsIndex];
-        foreach ($elems as $elem) {
+        $hierarchy = [$elementsIndex => []];
+        $ptr = &$hierarchy[$elementsIndex];
+        foreach ($elems as $i => $elem) {
             $data = current($elem);
             /*$logger->debug('будем добавлять элемент' . json_encode($data, JSON_PRETTY_PRINT));*/
 
@@ -221,7 +229,7 @@ class FastXmlToArray implements IFastXmlToArray
             $letDoSearch = $prev !== $curr;
             /*$logger->debug('надо ли искать последовательность элементов' . json_encode($letDoSearch, JSON_PRETTY_PRINT));*/
             if ($letDoSearch) {
-                $ptr = &$result[$elementsIndex];
+                $ptr = &$hierarchy[$elementsIndex];
                 /*$logger->debug('перевели указатель на корень=>' . json_encode($ptr, JSON_PRETTY_PRINT));*/
                 for ($d = 0; $d < $curr; $d++) {
                     /*$logger->debug("текущий уровень=>`$d`");*/
@@ -247,18 +255,24 @@ class FastXmlToArray implements IFastXmlToArray
             if (isset($data[$attributesIndex])) {
                 $new[$attributesIndex] = $data[$attributesIndex];
             }
-            $new[$elementsIndex] = [];
+
+            $ii = $i + 1;
+            if (isset($elems[$ii]) && current($elems[$ii])[static::DEPTH] > $curr) {
+                $new[$elementsIndex] = [];
+            }
 
             /*$logger->debug('новый элемент=>' . json_encode($new, JSON_PRETTY_PRINT));*/
             $ptr[] = $new;
             /*$logger->debug('последовательность после добавления элемента=>' . json_encode($ptr, JSON_PRETTY_PRINT));*/
 
-            end($ptr);
-            $last = key($ptr);
-            $hierarchy[$curr] = $last;
-            /*$logger->debug("на уровне `{$curr}` последний индекс `{$last}`");*/
             $prev = $curr;
             /*$logger->debug("предыдущий уровень вложенности `$prev`");*/
+        }
+
+        $hasRoot = isset($hierarchy[$elementsIndex][0]);
+        $result = [];
+        if ($hasRoot) {
+            $result = &$hierarchy[$elementsIndex][0];
         }
 
         return $result;
@@ -266,6 +280,8 @@ class FastXmlToArray implements IFastXmlToArray
 
     /**
      * @param array $elems
+     * @param string $valueIndex index for element value
+     * @param string $attributesIndex index for attributes collection
      * @return array[]
      */
     private static function composePrettyPrintByXmlElements(

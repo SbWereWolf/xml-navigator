@@ -1,12 +1,10 @@
-## About Xml Navigator
+# Xml Navigator
 
 Xml Navigator base on XMLReader.
 
+You can assign XML as string or as URI ( or file system path).
+
 Navigator can provide XML-document as array or as object.
-
-## How To Install
-
-`composer require sbwerewolf/xml-navigator`
 
 ## How to use
 
@@ -21,7 +19,8 @@ $result =
     \SbWereWolf\XmlNavigator\FastXmlToArray::prettyPrint($xml);
 echo json_encode($result, JSON_PRETTY_PRINT);
 ```
-Output:
+
+OUTPUT:
 
 ```json
 {
@@ -40,24 +39,9 @@ Output:
 }
 ```
 
-## Navigator API
+## How To Install
 
-- `name(): string;` // Returns the name of XML element
-- `hasValue(): bool;` // Returns true if XML element has value
-- `value(): string;` // Returns the value of XML element
-- `hasAttributes(): bool;` // Returns true if XML element has
-  attributes
-- `attributes(): array;` // Returns names of all attributes of xml
-  element
-- `get(string $name = null): string;` // Get value of attribute with
-  the `$name`, if `$name` is not defined, than returns value of random
-  attribute
-- `hasElements(): bool;` // Returns true if XML element has nested
-  elements
-- `elements(): array;` // Returns names of all nested elements
-- `pull(string $name = ''): Generator` // Pull IXmlNavigator for
-  nested element, if `$name` is defined, than pull elements with the
-  `$name`
+`composer require sbwerewolf/xml-navigator`
 
 ## Use cases
 
@@ -84,14 +68,18 @@ XML;
         $converter = new \SbWereWolf\XmlNavigator\Converter();
         $arrayRepresentationOfXml = 
         $converter->prettyPrint($xml);
-        echo var_export($arrayRepresentationOfXml);
+        echo var_export($arrayRepresentationOfXml,true);
+```
 
+OUTPUT:
+
+```php
 array (
   'complex' => 
   array (
     'a' => 
     array (
-      '@attributes' => 
+      'a' => 
       array (
         'empty' => '',
       ),
@@ -100,21 +88,21 @@ array (
     array (
       0 => 
       array (
-        '@attributes' => 
+        'a' => 
         array (
           'val' => 'x',
         ),
       ),
       1 => 
       array (
-        '@attributes' => 
+        'a' => 
         array (
           'val' => 'y',
         ),
       ),
       2 => 
       array (
-        '@attributes' => 
+        'a' => 
         array (
           'val' => 'z',
         ),
@@ -124,11 +112,11 @@ array (
     array (
       0 => 
       array (
-        '@value' => '0',
+        'v' => '0',
       ),
       1 => 
       array (
-        '@attributes' => 
+        'a' => 
         array (
           'v' => 'o',
         ),
@@ -148,10 +136,35 @@ array (
 
 XmlNavigator implements object-oriented approach.
 
-```php
-use SbWereWolf\XmlNavigator\IXmlNavigator;
+#### Navigator API
 
-        $xml = <<<XML
+- `name(): string` // Returns the name of XML element
+- `hasValue(): bool` // Returns `true` if XML element has value
+- `value(): string` // Returns the value of XML element
+- `hasAttribute(string $name = ''): bool` // Returns `true` if XML
+  element has attribute with `$name`. If `$name` omitted, than returns
+  `true` if XML element has any attribute
+- `attributes(): XmlAttribute[]` // Returns all attributes of XML
+  element
+- `get(string $name = null): string` // Get value of attribute with
+  the `$name`, if `$name` is omitted, than returns value of random
+  attribute
+- `hasElement(string $name = ''): bool` // Returns `true` if XML
+  element has nested element with `$name`. If `$name` omitted, than
+  returns `true` if XML element has any nested element
+- `elements(): IXmlElement[]` // Returns all nested elements
+- `pull(string $name = ''): Generator` // Pull `IXmlElement` for
+  nested element, if `$name` is defined, than pull elements with the
+  `$name`
+
+### Interact with XML as object
+
+```php
+use SbWereWolf\XmlNavigator\FastXmlToArray;
+use SbWereWolf\XmlNavigator\IXmlElement;
+use SbWereWolf\XmlNavigator\XmlElement;
+
+$xml = <<<XML
 <doc attrib="a" option="o" >
     <base/>
     <valuable>element value</valuable>
@@ -168,91 +181,95 @@ use SbWereWolf\XmlNavigator\IXmlNavigator;
 </doc>
 XML;
 
-        $content =
-            \SbWereWolf\XmlNavigator\FastXmlToArray::convert($xml);
-        $navigator = 
-            new \SbWereWolf\XmlNavigator\XmlNavigator(
-                $content[IFastXmlToArray::ELEMS][0]
-            );
+$content = FastXmlToArray::convert($xml);
+$navigator = new XmlElement($content);
 
-        /* get element name */
-        echo $navigator->name() . PHP_EOL;
-        /* doc */
+/* get name of element */
+echo $navigator->name() . PHP_EOL;
+/* doc */
 
-        /* get element value */
-        echo $navigator->value() . PHP_EOL;
-        /* '' */
+/* get value of element */
+echo "`{$navigator->value()}`" . PHP_EOL;
+/* `` */
 
-        /* get list of attributes */
-        echo var_export($navigator->attributes(), true) . PHP_EOL;
-        /*
-        array (
-          0 => 'attrib',
-          1 => 'option',
-        )
-        */
+/* get list of attributes */
+$attributes = $navigator->attributes();
+foreach ($attributes as $attribute) {
+    /** @var \SbWereWolf\XmlNavigator\IXmlAttribute $attribute */
+    echo "`{$attribute->name()}` `{$attribute->value()}`" . PHP_EOL;
+}
+/* 
+`attrib` `a`
+`option` `o` 
+*/
 
-        /* get attribute value */
-        echo $navigator->get('attrib') . PHP_EOL;
-        /* a */
+/* get value of attribute */
+echo $navigator->get('attrib') . PHP_EOL;
+/* a */
 
-        /* get list of nested elements */
-        echo var_export($navigator->elements(), true) . PHP_EOL;
-        /*
-        array (
-          0 => 'base',
-          1 => 'valuable',
-          2 => 'complex',
-        )
-        */
+/* get list of nested elements */
+$elements = $navigator->elements();
+foreach ($elements as $element) {
+    echo "{$element->name()}" . PHP_EOL;
+}
+/*
+base
+valuable
+complex
+ */
 
-        /* get desired nested element */
-        /** @var IXmlNavigator $elem */
-        $elem = $navigator->pull('valuable')->current();
-        echo $elem->name() . PHP_EOL;
-        /* valuable */
+/* get desired nested element */
+/** @var IXmlElement $elem */
+$elem = $navigator->pull('valuable')->current();
+echo $elem->name() . PHP_EOL;
+/* valuable */
 
-        /* get all nested elements */
-        foreach ($navigator->pull() as $pulled) {
-            /** @var IXmlNavigator $pulled */
-            echo $pulled->name() . PHP_EOL;
-            /* base */
-            /* valuable */
-            /* complex */
-        }
+/* get all nested elements */
+foreach ($navigator->pull() as $pulled) {
+    /** @var IXmlElement $pulled */
+    echo $pulled->name() . PHP_EOL;
+    /*
+    base
+    valuable
+    complex
+    */
+}
 
-        /* get nested element */
-        /** @var IXmlNavigator $nested */
-        $nested = $navigator->pull('complex')->current();
-        /* get names of all elements of nested element */
-        echo var_export($nested->elements(), true) . PHP_EOL;
-        /*
-        array (
-          0 => 'a',
-          1 => 'b',
-          2 => 'b',
-          3 => 'b',
-          4 => 'c',
-          5 => 'c',
-          6 => 'c',
-          7 => 'different',
-        )
-        */
+/* get nested element with given name */
+/** @var IXmlElement $nested */
+$nested = $navigator->pull('complex')->current();
+/* get names of all elements of nested element */
+$elements = $nested->elements();
+foreach ($elements as $element) {
+    echo "{$element->name()}" . PHP_EOL;
+}
+/*
+a
+b
+b
+b
+c
+c
+c
+different
+)
+*/
 
-        /* pull all elements with name `b` */
-        foreach ($nested->pull('b') as $b) {
-            /** @var IXmlNavigator $b */
-            echo ' element with name' .
-                ' `' . $b->name() .
-                '` have attribute `val` with value' .
-                ' `' . $b->get('val') . '`' .
-                PHP_EOL;
-        }
-        /*
-        element with name `b` have attribute `val` with value `x`
-        element with name `b` have attribute `val` with value `y`
-        element with name `b` have attribute `val` with value `z`
-        */
+/* pull all elements with name `b` */
+foreach ($nested->pull('b') as $b) {
+    /** @var IXmlElement $b */
+    echo ' element with name' .
+        ' `' . $b->name() .
+        '` have attribute `val` with value' .
+        ' `' . $b->get('val') . '`' .
+        PHP_EOL;
+}
+/*
+element with name `b` have attribute `val` with value `x`
+element with name `b` have attribute `val` with value `y`
+element with name `b` have attribute `val` with value `z`
+*/
+*/
 ```
 
 # Advanced using

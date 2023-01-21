@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SbWereWolf\XmlNavigator;
 
 use Generator;
@@ -7,15 +9,15 @@ use XMLReader;
 
 interface IFastXmlToArray
 {
-    public const NAME = 'name';
-    public const VAL = 'val';
-    public const ATTRIBS = 'attribs';
-    public const ELEMS = 'elems';
+    public const NAME = 'n';
+    public const VALUE = 'v';
+    public const ATTRIBUTES = 'a';
+    public const SEQUENCE = 's';
 
-    public const VALUE = '@value';
-    public const ATTRIBUTES = '@attributes';
+    public const VAL = '@value';
+    public const ATTR = '@attributes';
 
-    /** Convert xml document to array representation,
+    /** Convert xml document into normalized array
      * with call XMLReader::close() on $reader
      * @param string $xmlText The text of XML document
      * @param string $xmlUri Path or link to XML document
@@ -31,14 +33,14 @@ interface IFastXmlToArray
         string $xmlText = '',
         string $xmlUri = '',
         string $name = IFastXmlToArray::NAME,
-        string $val = IFastXmlToArray::VAL,
-        string $attribs = IFastXmlToArray::ATTRIBS,
-        string $elems = IFastXmlToArray::ELEMS,
+        string $val = IFastXmlToArray::VALUE,
+        string $attribs = IFastXmlToArray::ATTRIBUTES,
+        string $elems = IFastXmlToArray::SEQUENCE,
         string $encoding = null,
         int $flags = LIBXML_BIGLINES | LIBXML_COMPACT,
     ): array;
 
-    /**
+    /** Convert xml document into compact array
      * @param string $xmlText The text of XML document
      * @param string $xmlUri Path or link to XML document
      * @param string $val index for element value
@@ -50,8 +52,8 @@ interface IFastXmlToArray
     public static function prettyPrint(
         string $xmlText = '',
         string $xmlUri = '',
-        string $val = IFastXmlToArray::VALUE,
-        string $attribs = IFastXmlToArray::ATTRIBUTES,
+        string $val = IFastXmlToArray::VAL,
+        string $attribs = IFastXmlToArray::ATTR,
         string $encoding = null,
         int $flags = LIBXML_BIGLINES | LIBXML_COMPACT,
     ): array;
