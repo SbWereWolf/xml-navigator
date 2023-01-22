@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SbWereWolf\XmlNavigator;
 
 use JsonSerializable;
+use XMLReader;
 
 /**
  * Конвертор XML документа в PHP массив
@@ -29,17 +30,17 @@ class Converter implements IConverter, JsonSerializable
     private int $flags;
 
     /**
-     * @param string $name Индекс для имени
      * @param string $val Индекс для значения
      * @param string $attr Индекс для атрибутов
+     * @param string $name Индекс для имени
      * @param string $seq Индекс для вложенных элементов
      * @param string|null $encoding
      * @param int $flags
      */
     public function __construct(
-        string $name = IFastXmlToArray::NAME,
         string $val = IFastXmlToArray::VALUE,
         string $attr = IFastXmlToArray::ATTRIBUTES,
+        string $name = IFastXmlToArray::NAME,
         string $seq = IFastXmlToArray::SEQUENCE,
         string $encoding = null,
         int $flags = LIBXML_BIGLINES | LIBXML_COMPACT,
@@ -98,5 +99,40 @@ class Converter implements IConverter, JsonSerializable
     public function jsonSerialize(): array
     {
         return get_object_vars($this);
+    }
+
+    public function extractElements(XMLReader $reader): array
+    {
+        $result = FastXmlToArray::extractElements(
+            $reader,
+            $this->val,
+            $this->attribs,
+        );
+
+        return $result;
+    }
+
+    public function createTheHierarchyOfElements(array $elems): array
+    {
+        $result = FastXmlToArray::createTheHierarchyOfElements(
+            $elems,
+            $this->name,
+            $this->val,
+            $this->attribs,
+            $this->seq,
+        );
+
+        return $result;
+    }
+
+    public function composePrettyPrintByXmlElements(array $elems): array
+    {
+        $result = FastXmlToArray::composePrettyPrintByXmlElements(
+            $elems,
+            $this->val,
+            $this->attribs,
+        );
+
+        return $result;
     }
 }

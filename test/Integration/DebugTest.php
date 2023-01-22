@@ -14,6 +14,7 @@ use SbWereWolf\XmlNavigator\Converter;
 use SbWereWolf\XmlNavigator\FastXmlToArray;
 use SbWereWolf\XmlNavigator\IXmlElement;
 use SbWereWolf\XmlNavigator\XmlElement;
+use XMLReader;
 
 class DebugTest extends TestCase
 {
@@ -507,5 +508,156 @@ XML;
             static::PRETTY_PRINT,
             $arrayRepresentationOfXml
         );
+    }
+
+    public function test1()
+    {
+        $xml = <<<XML
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<QueryResult
+        xmlns="urn://x-artefacts-smev-gov-ru/services/service-adapter/types">
+    <smevMetadata
+            b="2">
+        <MessageId
+                c="re">c0f7b4bf-7453-11ed-8f6b-005056ac53b6
+        </MessageId>
+        <Sender>CUST01</Sender>
+        <Recipient>RPRN01</Recipient>
+    </smevMetadata>
+    <Message
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:type="RequestMessageType">
+        <RequestMetadata>
+            <clientId>a0efcf22-b199-4e1c-984a-63fd59ed9345</clientId>
+            <linkedGroupIdentity>
+                <refClientId>a0efcf22-b199-4e1c-984a-63fd59ed9345</refClientId>
+            </linkedGroupIdentity>
+            <testMessage>false</testMessage>
+        </RequestMetadata>
+        <RequestContent>
+            <content>
+                <MessagePrimaryContent>
+                    <ns:Query
+                            xmlns:ns="urn://rpn.gov.ru/services/smev/cites/1.0.0"
+                            xmlns="urn://x-artefacts-smev-gov-ru/services/message-exchange/types/basic/1.2"
+                    >
+                        <ns:Search>
+                            <ns:SearchNumber
+                                    Number="22RU006228DV"/>
+                        </ns:Search>
+                    </ns:Query>
+                </MessagePrimaryContent>
+            </content>
+        </RequestContent>
+    </Message>
+</QueryResult>
+XML;
+
+        $mayRead = true;
+        $reader = XMLReader::XML($xml);
+        while ($mayRead && $reader->name !== 'ns:Query') {
+            $mayRead = $reader->read();
+        }
+
+        while ($reader->name === 'ns:Query') {
+            $elementsCollection = FastXmlToArray::extractElements(
+                $reader,
+            );
+            $result = FastXmlToArray::createTheHierarchyOfElements(
+                $elementsCollection,
+            );
+
+            echo json_encode([$result], JSON_PRETTY_PRINT);
+
+            while (
+                $mayRead &&
+                $reader->nodeType !== XMLReader::ELEMENT
+            ) {
+                $mayRead = $reader->read();
+            }
+        }
+        $reader->close();
+
+        self::assertTrue(true);
+    }
+
+    public function test2()
+    {
+        $xml = <<<XML
+<?xml version="1.0" encoding="utf-8"?>
+<CARPLACES>
+    <CARPLACE
+            ID="11356925"
+            OBJECTID="20318444"
+            OBJECTGUID="6e237b93-09d6-4adf-9567-e9678608543b"
+            CHANGEID="31810106"
+            NUMBER="1"
+            OPERTYPEID="10"
+            PREVID="0"
+            NEXTID="0"
+            UPDATEDATE="2019-07-09"
+            STARTDATE="2019-07-09"
+            ENDDATE="2079-06-06"
+            ISACTUAL="1"
+            ISACTIVE="1"
+    />
+    <CARPLACE
+            ID="11361653"
+            OBJECTID="20326793"
+            OBJECTGUID="11d9f79b-be6f-43dc-bdcc-70bbfc9f86b0"
+            CHANGEID="31822630"
+            NUMBER="1"
+            OPERTYPEID="10"
+            PREVID="0"
+            NEXTID="0"
+            UPDATEDATE="2019-07-30"
+            STARTDATE="2019-07-30"
+            ENDDATE="2079-06-06"
+            ISACTUAL="1"
+            ISACTIVE="1"
+    />
+    <CARPLACE
+            ID="94824"
+            OBJECTID="101032823"
+            OBJECTGUID="4f37e0eb-141f-4c19-b416-0ec85e2e9e76"
+            CHANGEID="192339336"
+            NUMBER="0"
+            OPERTYPEID="10"
+            PREVID="0"
+            NEXTID="0"
+            UPDATEDATE="2021-04-22"
+            STARTDATE="2021-04-22"
+            ENDDATE="2079-06-06"
+            ISACTUAL="1"
+            ISACTIVE="1"
+    />
+</CARPLACES>
+XML;
+
+        $reader = XMLReader::XML($xml);
+        $mayRead = true;
+        while ($mayRead && $reader->name !== 'CARPLACE') {
+            $mayRead = $reader->read();
+        }
+
+        while ($mayRead && $reader->name === 'CARPLACE') {
+            $elementsCollection = FastXmlToArray::extractElements(
+                $reader,
+            );
+            $result = FastXmlToArray::createTheHierarchyOfElements(
+                $elementsCollection,
+            );
+            echo json_encode([$result], JSON_PRETTY_PRINT);
+
+            while (
+                $mayRead &&
+                $reader->nodeType !== XMLReader::ELEMENT
+            ) {
+                $mayRead = $reader->read();
+            }
+        }
+        $reader->close();
+
+        self::assertTrue(true);
     }
 }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace SbWereWolf\XmlNavigator;
 
-use Generator;
 use XMLReader;
 
 /**
@@ -69,15 +68,43 @@ interface IFastXmlToArray
         int $flags = LIBXML_BIGLINES | LIBXML_COMPACT,
     ): array;
 
-    /** Pull XML element or it value as
-     * [`element name` =>
-     *     [
-     *         0 => element depth,
-     *         1 => value of TEXT node, or attributes of ELEMENT node
-     *     ]
-     * ]
+    /**
      * @param XMLReader $reader
-     * @return Generator
+     * @param string $valueIndex index for element value
+     * @param string $attributesIndex index for element attributes collection
+     * @return array
      */
-    public static function nextElement(XMLReader $reader): Generator;
+    public static function extractElements(
+        XMLReader $reader,
+        string $valueIndex = IFastXmlToArray::VALUE,
+        string $attributesIndex = IFastXmlToArray::ATTRIBUTES,
+    ): array;
+
+    /**
+     * @param array $elems
+     * @param string $nameIndex index for element name
+     * @param string $valueIndex index for element value
+     * @param string $attributesIndex index for attributes collection
+     * @param string $elementsIndex index for child elements collection
+     * @return array[]
+     */
+    public static function createTheHierarchyOfElements(
+        array $elems,
+        string $nameIndex = IFastXmlToArray::NAME,
+        string $valueIndex = IFastXmlToArray::VALUE,
+        string $attributesIndex = IFastXmlToArray::ATTRIBUTES,
+        string $elementsIndex = IFastXmlToArray::SEQUENCE,
+    ): array;
+
+    /**
+     * @param array $elems
+     * @param string $valueIndex index for element value
+     * @param string $attributesIndex index for attributes collection
+     * @return array[]
+     */
+    public static function composePrettyPrintByXmlElements(
+        array $elems,
+        string $valueIndex = IFastXmlToArray::VAL,
+        string $attributesIndex = IFastXmlToArray::ATTR,
+    ): array;
 }

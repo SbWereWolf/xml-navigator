@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace SbWereWolf\XmlNavigator;
 
-use Generator;
 use InvalidArgumentException;
 use JetBrains\PhpStorm\ArrayShape;
 use XMLReader;
@@ -16,6 +15,11 @@ class FastXmlToArray implements IFastXmlToArray
 {
     /** @var string Индекс для уровня вложенности элемента */
     private const DEPTH = 'depth';
+    private const ALLOWED_NODE_TYPES = [
+        XMLReader::ELEMENT,
+        XMLReader::TEXT,
+        XMLReader::CDATA,
+    ];
 
     /* @inheritdoc */
     #[ArrayShape([IFastXmlToArray::NAME => "string"])]
@@ -76,46 +80,6 @@ class FastXmlToArray implements IFastXmlToArray
         return $result;
     }
 
-    /* @inheritdoc */
-    public static function nextElement(XMLReader $reader): Generator
-    {
-        $path = [];
-        while ($reader->read()) {
-            $result = [];
-            if (
-                $reader->nodeType === XMLReader::ELEMENT
-            ) {
-                $path[$reader->depth] = $reader->name;
-                $attribs = [];
-                while ($reader->moveToNextAttribute()) {
-                    $attribs[$reader->name] = $reader->value;
-                }
-
-                $hasAttribs = count($attribs) !== 0;
-                if (!$hasAttribs) {
-                    yield
-                    $path[$reader->depth] => [0 => $reader->depth];
-                }
-                if ($hasAttribs) {
-                    $result[0] = $reader->depth - 1;
-                    $result[1] = $attribs;
-
-                    yield $path[$reader->depth - 1] => $result;
-                }
-            }
-
-            if (
-                $reader->nodeType === XMLReader::TEXT ||
-                $reader->nodeType === XMLReader::CDATA
-            ) {
-                $result[0] = $reader->depth - 1;
-                $result[1] = $reader->value;
-
-                yield $path[$reader->depth - 1] => $result;
-            }
-        }
-    }
-
     /**
      * @param string $xmlText The text of XML document
      * @param string $xmlUri Path or link to XML document
@@ -131,7 +95,7 @@ class FastXmlToArray implements IFastXmlToArray
         ?string $encoding,
         int $flags,
         string $val,
-        string $attribs
+        string $attribs,
     ): array {
         if ($xmlText === '' && $xmlUri === '') {
             throw new InvalidArgumentException(
@@ -156,7 +120,7 @@ class FastXmlToArray implements IFastXmlToArray
             );
         }
 
-        $elementsCollection = static::extractElementsWithDepth(
+        $elementsCollection = static::extractElements(
             $reader,
             $val,
             $attribs,
@@ -173,30 +137,45 @@ class FastXmlToArray implements IFastXmlToArray
      * @param string $attributesIndex index for element attributes collection
      * @return array
      */
-    private static function extractElementsWithDepth(
+    public static function extractElements(
         XMLReader $reader,
-        string $valueIndex,
-        string $attributesIndex,
+        string $valueIndex = IFastXmlToArray::VALUE,
+        string $attributesIndex = IFastXmlToArray::ATTRIBUTES,
     ): array {
         $elems = [];
-        foreach (static::nextElement($reader) as $name => $data) {
-            $isSet = isset($data[1]);
-            if (!$isSet) {
-                $elems[] = [$name => [static::DEPTH => $data[0]]];
+        $path = [];
+        $tryRead = true;
+        $base = $reader->depth;
+        while ($tryRead && $reader->nodeType !== XMLReader::ELEMENT) {
+            $tryRead = $reader->read();
+        }
+        if ($tryRead) {
+            $props = static::props($reader, $path);
+            static::assume(
+                $props,
+                $elems,
+                $attributesIndex,
+                $valueIndex
+            );
+            $tryRead = $reader->read();
+        }
+        while ($tryRead && $reader->depth > $base) {
+            $isAllowed = in_array(
+                $reader->nodeType,
+                static::ALLOWED_NODE_TYPES,
+                true
+            );
+            if ($isAllowed) {
+                $props = static::props($reader, $path);
+                static::assume(
+                    $props,
+                    $elems,
+                    $attributesIndex,
+                    $valueIndex
+                );
             }
 
-            $isArr = $isSet && is_array($data[1]);
-            if ($isSet && $isArr) {
-                $elems[] = [$name => [static::DEPTH => $data[0]]];
-
-                end($elems);
-                $elems[key($elems)][$name][$attributesIndex] =
-                    $data[1];
-            }
-            if ($isSet && !$isArr) {
-                end($elems);
-                $elems[key($elems)][$name][$valueIndex] = $data[1];
-            }
+            $tryRead = $reader->read();
         }
 
         return $elems;
@@ -210,14 +189,16 @@ class FastXmlToArray implements IFastXmlToArray
      * @param string $elementsIndex index for child elements collection
      * @return array[]
      */
-    private static function createTheHierarchyOfElements(
+    public static function createTheHierarchyOfElements(
         array $elems,
-        string $nameIndex,
-        string $valueIndex,
-        string $attributesIndex,
-        string $elementsIndex,
+        string $nameIndex = IFastXmlToArray::NAME,
+        string $valueIndex = IFastXmlToArray::VALUE,
+        string $attributesIndex = IFastXmlToArray::ATTRIBUTES,
+        string $elementsIndex = IFastXmlToArray::SEQUENCE,
     ): array {
-        $prev = 0;
+        $base = static::extractBaseDepth($elems);
+        $prev = $base;
+
         $hierarchy = [$elementsIndex => []];
         $ptr = &$hierarchy[$elementsIndex];
         foreach ($elems as $i => $elem) {
@@ -234,7 +215,7 @@ class FastXmlToArray implements IFastXmlToArray
             if ($letDoSearch) {
                 $ptr = &$hierarchy[$elementsIndex];
                 /*$logger->debug('перевели указатель на корень=>' . json_encode($ptr, JSON_PRETTY_PRINT));*/
-                for ($d = 0; $d < $curr; $d++) {
+                for ($d = $base; $d < $curr; $d++) {
                     /*$logger->debug("текущий уровень=>`$d`");*/
 
                     $end = 0;
@@ -260,7 +241,10 @@ class FastXmlToArray implements IFastXmlToArray
             }
 
             $ii = $i + 1;
-            if (isset($elems[$ii]) && current($elems[$ii])[static::DEPTH] > $curr) {
+            if (
+                isset($elems[$ii])
+                && current($elems[$ii])[static::DEPTH] > $curr
+            ) {
                 $new[$elementsIndex] = [];
             }
 
@@ -272,10 +256,13 @@ class FastXmlToArray implements IFastXmlToArray
             /*$logger->debug("предыдущий уровень вложенности `$prev`");*/
         }
 
-        $hasRoot = isset($hierarchy[$elementsIndex][0]);
         $result = [];
+        $hasRoot = 1 === count($hierarchy[$elementsIndex]);
         if ($hasRoot) {
             $result = &$hierarchy[$elementsIndex][0];
+        }
+        if (!$hasRoot) {
+            $result = &$hierarchy[$elementsIndex];
         }
 
         return $result;
@@ -287,12 +274,13 @@ class FastXmlToArray implements IFastXmlToArray
      * @param string $attributesIndex index for attributes collection
      * @return array[]
      */
-    private static function composePrettyPrintByXmlElements(
+    public static function composePrettyPrintByXmlElements(
         array $elems,
-        string $valueIndex,
-        string $attributesIndex,
+        string $valueIndex = IFastXmlToArray::VAL,
+        string $attributesIndex = IFastXmlToArray::ATTR,
     ): array {
-        $prev = 0;
+        $base = static::extractBaseDepth($elems);
+        $prev = $base;
         $result = [];
         $ptr = &$result;
         foreach ($elems as $elem) {
@@ -304,7 +292,7 @@ class FastXmlToArray implements IFastXmlToArray
             $letDoSearch = $prev !== $curr;
             if ($letDoSearch) {
                 $ptr = &$result;
-                for ($d = 0; $d < $curr; $d++) {
+                for ($d = $base; $d < $curr; $d++) {
                     $end = 0;
                     if (count($ptr)) {
                         end($ptr);
@@ -370,5 +358,106 @@ class FastXmlToArray implements IFastXmlToArray
         }
 
         return $result;
+    }
+
+    /**
+     * @param XMLReader $reader
+     * @param array $path
+     * @return array|array[]
+     */
+    private static function props(
+        XMLReader $reader,
+        array &$path
+    ): array {
+        $result = [];
+        $props = [];
+        if (
+            $reader->nodeType === XMLReader::ELEMENT
+        ) {
+            $path[$reader->depth] = $reader->name;
+            $attribs = [];
+            while ($reader->moveToNextAttribute()) {
+                $attribs[$reader->name] = $reader->value;
+            }
+
+            $hasAttribs = count($attribs) !== 0;
+            if (!$hasAttribs) {
+                $result = [
+                    $path[$reader->depth] => [0 => $reader->depth]
+                ];
+            }
+            if ($hasAttribs) {
+                $props[0] = $reader->depth - 1;
+                $props[1] = $attribs;
+
+                $result = [$path[$reader->depth - 1] => $props];
+            }
+        }
+
+        if (
+            $reader->nodeType === XMLReader::TEXT ||
+            $reader->nodeType === XMLReader::CDATA
+        ) {
+            $props[0] = $reader->depth - 1;
+            $props[1] = $reader->value;
+
+            $result = [$path[$reader->depth - 1] => $props];
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array $data
+     * @param array $elems
+     * @param string $attributesIndex
+     * @param string $valueIndex
+     * @return array
+     */
+    private static function assume(
+        array $props,
+        array &$elems,
+        string $attributesIndex,
+        string $valueIndex
+    ): array {
+        $name = key($props);
+        $data = current($props);
+        $isSet = isset($data[1]);
+        if (!$isSet) {
+            $elems[] = [$name => [static::DEPTH => $data[0]]];
+        }
+
+        $isArr = $isSet && is_array($data[1]);
+        if ($isSet && $isArr) {
+            $elems[] = [$name => [static::DEPTH => $data[0]]];
+
+            end($elems);
+            $elems[key($elems)][$name][$attributesIndex] =
+                $data[1];
+        }
+        if ($isSet && !$isArr) {
+            end($elems);
+            $elems[key($elems)][$name][$valueIndex] = $data[1];
+        }
+        return $elems;
+    }
+
+    /**
+     * @param array $elems
+     * @return int
+     */
+    private static function extractBaseDepth(array $elems): int
+    {
+        $first = [];
+        if ($elems) {
+            reset($elems);
+            $first = current($elems);
+        }
+        $base = 0;
+        if ($first) {
+            $base = current($first)[static::DEPTH];
+        }
+
+        return $base;
     }
 }
