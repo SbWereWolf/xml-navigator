@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace SbWereWolf\XmlNavigator;
 
 use JsonSerializable;
+use SbWereWolf\JsonSerializable\JsonSerializeTrait;
 
 /**
  * Объект для XML атрибута
  */
 class XmlAttribute implements IXmlAttribute, JsonSerializable
 {
+    use JsonSerializeTrait;
+
     private string $name;
     private string $value;
 
@@ -34,11 +37,5 @@ class XmlAttribute implements IXmlAttribute, JsonSerializable
     public function value(): string
     {
         return $this->value;
-    }
-
-    /* @inheritdoc */
-    public function jsonSerialize(): array
-    {
-        return get_object_vars($this);
     }
 }
