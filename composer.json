@@ -22,6 +22,7 @@
     "require": {
         "sbwerewolf/language-specific": "^8.0",
         "ext-xmlreader": "*",
-        "ext-libxml": "*"
+        "ext-libxml": "*",
+        "sbwerewolf/json-serialize-trait": "^1.0"
     }
 }

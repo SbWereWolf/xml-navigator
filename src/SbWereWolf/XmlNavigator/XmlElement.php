@@ -9,12 +9,15 @@ use InvalidArgumentException;
 use JsonSerializable;
 use LanguageSpecific\ArrayHandler;
 use LanguageSpecific\IArrayHandler;
+use SbWereWolf\JsonSerializable\JsonSerializeTrait;
 
 /**
  * Объект для XML элемента
  */
 class XmlElement implements IXmlElement, JsonSerializable
 {
+    use JsonSerializeTrait;
+
     /** @var IArrayHandler Массив со свойствами XML элемента */
     private IArrayHandler $handler;
     /** @var string Индекс имени элемента */
@@ -179,11 +182,5 @@ class XmlElement implements IXmlElement, JsonSerializable
         $result = $this->checkNameInsideIndex($index, $name);
 
         return $result;
-    }
-
-    /* @inheritdoc */
-    public function jsonSerialize(): array
-    {
-        return get_object_vars($this);
     }
 }

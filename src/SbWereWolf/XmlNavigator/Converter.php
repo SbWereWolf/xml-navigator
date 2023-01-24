@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SbWereWolf\XmlNavigator;
 
 use JsonSerializable;
+use SbWereWolf\JsonSerializable\JsonSerializeTrait;
 use XMLReader;
 
 /**
@@ -12,6 +13,8 @@ use XMLReader;
  */
 class Converter implements IConverter, JsonSerializable
 {
+    use JsonSerializeTrait;
+
     /** @var array Структура XML документа в нормализованном виде */
     private array $xmlStructure = [];
     /** @var array  XML документа в виде удобном для чтения */
@@ -93,12 +96,6 @@ class Converter implements IConverter, JsonSerializable
         }
 
         return $this->xmlStructure;
-    }
-
-    /* @inheritdoc */
-    public function jsonSerialize(): array
-    {
-        return get_object_vars($this);
     }
 
     public function extractElements(XMLReader $reader): array
