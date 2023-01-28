@@ -1,6 +1,6 @@
 # Xml Navigator
 
-Xml Navigator base on XMLReader.
+The PHP library Xml Navigator base on XMLReader.
 
 You can assign XML as string or as URI ( or file system path to file).
 
@@ -44,6 +44,96 @@ OUTPUT:
 `composer require sbwerewolf/xml-navigator`
 
 ## Use cases
+
+### Fast XML file processing with no worries of file size
+
+Access time to first element do not depend on file size.
+
+Let generate file with script and parse first element:
+
+```php
+$xml = '<SomeElement key="123">value</SomeElement>' . PHP_EOL;
+
+$filename = 'temp-' . uniqid() . '.xml';
+$file = fopen($filename, 'a');
+fwrite($file, '<Collection>');
+
+$limit = 1;
+for ($i = 0; $i < $limit; $i++) {
+    $content = "$xml$xml$xml$xml$xml$xml$xml$xml$xml$xml";
+    fwrite($file, $content);
+}
+
+fwrite($file, '</Collection>');
+fclose($file);
+
+$size = round(filesize($filename) / 1024, 2);
+echo "$filename size is $size Kb" . PHP_EOL;
+
+$start = hrtime(true);
+
+/** @var XMLReader $reader */
+$reader = XMLReader::open($filename);
+$mayRead = true;
+while ($mayRead && $reader->name !== 'SomeElement') {
+    $mayRead = $reader->read();
+}
+
+$elementsCollection =
+    SbWereWolf\XmlNavigator\FastXmlToArray::extractElements(
+        $reader,
+        SbWereWolf\XmlNavigator\FastXmlToArray::VAL,
+        SbWereWolf\XmlNavigator\FastXmlToArray::ATTR,
+    );
+$result =
+    SbWereWolf\XmlNavigator\FastXmlToArray::composePrettyPrintByXmlElements(
+        $elementsCollection,
+    );
+
+$finish = hrtime(true);
+$duration = $finish - $start;
+$duration = number_format($duration,);
+echo "First element parsing duration is $duration ns" . PHP_EOL;
+echo json_encode($result, JSON_PRETTY_PRINT) . PHP_EOL;
+
+$reader->close();
+```
+
+Repeat script with `$limit` values of 1, 1 000, 1 000 000,
+output will be
+
+```bash
+temp-63d5a9d9273aa.xml size is 0.45 Kb
+First element parsing duration is 2,291,700 ns
+{
+    "SomeElement": {
+        "@value": "value",
+        "@attributes": {
+            "key": "123"
+        }
+    }
+}
+temp-63d5a9d927ede.xml size is 429.71 Kb
+First element parsing duration is 11,159,800 ns
+{
+    "SomeElement": {
+        "@value": "value",
+        "@attributes": {
+            "key": "123"
+        }
+    }
+}
+temp-63d5a9d92c676.xml size is 429687.52 Kb
+First element parsing duration is 4,621,500 ns
+{
+    "SomeElement": {
+        "@value": "value",
+        "@attributes": {
+            "key": "123"
+        }
+    }
+}
+```
 
 ### XML-document as array
 
