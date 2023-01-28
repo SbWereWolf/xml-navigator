@@ -2,7 +2,7 @@
 
 Xml Navigator base on XMLReader.
 
-You can assign XML as string or as URI ( or file system path).
+You can assign XML as string or as URI ( or file system path to file).
 
 Navigator can provide XML-document as array or as object.
 
@@ -52,7 +52,7 @@ Converter implements array approach.
 Converter can use to convert XML-document to array, example:
 
 ```php
-        $xml = <<<XML
+$xml = <<<XML
 <complex>
     <a empty=""/>
     <b val="x"/>
@@ -65,71 +65,74 @@ Converter can use to convert XML-document to array, example:
 </complex>
 XML;
 
-        $converter = new \SbWereWolf\XmlNavigator\Converter();
-        $arrayRepresentationOfXml = 
-        $converter->prettyPrint($xml);
-        echo var_export($arrayRepresentationOfXml,true);
+$converter = new \SbWereWolf\XmlNavigator\Converter(
+    \SbWereWolf\XmlNavigator\IFastXmlToArray::VAL,
+    \SbWereWolf\XmlNavigator\IFastXmlToArray::ATTR,
+);
+$arrayRepresentationOfXml =
+    $converter->prettyPrint($xml);
+echo var_export($arrayRepresentationOfXml,true);
 ```
 
 OUTPUT:
 
 ```php
 array (
-  'complex' => 
-  array (
-    'a' => 
-    array (
-      'a' => 
-      array (
-        'empty' => '',
-      ),
-    ),
-    'b' => 
-    array (
-      0 => 
-      array (
-        'a' => 
+    'complex' =>
         array (
-          'val' => 'x',
+            'a' =>
+                array (
+                    '@attributes' =>
+                        array (
+                            'empty' => '',
+                        ),
+                ),
+            'b' =>
+                array (
+                    0 =>
+                        array (
+                            '@attributes' =>
+                                array (
+                                    'val' => 'x',
+                                ),
+                        ),
+                    1 =>
+                        array (
+                            '@attributes' =>
+                                array (
+                                    'val' => 'y',
+                                ),
+                        ),
+                    2 =>
+                        array (
+                            '@attributes' =>
+                                array (
+                                    'val' => 'z',
+                                ),
+                        ),
+                ),
+            'c' =>
+                array (
+                    0 =>
+                        array (
+                            '@value' => '0',
+                        ),
+                    1 =>
+                        array (
+                            '@attributes' =>
+                                array (
+                                    'v' => 'o',
+                                ),
+                        ),
+                    2 =>
+                        array (
+                        ),
+                ),
+            'different' =>
+                array (
+                ),
         ),
-      ),
-      1 => 
-      array (
-        'a' => 
-        array (
-          'val' => 'y',
-        ),
-      ),
-      2 => 
-      array (
-        'a' => 
-        array (
-          'val' => 'z',
-        ),
-      ),
-    ),
-    'c' => 
-    array (
-      0 => 
-      array (
-        'v' => '0',
-      ),
-      1 => 
-      array (
-        'a' => 
-        array (
-          'v' => 'o',
-        ),
-      ),
-      2 => 
-      array (
-      ),
-    ),
-    'different' => 
-    array (
-    ),
-  ),
-)
+);
 ```
 
 ### XML-document as object
@@ -160,10 +163,6 @@ XmlNavigator implements object-oriented approach.
 ### Interact with XML as object
 
 ```php
-use SbWereWolf\XmlNavigator\FastXmlToArray;
-use SbWereWolf\XmlNavigator\IXmlElement;
-use SbWereWolf\XmlNavigator\XmlElement;
-
 $xml = <<<XML
 <doc attrib="a" option="o" >
     <base/>
@@ -181,8 +180,9 @@ $xml = <<<XML
 </doc>
 XML;
 
-$content = FastXmlToArray::convert($xml);
-$navigator = new XmlElement($content);
+$converter = new \SbWereWolf\XmlNavigator\Converter();
+$content = $converter->xmlStructure($xml);
+$navigator = new SbWereWolf\XmlNavigator\XmlElement($content);
 
 /* get name of element */
 echo $navigator->name() . PHP_EOL;
@@ -198,9 +198,9 @@ foreach ($attributes as $attribute) {
     /** @var \SbWereWolf\XmlNavigator\IXmlAttribute $attribute */
     echo "`{$attribute->name()}` `{$attribute->value()}`" . PHP_EOL;
 }
-/* 
+/*
 `attrib` `a`
-`option` `o` 
+`option` `o`
 */
 
 /* get value of attribute */
@@ -219,14 +219,14 @@ complex
  */
 
 /* get desired nested element */
-/** @var IXmlElement $elem */
+/** @var SbWereWolf\XmlNavigator\IXmlElement $elem */
 $elem = $navigator->pull('valuable')->current();
 echo $elem->name() . PHP_EOL;
 /* valuable */
 
 /* get all nested elements */
 foreach ($navigator->pull() as $pulled) {
-    /** @var IXmlElement $pulled */
+    /** @var SbWereWolf\XmlNavigator\IXmlElement $pulled */
     echo $pulled->name() . PHP_EOL;
     /*
     base
@@ -236,7 +236,7 @@ foreach ($navigator->pull() as $pulled) {
 }
 
 /* get nested element with given name */
-/** @var IXmlElement $nested */
+/** @var SbWereWolf\XmlNavigator\IXmlElement $nested */
 $nested = $navigator->pull('complex')->current();
 /* get names of all elements of nested element */
 $elements = $nested->elements();
@@ -252,12 +252,11 @@ c
 c
 c
 different
-)
 */
 
 /* pull all elements with name `b` */
 foreach ($nested->pull('b') as $b) {
-    /** @var IXmlElement $b */
+    /** @var SbWereWolf\XmlNavigator\IXmlElement $b */
     echo ' element with name' .
         ' `' . $b->name() .
         '` have attribute `val` with value' .
@@ -265,10 +264,9 @@ foreach ($nested->pull('b') as $b) {
         PHP_EOL;
 }
 /*
-element with name `b` have attribute `val` with value `x`
-element with name `b` have attribute `val` with value `y`
-element with name `b` have attribute `val` with value `z`
-*/
+ element with name `b` have attribute `val` with value `x`
+ element with name `b` have attribute `val` with value `y`
+ element with name `b` have attribute `val` with value `z`
 */
 ```
 
