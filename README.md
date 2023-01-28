@@ -99,8 +99,7 @@ echo json_encode($result, JSON_PRETTY_PRINT) . PHP_EOL;
 $reader->close();
 ```
 
-Repeat script with `$limit` values of 1, 1 000, 1 000 000,
-output will be
+Run script with `$limit` values of 1, 1 000, 1 000 000, output will be
 
 ```bash
 temp-63d5a9d9273aa.xml size is 0.45 Kb
