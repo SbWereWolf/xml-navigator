@@ -1,6 +1,6 @@
 # Xml Navigator
 
-The PHP library Xml Navigator base on XMLReader.
+The PHP library `Xml Navigator` base on `XMLReader`.
 
 You can assign XML as string or as URI ( or file system path to file).
 
@@ -106,13 +106,12 @@ function parseFirstElement(string $filename): void
     }
     
     $result =
-        SbWereWolf\XmlNavigator\PrettyPrintComposer::compose($reader,);
+        SbWereWolf\XmlNavigator\PrettyPrintComposer::compose($reader);
 
     $finish = hrtime(true);
     $duration = $finish - $start;
     $duration = number_format($duration,);
-    echo 'First element parsing duration of' .
-        " $filename is $duration ns" .
+    echo "First element parsing duration of $filename is $duration ns" .
         PHP_EOL;
 
     $reader->close();
@@ -200,7 +199,6 @@ XML;
 
         $reader = XMLReader::XML($xml);
 
-        $results = [];
         $extractor = FastXmlParser::extractPrettyPrint(
             $reader,
             /* callback for detect desired elements */
@@ -208,6 +206,8 @@ XML;
                 return $cursor->name === 'CARPLACE';
             }
         );
+        
+        $results = [];
         foreach ($extractor as $result) {
             $results[] = $result;
         }
@@ -218,64 +218,65 @@ XML;
 
 Output to console will be:
 
-```bash
-    {
-        "CARPLACE": {
-            "@attributes": {
-                "ID": "11356925",
-                "OBJECTID": "20318444",
-                "OBJECTGUID": "6e237b93-09d6-4adf-9567-e9678608543b",
-                "CHANGEID": "31810106",
-                "NUMBER": "1",
-                "OPERTYPEID": "10",
-                "PREVID": "0",
-                "NEXTID": "0",
-                "UPDATEDATE": "2019-07-09",
-                "STARTDATE": "2019-07-09",
-                "ENDDATE": "2079-06-06",
-                "ISACTUAL": "1",
-                "ISACTIVE": "1"
-            }
-        }
-    },
-    {
-        "CARPLACE": {
-            "@attributes": {
-                "ID": "11361653",
-                "OBJECTID": "20326793",
-                "OBJECTGUID": "11d9f79b-be6f-43dc-bdcc-70bbfc9f86b0",
-                "CHANGEID": "31822630",
-                "NUMBER": "1",
-                "OPERTYPEID": "10",
-                "PREVID": "0",
-                "NEXTID": "0",
-                "UPDATEDATE": "2019-07-30",
-                "STARTDATE": "2019-07-30",
-                "ENDDATE": "2079-06-06",
-                "ISACTUAL": "1",
-                "ISACTIVE": "1"
-            }
-        }
-    },
-    {
-        "CARPLACE": {
-            "@attributes": {
-                "ID": "94824",
-                "OBJECTID": "101032823",
-                "OBJECTGUID": "4f37e0eb-141f-4c19-b416-0ec85e2e9e76",
-                "CHANGEID": "192339336",
-                "NUMBER": "0",
-                "OPERTYPEID": "10",
-                "PREVID": "0",
-                "NEXTID": "0",
-                "UPDATEDATE": "2021-04-22",
-                "STARTDATE": "2021-04-22",
-                "ENDDATE": "2079-06-06",
-                "ISACTUAL": "1",
-                "ISACTIVE": "1"
-            }
-        }
+```json
+[
+  {
+    "CARPLACE": {
+      "@attributes": {
+        "ID": "11356925",
+        "OBJECTID": "20318444",
+        "OBJECTGUID": "6e237b93-09d6-4adf-9567-e9678608543b",
+        "CHANGEID": "31810106",
+        "NUMBER": "1",
+        "OPERTYPEID": "10",
+        "PREVID": "0",
+        "NEXTID": "0",
+        "UPDATEDATE": "2019-07-09",
+        "STARTDATE": "2019-07-09",
+        "ENDDATE": "2079-06-06",
+        "ISACTUAL": "1",
+        "ISACTIVE": "1"
+      }
     }
+  },
+  {
+    "CARPLACE": {
+      "@attributes": {
+        "ID": "11361653",
+        "OBJECTID": "20326793",
+        "OBJECTGUID": "11d9f79b-be6f-43dc-bdcc-70bbfc9f86b0",
+        "CHANGEID": "31822630",
+        "NUMBER": "1",
+        "OPERTYPEID": "10",
+        "PREVID": "0",
+        "NEXTID": "0",
+        "UPDATEDATE": "2019-07-30",
+        "STARTDATE": "2019-07-30",
+        "ENDDATE": "2079-06-06",
+        "ISACTUAL": "1",
+        "ISACTIVE": "1"
+      }
+    }
+  },
+  {
+    "CARPLACE": {
+      "@attributes": {
+        "ID": "94824",
+        "OBJECTID": "101032823",
+        "OBJECTGUID": "4f37e0eb-141f-4c19-b416-0ec85e2e9e76",
+        "CHANGEID": "192339336",
+        "NUMBER": "0",
+        "OPERTYPEID": "10",
+        "PREVID": "0",
+        "NEXTID": "0",
+        "UPDATEDATE": "2021-04-22",
+        "STARTDATE": "2021-04-22",
+        "ENDDATE": "2079-06-06",
+        "ISACTUAL": "1",
+        "ISACTIVE": "1"
+      }
+    }
+  }
 ]
 ```
 
