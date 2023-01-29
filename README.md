@@ -45,93 +45,110 @@ OUTPUT:
 
 ## Use cases
 
-### Fast XML file processing with no worries of file size
+### XML file processing with no worries of file size
 
 Access time to first element do not depend on file size.
 
-Let generate file with script and parse first element:
+Let generate XML files by script:
 
 ```php
+function generateFile(string $filename, int $limit, string $xml): void
+{
+    $file = fopen($filename, 'a');
+    fwrite($file, '<Collection>');
+
+    for ($i = 0; $i < $limit; $i++) {
+        $content = "$xml$xml$xml$xml$xml$xml$xml$xml$xml$xml";
+        fwrite($file, $content);
+    }
+
+    fwrite($file, '</Collection>');
+    fclose($file);
+
+    $size = round(filesize($filename) / 1024, 2);
+    echo "$filename size is $size Kb" . PHP_EOL;
+}
+
 $xml = '<SomeElement key="123">value</SomeElement>' . PHP_EOL;
+$generation['temp-465b.xml'] = 1;
+$generation['temp-429Kb.xml'] = 1_000;
+$generation['temp-429Mb.xml'] = 1_000_000;
 
-$filename = 'temp-' . uniqid() . '.xml';
-$file = fopen($filename, 'a');
-fwrite($file, '<Collection>');
-
-$limit = 1;
-for ($i = 0; $i < $limit; $i++) {
-    $content = "$xml$xml$xml$xml$xml$xml$xml$xml$xml$xml";
-    fwrite($file, $content);
+foreach ($generation as $filename => $size) {
+    generateFile($filename, $size, $xml);
 }
-
-fwrite($file, '</Collection>');
-fclose($file);
-
-$size = round(filesize($filename) / 1024, 2);
-echo "$filename size is $size Kb" . PHP_EOL;
-
-$start = hrtime(true);
-
-/** @var XMLReader $reader */
-$reader = XMLReader::open($filename);
-$mayRead = true;
-while ($mayRead && $reader->name !== 'SomeElement') {
-    $mayRead = $reader->read();
-}
-
-$elementsCollection =
-    SbWereWolf\XmlNavigator\FastXmlToArray::extractElements(
-        $reader,
-        SbWereWolf\XmlNavigator\FastXmlToArray::VAL,
-        SbWereWolf\XmlNavigator\FastXmlToArray::ATTR,
-    );
-$result =
-    SbWereWolf\XmlNavigator\FastXmlToArray::composePrettyPrintByXmlElements(
-        $elementsCollection,
-    );
-
-$finish = hrtime(true);
-$duration = $finish - $start;
-$duration = number_format($duration,);
-echo "First element parsing duration is $duration ns" . PHP_EOL;
-echo json_encode($result, JSON_PRETTY_PRINT) . PHP_EOL;
-
-$reader->close();
 ```
 
-Run script with `$limit` values of 1, 1 000, 1 000 000, output will be
+```bash
+temp-465b.xml size is 0.45 Kb
+temp-429Kb.xml size is 429.71 Kb
+temp-429Mb.xml size is 429687.52 Kb
+```
+
+Let run benchmark by script:
+
+```php
+/**
+ * @param string $filename
+ * @return void
+ */
+function parseFirstElement(string $filename): void
+{
+    $start = hrtime(true);
+
+    /** @var XMLReader $reader */
+    $reader = XMLReader::open($filename);
+    $mayRead = true;
+    while ($mayRead && $reader->name !== 'SomeElement') {
+        $mayRead = $reader->read();
+    }
+
+    $elementsCollection =
+        SbWereWolf\XmlNavigator\FastXmlToArray::extractElements(
+            $reader,
+            SbWereWolf\XmlNavigator\FastXmlToArray::VAL,
+            SbWereWolf\XmlNavigator\FastXmlToArray::ATTR,
+        );
+    $result =
+        SbWereWolf\XmlNavigator\FastXmlToArray
+            ::composePrettyPrintByXmlElements(
+                $elementsCollection,
+            );
+
+    $finish = hrtime(true);
+    $duration = $finish - $start;
+    $duration = number_format($duration,);
+    echo 'First element parsing duration of' .
+        " $filename is $duration ns" .
+        PHP_EOL;
+
+    $reader->close();
+}
+
+$files = [
+    'temp-465b.xml',
+    'temp-429Kb.xml',
+    'temp-429Mb.xml',
+];
+
+echo 'Warm up OPcache' . PHP_EOL;
+parseFirstElement(current($files));
+
+echo 'Benchmark is starting' . PHP_EOL;
+foreach ($files as $filename) {
+    parseFirstElement($filename);
+}
+echo 'Benchmark was finished' . PHP_EOL;
+```
 
 ```bash
-temp-63d5a9d9273aa.xml size is 0.45 Kb
-First element parsing duration is 2,291,700 ns
-{
-    "SomeElement": {
-        "@value": "value",
-        "@attributes": {
-            "key": "123"
-        }
-    }
-}
-temp-63d5a9d927ede.xml size is 429.71 Kb
-First element parsing duration is 11,159,800 ns
-{
-    "SomeElement": {
-        "@value": "value",
-        "@attributes": {
-            "key": "123"
-        }
-    }
-}
-temp-63d5a9d92c676.xml size is 429687.52 Kb
-First element parsing duration is 4,621,500 ns
-{
-    "SomeElement": {
-        "@value": "value",
-        "@attributes": {
-            "key": "123"
-        }
-    }
-}
+Warm up OPcache
+First element parsing duration of temp-465b.xml is 1,291,100 ns
+Benchmark is starting
+First element parsing duration of temp-465b.xml is 156,600 ns
+First element parsing duration of temp-429Kb.xml is 133,700 ns
+First element parsing duration of temp-429Mb.xml is 122,100 ns
+Benchmark was finished
 ```
 
 ### XML-document as array
