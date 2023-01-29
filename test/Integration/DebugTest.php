@@ -1,21 +1,24 @@
 <?php
-/*
- * storage-for-all-things
- * Copyright © 2021 Volkhin Nikolay
- * 30.07.2021, 5:46
- */
 
 declare(strict_types=1);
 
 namespace Integration;
 
 use PHPUnit\Framework\TestCase;
-use SbWereWolf\XmlNavigator\Converter;
+use SbWereWolf\XmlNavigator\FastXmlParser;
 use SbWereWolf\XmlNavigator\FastXmlToArray;
+use SbWereWolf\XmlNavigator\HierarchyComposer;
+use SbWereWolf\XmlNavigator\IElementComposer;
 use SbWereWolf\XmlNavigator\IXmlElement;
+use SbWereWolf\XmlNavigator\PrettyPrintComposer;
+use SbWereWolf\XmlNavigator\XmlConverter;
 use SbWereWolf\XmlNavigator\XmlElement;
+use SbWereWolf\XmlNavigator\XmlParser;
 use XMLReader;
 
+/**
+ * Testing library classes
+ */
 class DebugTest extends TestCase
 {
     private const PRETTY_PRINT =
@@ -136,7 +139,7 @@ class DebugTest extends TestCase
                 ),
         );
 
-    private const XML_STRUCTURE =
+    private const XML_HIERARCHY =
         array(
             'n' => 'complex',
             's' =>
@@ -204,7 +207,302 @@ class DebugTest extends TestCase
                 ),
         );
 
-    public function testXmlNavigator()
+    private const NS_QUERY = <<<XML
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<QueryResult
+        xmlns="urn://x-artefacts-smev-gov-ru/services/service-adapter/types">
+    <smevMetadata
+            b="2">
+        <MessageId
+                c="re">c0f7b4bf-7453-11ed-8f6b-005056ac53b6
+        </MessageId>
+        <Sender>CUST01</Sender>
+        <Recipient>RPRN01</Recipient>
+    </smevMetadata>
+    <Message
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:type="RequestMessageType">
+        <RequestMetadata>
+            <clientId>a0efcf22-b199-4e1c-984a-63fd59ed9345</clientId>
+            <linkedGroupIdentity>
+                <refClientId>a0efcf22-b199-4e1c-984a-63fd59ed9345</refClientId>
+            </linkedGroupIdentity>
+            <testMessage>false</testMessage>
+        </RequestMetadata>
+        <RequestContent>
+            <content>
+                <MessagePrimaryContent>
+                    <ns:Query
+                            xmlns:ns="urn://rpn.gov.ru/services/smev/cites/1.0.0"
+                            xmlns="urn://x-artefacts-smev-gov-ru/services/message-exchange/types/basic/1.2"
+                    >
+                        <ns:Search>
+                            <ns:SearchNumber
+                                    Number="22RU006228DV"/>
+                        </ns:Search>
+                    </ns:Query>
+                </MessagePrimaryContent>
+            </content>
+        </RequestContent>
+    </Message>
+</QueryResult>
+XML;
+
+    private const NS_QUERY_HIERARCHY =
+        array(
+            0 => array
+            (
+                'n' => 'ns:Query',
+                'a' => array
+                (
+                    'xmlns:ns' =>
+                        'urn://rpn.gov.ru/services/smev/cites/1.0.0',
+                    'xmlns' =>
+                        'urn://x-artefacts-smev-gov-ru/services/message' .
+                        '-exchange/types/basic/1.2',
+                ),
+                's' => array
+                (
+                    0 => array
+                    (
+                        'n' => 'ns:Search',
+                        's' => array
+                        (
+                            0 => array
+                            (
+                                'n' => 'ns:SearchNumber',
+                                'a' => array
+                                (
+                                    'Number' => '22RU006228DV',
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        );
+
+    private const NS_QUERY_PRETTY_PRINT =
+        array(
+            0 => array
+            (
+                'ns:Query' => array
+                (
+                    '@attributes' => array
+                    (
+                        'xmlns:ns' =>
+                            'urn://rpn.gov.ru/services/smev/cites/1.0.0',
+                        'xmlns' =>
+                            'urn://x-artefacts-smev-gov-ru/services/message-exchange/types/basic/1.2'
+                    ),
+                    'ns:Search' => array
+                    (
+                        'ns:SearchNumber' => array
+                        (
+                            '@attributes' => array
+                            (
+                                'Number' => '22RU006228DV'
+                            )
+                        )
+                    )
+                )
+            )
+        );
+
+
+    private const CARPLACE = <<<XML
+<?xml version="1.0" encoding="utf-8"?>
+<CARPLACES>
+    <CARPLACE
+            ID="11356925"
+            OBJECTID="20318444"
+            OBJECTGUID="6e237b93-09d6-4adf-9567-e9678608543b"
+            CHANGEID="31810106"
+            NUMBER="1"
+            OPERTYPEID="10"
+            PREVID="0"
+            NEXTID="0"
+            UPDATEDATE="2019-07-09"
+            STARTDATE="2019-07-09"
+            ENDDATE="2079-06-06"
+            ISACTUAL="1"
+            ISACTIVE="1"
+    />
+    <CARPLACE
+            ID="11361653"
+            OBJECTID="20326793"
+            OBJECTGUID="11d9f79b-be6f-43dc-bdcc-70bbfc9f86b0"
+            CHANGEID="31822630"
+            NUMBER="1"
+            OPERTYPEID="10"
+            PREVID="0"
+            NEXTID="0"
+            UPDATEDATE="2019-07-30"
+            STARTDATE="2019-07-30"
+            ENDDATE="2079-06-06"
+            ISACTUAL="1"
+            ISACTIVE="1"
+    />
+    <CARPLACE
+            ID="94824"
+            OBJECTID="101032823"
+            OBJECTGUID="4f37e0eb-141f-4c19-b416-0ec85e2e9e76"
+            CHANGEID="192339336"
+            NUMBER="0"
+            OPERTYPEID="10"
+            PREVID="0"
+            NEXTID="0"
+            UPDATEDATE="2021-04-22"
+            STARTDATE="2021-04-22"
+            ENDDATE="2079-06-06"
+            ISACTUAL="1"
+            ISACTIVE="1"
+    />
+</CARPLACES>
+XML;
+
+    private const CARPLACE_HIERARCHY =
+        array(
+            0 => array
+            (
+                'n' => 'CARPLACE',
+                'a' => array
+                (
+                    'ID' => '11356925',
+                    'OBJECTID' => '20318444',
+                    'OBJECTGUID' => '6e237b93-09d6-4adf-9567-e9678608543b',
+                    'CHANGEID' => '31810106',
+                    'NUMBER' => '1',
+                    'OPERTYPEID' => '10',
+                    'PREVID' => '0',
+                    'NEXTID' => '0',
+                    'UPDATEDATE' => '2019-07-09',
+                    'STARTDATE' => '2019-07-09',
+                    'ENDDATE' => '2079-06-06',
+                    'ISACTUAL' => '1',
+                    'ISACTIVE' => '1',
+                )
+            ),
+            1 => array
+            (
+                'n' => 'CARPLACE',
+                'a' => array
+                (
+                    'ID' => '11361653',
+                    'OBJECTID' => '20326793',
+                    'OBJECTGUID' => '11d9f79b-be6f-43dc-bdcc-70bbfc9f86b0',
+                    'CHANGEID' => '31822630',
+                    'NUMBER' => '1',
+                    'OPERTYPEID' => '10',
+                    'PREVID' => '0',
+                    'NEXTID' => '0',
+                    'UPDATEDATE' => '2019-07-30',
+                    'STARTDATE' => '2019-07-30',
+                    'ENDDATE' => '2079-06-06',
+                    'ISACTUAL' => '1',
+                    'ISACTIVE' => '1',
+                )
+
+            ),
+            2 => array
+            (
+                'n' => 'CARPLACE',
+                'a' => array
+                (
+                    'ID' => '94824',
+                    'OBJECTID' => '101032823',
+                    'OBJECTGUID' => '4f37e0eb-141f-4c19-b416-0ec85e2e9e76',
+                    'CHANGEID' => '192339336',
+                    'NUMBER' => '0',
+                    'OPERTYPEID' => '10',
+                    'PREVID' => '0',
+                    'NEXTID' => '0',
+                    'UPDATEDATE' => '2021-04-22',
+                    'STARTDATE' => '2021-04-22',
+                    'ENDDATE' => '2079-06-06',
+                    'ISACTUAL' => '1',
+                    'ISACTIVE' => '1',
+                )
+            )
+        );
+
+    private const CARPLACE_PRETTY_PRINT =
+        array(
+            '0' => array
+            (
+                'CARPLACE' => array
+                (
+                    '@attributes' => array
+                    (
+                        'ID' => '11356925',
+                        'OBJECTID' => '20318444',
+                        'OBJECTGUID' =>
+                            '6e237b93-09d6-4adf-9567-e9678608543b',
+                        'CHANGEID' => '31810106',
+                        'NUMBER' => '1',
+                        'OPERTYPEID' => '10',
+                        'PREVID' => '0',
+                        'NEXTID' => '0',
+                        'UPDATEDATE' => '2019-07-09',
+                        'STARTDATE' => '2019-07-09',
+                        'ENDDATE' => '2079-06-06',
+                        'ISACTUAL' => '1',
+                        'ISACTIVE' => '1',
+                    )
+                )
+            ),
+            1 => array
+            (
+                'CARPLACE' => array
+                (
+                    '@attributes' => array
+                    (
+                        'ID' => '11361653',
+                        'OBJECTID' => '20326793',
+                        'OBJECTGUID' =>
+                            '11d9f79b-be6f-43dc-bdcc-70bbfc9f86b0',
+                        'CHANGEID' => '31822630',
+                        'NUMBER' => '1',
+                        'OPERTYPEID' => '10',
+                        'PREVID' => '0',
+                        'NEXTID' => '0',
+                        'UPDATEDATE' => '2019-07-30',
+                        'STARTDATE' => '2019-07-30',
+                        'ENDDATE' => '2079-06-06',
+                        'ISACTUAL' => '1',
+                        'ISACTIVE' => '1',
+                    )
+                )
+            ),
+            2 => array
+            (
+                'CARPLACE' => array
+                (
+                    '@attributes' => array
+                    (
+                        'ID' => '94824',
+                        'OBJECTID' => '101032823',
+                        'OBJECTGUID' =>
+                            '4f37e0eb-141f-4c19-b416-0ec85e2e9e76',
+                        'CHANGEID' => '192339336',
+                        'NUMBER' => '0',
+                        'OPERTYPEID' => '10',
+                        'PREVID' => '0',
+                        'NEXTID' => '0',
+                        'UPDATEDATE' => '2021-04-22',
+                        'STARTDATE' => '2021-04-22',
+                        'ENDDATE' => '2079-06-06',
+                        'ISACTUAL' => '1',
+                        'ISACTIVE' => '1',
+                    )
+                )
+            )
+        );
+
+    /**
+     * @return void
+     */
+    public function testXmlNavigator(): void
     {
         $xmlContent =
             array(
@@ -412,7 +710,10 @@ class DebugTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function testConverterXmlStructure()
+    /**
+     * @return void
+     */
+    public function testXmlConverterToHierarchyOfElements(): void
     {
         $xml = <<<XML
 <complex>
@@ -429,15 +730,18 @@ class DebugTest extends TestCase
 XML;
 
         $arrayRepresentationOfXml =
-            (new Converter())->xmlStructure($xml);
+            (new XmlConverter())->toHierarchyOfElements($xml);
 
         self::assertEquals(
-            static::XML_STRUCTURE,
+            static::XML_HIERARCHY,
             $arrayRepresentationOfXml
         );
     }
 
-    public function testConverterPrettyPrint()
+    /**
+     * @return void
+     */
+    public function testXmlConverterToPrettyPrint(): void
     {
         $xml = <<<XML
 <complex>
@@ -454,7 +758,7 @@ XML;
 XML;
 
         $arrayRepresentationOfXml =
-            (new Converter())->prettyPrint($xml);
+            (new XmlConverter())->toPrettyPrint($xml);
 
         self::assertEquals(
             static::CONVERTER_PRETTY_PRINT,
@@ -462,7 +766,10 @@ XML;
         );
     }
 
-    public function testFastXmlToArrayConvert()
+    /**
+     * @return void
+     */
+    public function testFastXmlToArrayConvert(): void
     {
         $xml = <<<XML
 <complex>
@@ -481,12 +788,15 @@ XML;
         $arrayRepresentationOfXml = FastXmlToArray::convert($xml);
 
         self::assertEquals(
-            static::XML_STRUCTURE,
+            static::XML_HIERARCHY,
             $arrayRepresentationOfXml
         );
     }
 
-    public function testFastXmlToArrayPrettyPrint()
+    /**
+     * @return void
+     */
+    public function testFastXmlToArrayPrettyPrint(): void
     {
         $xml = <<<XML
 <complex>
@@ -510,64 +820,22 @@ XML;
         );
     }
 
-    public function test1()
+    /**
+     * @return void
+     */
+    public function testHierarchyComposerComposeNsQuery(): void
     {
-        $xml = <<<XML
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<QueryResult
-        xmlns="urn://x-artefacts-smev-gov-ru/services/service-adapter/types">
-    <smevMetadata
-            b="2">
-        <MessageId
-                c="re">c0f7b4bf-7453-11ed-8f6b-005056ac53b6
-        </MessageId>
-        <Sender>CUST01</Sender>
-        <Recipient>RPRN01</Recipient>
-    </smevMetadata>
-    <Message
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xsi:type="RequestMessageType">
-        <RequestMetadata>
-            <clientId>a0efcf22-b199-4e1c-984a-63fd59ed9345</clientId>
-            <linkedGroupIdentity>
-                <refClientId>a0efcf22-b199-4e1c-984a-63fd59ed9345</refClientId>
-            </linkedGroupIdentity>
-            <testMessage>false</testMessage>
-        </RequestMetadata>
-        <RequestContent>
-            <content>
-                <MessagePrimaryContent>
-                    <ns:Query
-                            xmlns:ns="urn://rpn.gov.ru/services/smev/cites/1.0.0"
-                            xmlns="urn://x-artefacts-smev-gov-ru/services/message-exchange/types/basic/1.2"
-                    >
-                        <ns:Search>
-                            <ns:SearchNumber
-                                    Number="22RU006228DV"/>
-                        </ns:Search>
-                    </ns:Query>
-                </MessagePrimaryContent>
-            </content>
-        </RequestContent>
-    </Message>
-</QueryResult>
-XML;
+        $reader = XMLReader::XML(static::NS_QUERY);
 
         $mayRead = true;
-        $reader = XMLReader::XML($xml);
         while ($mayRead && $reader->name !== 'ns:Query') {
             $mayRead = $reader->read();
         }
 
+        $results = [];
         while ($reader->name === 'ns:Query') {
-            $elementsCollection = FastXmlToArray::extractElements(
-                $reader,
-            );
-            $result = FastXmlToArray::createTheHierarchyOfElements(
-                $elementsCollection,
-            );
-
-            echo json_encode($result, JSON_PRETTY_PRINT);
+            $result = HierarchyComposer::compose($reader);
+            $results[] = $result;
 
             while (
                 $mayRead &&
@@ -578,76 +846,26 @@ XML;
         }
         $reader->close();
 
-        self::assertTrue(true);
+
+        self::assertEquals(static::NS_QUERY_HIERARCHY, $results);
     }
 
-    public function test2()
+    /**
+     * @return void
+     */
+    public function testHierarchyComposerComposeCarplace(): void
     {
-        $xml = <<<XML
-<?xml version="1.0" encoding="utf-8"?>
-<CARPLACES>
-    <CARPLACE
-            ID="11356925"
-            OBJECTID="20318444"
-            OBJECTGUID="6e237b93-09d6-4adf-9567-e9678608543b"
-            CHANGEID="31810106"
-            NUMBER="1"
-            OPERTYPEID="10"
-            PREVID="0"
-            NEXTID="0"
-            UPDATEDATE="2019-07-09"
-            STARTDATE="2019-07-09"
-            ENDDATE="2079-06-06"
-            ISACTUAL="1"
-            ISACTIVE="1"
-    />
-    <CARPLACE
-            ID="11361653"
-            OBJECTID="20326793"
-            OBJECTGUID="11d9f79b-be6f-43dc-bdcc-70bbfc9f86b0"
-            CHANGEID="31822630"
-            NUMBER="1"
-            OPERTYPEID="10"
-            PREVID="0"
-            NEXTID="0"
-            UPDATEDATE="2019-07-30"
-            STARTDATE="2019-07-30"
-            ENDDATE="2079-06-06"
-            ISACTUAL="1"
-            ISACTIVE="1"
-    />
-    <CARPLACE
-            ID="94824"
-            OBJECTID="101032823"
-            OBJECTGUID="4f37e0eb-141f-4c19-b416-0ec85e2e9e76"
-            CHANGEID="192339336"
-            NUMBER="0"
-            OPERTYPEID="10"
-            PREVID="0"
-            NEXTID="0"
-            UPDATEDATE="2021-04-22"
-            STARTDATE="2021-04-22"
-            ENDDATE="2079-06-06"
-            ISACTUAL="1"
-            ISACTIVE="1"
-    />
-</CARPLACES>
-XML;
+        $reader = XMLReader::XML(static::CARPLACE);
 
-        $reader = XMLReader::XML($xml);
         $mayRead = true;
         while ($mayRead && $reader->name !== 'CARPLACE') {
             $mayRead = $reader->read();
         }
 
+        $results = [];
         while ($mayRead && $reader->name === 'CARPLACE') {
-            $elementsCollection = FastXmlToArray::extractElements(
-                $reader,
-            );
-            $result = FastXmlToArray::createTheHierarchyOfElements(
-                $elementsCollection,
-            );
-            echo json_encode($result, JSON_PRETTY_PRINT);
+            $result = HierarchyComposer::compose($reader);
+            $results[] = $result;
 
             while (
                 $mayRead &&
@@ -658,6 +876,253 @@ XML;
         }
         $reader->close();
 
-        self::assertTrue(true);
+        self::assertEquals(static::CARPLACE_HIERARCHY, $results);
+    }
+
+    /**
+     * @return void
+     */
+    public function testPrettyPrintComposerComposeNsQuery(): void
+    {
+        $reader = XMLReader::XML(static::NS_QUERY);
+
+        $mayRead = true;
+        while ($mayRead && $reader->name !== 'ns:Query') {
+            $mayRead = $reader->read();
+        }
+
+        $results = [];
+        while ($reader->name === 'ns:Query') {
+            $result = PrettyPrintComposer::compose($reader);
+            $results[] = $result;
+
+            while (
+                $mayRead &&
+                $reader->nodeType !== XMLReader::ELEMENT
+            ) {
+                $mayRead = $reader->read();
+            }
+        }
+        $reader->close();
+
+
+        self::assertEquals(static::NS_QUERY_PRETTY_PRINT, $results);
+    }
+
+    /**
+     * @return void
+     */
+    public function testPrettyPrintComposerComposeCarplace(): void
+    {
+        $reader = XMLReader::XML(static::CARPLACE);
+
+        $mayRead = true;
+        while ($mayRead && $reader->name !== 'CARPLACE') {
+            $mayRead = $reader->read();
+        }
+
+        $results = [];
+        while ($mayRead && $reader->name === 'CARPLACE') {
+            $result = PrettyPrintComposer::compose($reader);
+            $results[] = $result;
+
+            while (
+                $mayRead &&
+                $reader->nodeType !== XMLReader::ELEMENT
+            ) {
+                $mayRead = $reader->read();
+            }
+        }
+        $reader->close();
+
+        self::assertEquals(static::CARPLACE_PRETTY_PRINT, $results);
+    }
+
+    /**
+     * @return void
+     */
+    public function testFastXmlParserExtractHierarchyNsQuery(): void
+    {
+        $reader = XMLReader::XML(static::NS_QUERY);
+
+        $results = [];
+        $extractor = FastXmlParser::extractHierarchy(
+            $reader,
+            function (XMLReader $cursor) {
+                return $cursor->name === 'ns:Query';
+            }
+        );
+        foreach ($extractor as $element) {
+            $results[] = $element;
+        }
+
+        $reader->close();
+
+        self::assertEquals(static::NS_QUERY_HIERARCHY, $results);
+    }
+
+    /**
+     * @return void
+     */
+    public function testFastXmlParserExtractPrettyPrintNsQuery(): void
+    {
+        $reader = XMLReader::XML(static::NS_QUERY);
+
+        $results = [];
+        $extractor = FastXmlParser::extractPrettyPrint(
+            $reader,
+            function (XMLReader $cursor) {
+                return $cursor->name === 'ns:Query';
+            }
+        );
+        foreach ($extractor as $element) {
+            $results[] = $element;
+        }
+
+        $reader->close();
+
+        self::assertEquals(static::NS_QUERY_PRETTY_PRINT, $results);
+    }
+
+    /**
+     * @return void
+     */
+    public function testFastXmlParserExtractHierarchyCarplace(): void
+    {
+        $reader = XMLReader::XML(static::CARPLACE);
+
+        $results = [];
+        $extractor = FastXmlParser::extractHierarchy(
+            $reader,
+            function (XMLReader $cursor) {
+                return $cursor->name === 'CARPLACE';
+            }
+        );
+        foreach ($extractor as $result) {
+            $results[] = $result;
+        }
+        $reader->close();
+
+        self::assertEquals(static::CARPLACE_HIERARCHY, $results);
+    }
+
+    /**
+     * @return void
+     */
+    public function testFastXmlParserExtractPrettyPrintCarplace(): void
+    {
+        $reader = XMLReader::XML(static::CARPLACE);
+
+        $results = [];
+        $extractor = FastXmlParser::extractPrettyPrint(
+            $reader,
+            function (XMLReader $cursor) {
+                return $cursor->name === 'CARPLACE';
+            }
+        );
+        foreach ($extractor as $result) {
+            $results[] = $result;
+        }
+        $reader->close();
+
+        self::assertEquals(static::CARPLACE_PRETTY_PRINT, $results);
+    }
+
+    /**
+     * @return void
+     */
+    public function testXmlParserExtractHierarchyNsQuery(): void
+    {
+        $reader = XMLReader::XML(static::NS_QUERY);
+        $parser = new XmlParser($reader);
+
+        $results = [];
+        $extractor = $parser->extractHierarchy(
+            function (XMLReader $cursor) {
+                return $cursor->name === 'ns:Query';
+            }
+        );
+        foreach ($extractor as $element) {
+            $results[] = $element;
+        }
+
+        $reader->close();
+
+        self::assertEquals(static::NS_QUERY_HIERARCHY, $results);
+    }
+
+    /**
+     * @return void
+     */
+    public function testXmlParserExtractPrettyPrintNsQuery(): void
+    {
+        $reader = XMLReader::XML(static::NS_QUERY);
+        $parser = new XmlParser(
+            $reader,
+            IElementComposer::VAL,
+            IElementComposer::ATTR,
+        );
+
+        $results = [];
+        $extractor = $parser->extractPrettyPrint(
+            function (XMLReader $cursor) {
+                return $cursor->name === 'ns:Query';
+            }
+        );
+        foreach ($extractor as $element) {
+            $results[] = $element;
+        }
+
+        $reader->close();
+
+        self::assertEquals(static::NS_QUERY_PRETTY_PRINT, $results);
+    }
+
+    /**
+     * @return void
+     */
+    public function testXmlParserExtractHierarchyCarplace(): void
+    {
+        $reader = XMLReader::XML(static::CARPLACE);
+        $parser = new XmlParser($reader);
+
+        $results = [];
+        $extractor = $parser->extractHierarchy(
+            function (XMLReader $cursor) {
+                return $cursor->name === 'CARPLACE';
+            }
+        );
+        foreach ($extractor as $result) {
+            $results[] = $result;
+        }
+        $reader->close();
+
+        self::assertEquals(static::CARPLACE_HIERARCHY, $results);
+    }
+
+    /**
+     * @return void
+     */
+    public function testXmlParserExtractPrettyPrintCarplace(): void
+    {
+        $reader = XMLReader::XML(static::CARPLACE);
+        $parser = new XmlParser(
+            $reader,
+            IElementComposer::VAL,
+            IElementComposer::ATTR,
+        );
+
+        $results = [];
+        $extractor = $parser->extractPrettyPrint(
+            function (XMLReader $cursor) {
+                return $cursor->name === 'CARPLACE';
+            }
+        );
+        foreach ($extractor as $result) {
+            $results[] = $result;
+        }
+        $reader->close();
+
+        self::assertEquals(static::CARPLACE_PRETTY_PRINT, $results);
     }
 }

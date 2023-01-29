@@ -26,8 +26,8 @@ interface IXmlElement
      */
     public function value(): string;
 
-    /** Returns true if XML element has attribute with $name.
-     * If $name omitted, than
+    /** Returns true if XML element has attributes with $name.
+     * If $name omitted, then
      * returns true if XML element has any attribute
      * @param string $name
      * @return bool
@@ -40,7 +40,7 @@ interface IXmlElement
     public function attributes(): array;
 
     /** Get value of attribute with the $name.
-     * If $name is omitted, than returns value of random attribute
+     * If $name is omitted, then returns value of random attribute
      * @param string|null $name
      * @return string
      */

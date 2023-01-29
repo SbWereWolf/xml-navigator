@@ -38,10 +38,10 @@ class XmlElement implements IXmlElement, JsonSerializable
      */
     public function __construct(
         array $data,
-        string $name = IFastXmlToArray::NAME,
-        string $val = IFastXmlToArray::VALUE,
-        string $attr = IFastXmlToArray::ATTRIBUTES,
-        string $seq = IFastXmlToArray::SEQUENCE,
+        string $name = IElementComposer::NAME,
+        string $val = IElementComposer::VALUE,
+        string $attr = IElementComposer::ATTRIBUTES,
+        string $seq = IElementComposer::SEQUENCE,
     ) {
         $keys = array_keys($data);
         if (key_exists($name, $keys)) {
@@ -78,7 +78,7 @@ class XmlElement implements IXmlElement, JsonSerializable
      * @param string $index
      * @return null|string|array
      */
-    private function getIndexContent(string $index)
+    private function getIndexContent(string $index): array|string|null
     {
         $content = null;
         if ($this->handler->has($index)) {
@@ -91,8 +91,7 @@ class XmlElement implements IXmlElement, JsonSerializable
     /* @inheritdoc */
     public function get(string $name = null): string
     {
-        $value = $this->handler->pull($this->attr)
-            ->get($name)->str();
+        $value = $this->handler->pull($this->attr)->get($name)->str();
 
         return $value;
     }
@@ -129,8 +128,7 @@ class XmlElement implements IXmlElement, JsonSerializable
     /* @inheritdoc */
     public function value(): string
     {
-        $result = (string)$this
-            ->getIndexContent($this->val);
+        $result = (string)$this->getIndexContent($this->val);
 
         return $result;
     }
@@ -138,9 +136,7 @@ class XmlElement implements IXmlElement, JsonSerializable
     /* @inheritdoc */
     public function name(): string
     {
-        return $this->handler
-            ->get($this->name)
-            ->str();
+        return $this->handler->get($this->name)->str();
     }
 
     /** Check existence of element with key $name

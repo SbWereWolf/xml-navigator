@@ -6,12 +6,11 @@ namespace SbWereWolf\XmlNavigator;
 
 use JsonSerializable;
 use SbWereWolf\JsonSerializable\JsonSerializeTrait;
-use XMLReader;
 
 /**
  * Конвертор XML документа в PHP массив
  */
-class Converter implements IConverter, JsonSerializable
+class XmlConverter implements IXmlConverter, JsonSerializable
 {
     use JsonSerializeTrait;
 
@@ -31,6 +30,10 @@ class Converter implements IConverter, JsonSerializable
     private ?string $encoding;
     /** @var int Битовая маска из констант LIBXML_* */
     private int $flags;
+    /** @var string Previous text of XML document */
+    private string $previousXmlText = '';
+    /** @var string Previous path or link to XML document */
+    private string $previousXmlUri = '';
 
     /**
      * @param string $val Индекс для значения
@@ -41,10 +44,10 @@ class Converter implements IConverter, JsonSerializable
      * @param int $flags
      */
     public function __construct(
-        string $val = IFastXmlToArray::VALUE,
-        string $attr = IFastXmlToArray::ATTRIBUTES,
-        string $name = IFastXmlToArray::NAME,
-        string $seq = IFastXmlToArray::SEQUENCE,
+        string $val = IElementComposer::VALUE,
+        string $attr = IElementComposer::ATTRIBUTES,
+        string $name = IElementComposer::NAME,
+        string $seq = IElementComposer::SEQUENCE,
         string $encoding = null,
         int $flags = LIBXML_BIGLINES | LIBXML_COMPACT,
     ) {
@@ -57,11 +60,12 @@ class Converter implements IConverter, JsonSerializable
     }
 
     /* @inheritdoc */
-    public function prettyPrint(
+    public function toPrettyPrint(
         string $xmlText = '',
         string $xmlUri = '',
     ): array {
-        if (!count($this->prettyXml)) {
+        $isPrevious = $this->isPrevious($xmlText, $xmlUri);
+        if (!$isPrevious || !count($this->prettyXml)) {
             $this->prettyXml =
                 FastXmlToArray::prettyPrint(
                     $xmlText,
@@ -71,65 +75,60 @@ class Converter implements IConverter, JsonSerializable
                     $this->encoding,
                     $this->flags,
                 );
+
+            $this->previousXmlText = $xmlText;
+            $this->previousXmlUri = $xmlUri;
         }
 
         return $this->prettyXml;
     }
 
     /* @inheritdoc */
-    public function xmlStructure(
+    public function toHierarchyOfElements(
         string $xmlText = '',
         string $xmlUri = '',
     ): array {
-        if (!count($this->xmlStructure)) {
+        $isPrevious = $this->isPrevious($xmlText, $xmlUri);
+        if (!$isPrevious || !count($this->xmlStructure)) {
             $this->xmlStructure =
                 FastXmlToArray::convert(
                     $xmlText,
                     $xmlUri,
-                    $this->name,
                     $this->val,
                     $this->attribs,
+                    $this->name,
                     $this->seq,
                     $this->encoding,
                     $this->flags,
                 );
+
+            $this->previousXmlText = $xmlText;
+            $this->previousXmlUri = $xmlUri;
         }
 
         return $this->xmlStructure;
     }
 
-    public function extractElements(XMLReader $reader): array
-    {
-        $result = FastXmlToArray::extractElements(
-            $reader,
-            $this->val,
-            $this->attribs,
-        );
-
-        return $result;
-    }
-
-    public function createTheHierarchyOfElements(array $elems): array
-    {
-        $result = FastXmlToArray::createTheHierarchyOfElements(
-            $elems,
-            $this->name,
-            $this->val,
-            $this->attribs,
-            $this->seq,
-        );
-
-        return $result;
-    }
-
-    public function composePrettyPrintByXmlElements(array $elems): array
-    {
-        $result = FastXmlToArray::composePrettyPrintByXmlElements(
-            $elems,
-            $this->val,
-            $this->attribs,
-        );
-
-        return $result;
+    /**
+     * @param string $xmlText
+     * @param string $xmlUri
+     * @return bool
+     */
+    private function isPrevious(
+        string $xmlText,
+        string $xmlUri
+    ): bool {
+        $isPrevious = true;
+        if ($xmlText !== '' && $xmlText !== $this->previousXmlText) {
+            $isPrevious = false;
+        }
+        if (
+            $xmlText === '' &&
+            $xmlUri !== '' &&
+            $xmlUri !== $this->previousXmlUri
+        ) {
+            $isPrevious = false;
+        }
+        return $isPrevious;
     }
 }
