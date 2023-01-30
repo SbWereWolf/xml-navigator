@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
-namespace SbWereWolf\XmlNavigator;
+namespace SbWereWolf\XmlNavigator\Converting;
 
 use InvalidArgumentException;
+use SbWereWolf\XmlNavigator\General\Notation;
+use SbWereWolf\XmlNavigator\Parsing\FastXmlParser;
 use XMLReader;
 
 /**
@@ -16,10 +18,10 @@ class FastXmlToArray implements IFastXmlToArray
     public static function convert(
         string $xmlText = '',
         string $xmlUri = '',
-        string $val = IElementComposer::VALUE,
-        string $attribs = IElementComposer::ATTRIBUTES,
-        string $name = IElementComposer::NAME,
-        string $seq = IElementComposer::SEQUENCE,
+        string $val = Notation::VALUE,
+        string $attr = Notation::ATTRIBUTES,
+        string $name = Notation::NAME,
+        string $seq = Notation::SEQUENCE,
         string $encoding = null,
         int $flags = LIBXML_BIGLINES | LIBXML_COMPACT,
     ): array {
@@ -29,13 +31,19 @@ class FastXmlToArray implements IFastXmlToArray
             $encoding,
             $flags
         );
-        $result = HierarchyComposer::compose(
+
+        $detectElement = function (XMLReader $cursor) {
+            return $cursor->nodeType === XMLReader::ELEMENT;
+        };
+        $extractor = FastXmlParser::extractHierarchy(
             $reader,
+            $detectElement,
             $val,
-            $attribs,
+            $attr,
             $name,
             $seq,
         );
+        $result = $extractor->current();
 
         $reader->close();
 
@@ -46,8 +54,8 @@ class FastXmlToArray implements IFastXmlToArray
     public static function prettyPrint(
         string $xmlText = '',
         string $xmlUri = '',
-        string $val = IElementComposer::VAL,
-        string $attribs = IElementComposer::ATTR,
+        string $val = Notation::VAL,
+        string $attr = Notation::ATTR,
         string $encoding = null,
         int $flags = LIBXML_BIGLINES | LIBXML_COMPACT,
     ): array {
@@ -57,11 +65,17 @@ class FastXmlToArray implements IFastXmlToArray
             $encoding,
             $flags
         );
-        $result = PrettyPrintComposer::compose(
+
+        $detectElement = function (XMLReader $cursor) {
+            return $cursor->nodeType === XMLReader::ELEMENT;
+        };
+        $extractor = FastXmlParser::extractPrettyPrint(
             $reader,
+            $detectElement,
             $val,
-            $attribs,
+            $attr,
         );
+        $result = $extractor->current();
 
         $reader->close();
 

@@ -2,9 +2,12 @@
 
 declare(strict_types=1);
 
-namespace SbWereWolf\XmlNavigator;
+namespace SbWereWolf\XmlNavigator\Parsing;
 
 use Generator;
+use SbWereWolf\XmlNavigator\Extracting\HierarchyComposer;
+use SbWereWolf\XmlNavigator\Extracting\PrettyPrintComposer;
+use SbWereWolf\XmlNavigator\General\Notation;
 use XMLReader;
 
 /**
@@ -24,10 +27,10 @@ class FastXmlParser
     public static function extractHierarchy(
         XMLReader $reader,
         callable $detectElement,
-        string $val = IElementComposer::VALUE,
-        string $attr = IElementComposer::ATTRIBUTES,
-        string $name = IElementComposer::NAME,
-        string $seq = IElementComposer::SEQUENCE,
+        string $val = Notation::VALUE,
+        string $attr = Notation::ATTRIBUTES,
+        string $name = Notation::NAME,
+        string $seq = Notation::SEQUENCE,
     ): Generator {
         $isSuitable = $detectElement($reader);
         $mayRead = true;
@@ -69,8 +72,8 @@ class FastXmlParser
     public static function extractPrettyPrint(
         XMLReader $reader,
         callable $detectElement,
-        string $val = IElementComposer::VAL,
-        string $attr = IElementComposer::ATTR,
+        string $val = Notation::VAL,
+        string $attr = Notation::ATTR,
     ): Generator {
         $isSuitable = $detectElement($reader);
         $mayRead = true;

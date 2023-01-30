@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace SbWereWolf\XmlNavigator;
+namespace SbWereWolf\XmlNavigator\General;
 
 /**
  * Interface with array indexes witch one uses every other classes
  */
-interface IElementComposer
+interface Notation
 {
     /** @var string Индекс Имени в нормализованном виде */
     public const NAME = 'n';

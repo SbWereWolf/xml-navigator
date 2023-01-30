@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SbWereWolf\XmlNavigator;
+namespace SbWereWolf\XmlNavigator\Extracting;
 
 use XMLReader;
 

@@ -16,7 +16,8 @@ $xml =<<<XML
 </outer>
 XML;
 $result =
-    \SbWereWolf\XmlNavigator\FastXmlToArray::prettyPrint($xml);
+    \SbWereWolf\XmlNavigator\Converting\FastXmlToArray
+    ::prettyPrint($xml);
 echo json_encode($result, JSON_PRETTY_PRINT);
 ```
 
@@ -106,7 +107,7 @@ function parseFirstElement(string $filename): void
     }
     
     $result =
-        SbWereWolf\XmlNavigator\PrettyPrintComposer::compose($reader);
+        \SbWereWolf\XmlNavigator\Extracting\PrettyPrintComposer::compose($reader);
 
     $finish = hrtime(true);
     $duration = $finish - $start;
@@ -146,7 +147,7 @@ Benchmark was finished
 ### Parse XML fast with callback for detect suitable elements
 
 ```php
-        $xml = <<<XML
+$xml = <<<XML
 <?xml version="1.0" encoding="utf-8"?>
 <CARPLACES>
     <CARPLACE
@@ -197,23 +198,24 @@ Benchmark was finished
 </CARPLACES>
 XML;
 
-        $reader = XMLReader::XML($xml);
+$reader = XMLReader::XML($xml);
 
-        $extractor = FastXmlParser::extractPrettyPrint(
-            $reader,
-            /* callback for detect desired elements */
-            function (XMLReader $cursor) {
-                return $cursor->name === 'CARPLACE';
-            }
-        );
-        
-        $results = [];
-        foreach ($extractor as $result) {
-            $results[] = $result;
+$extractor = \SbWereWolf\XmlNavigator\Parsing\FastXmlParser
+    ::extractPrettyPrint(
+        $reader,
+        /* callback for detect desired elements */
+        function (XMLReader $cursor) {
+            return $cursor->name === 'CARPLACE';
         }
-        $reader->close();
-        
-        echo json_encode($results,JSON_PRETTY_PRINT) . PHP_EOL;
+    );
+
+$results = [];
+foreach ($extractor as $result) {
+    $results[] = $result;
+}
+$reader->close();
+
+echo json_encode($results, JSON_PRETTY_PRINT) . PHP_EOL;
 ```
 
 Output to console will be:
@@ -300,9 +302,9 @@ $xml = <<<XML
 </complex>
 XML;
 
-$converter = new \SbWereWolf\XmlNavigator\XmlConverter(
-    \SbWereWolf\XmlNavigator\IFastXmlToArray::VAL,
-    \SbWereWolf\XmlNavigator\IFastXmlToArray::ATTR,
+$converter = new \SbWereWolf\XmlNavigator\Converting\XmlConverter(
+    \SbWereWolf\XmlNavigator\General\Notation::VAL,
+    \SbWereWolf\XmlNavigator\General\Notation::ATTR,
 );
 $arrayRepresentationOfXml =
     $converter->toPrettyPrint($xml);
@@ -415,9 +417,9 @@ $xml = <<<XML
 </doc>
 XML;
 
-$converter = new \SbWereWolf\XmlNavigator\XmlConverter();
+$converter = new \SbWereWolf\XmlNavigator\Converting\XmlConverter();
 $content = $converter->toHierarchyOfElements($xml);
-$navigator = new SbWereWolf\XmlNavigator\XmlElement($content);
+$navigator = new \SbWereWolf\XmlNavigator\Navigation\XmlElement($content);
 
 /* get name of element */
 echo $navigator->name() . PHP_EOL;
@@ -430,7 +432,7 @@ echo "`{$navigator->value()}`" . PHP_EOL;
 /* get list of attributes */
 $attributes = $navigator->attributes();
 foreach ($attributes as $attribute) {
-    /** @var \SbWereWolf\XmlNavigator\IXmlAttribute $attribute */
+    /** @var \SbWereWolf\XmlNavigator\Navigation\IXmlAttribute $attribute */
     echo "`{$attribute->name()}` `{$attribute->value()}`" . PHP_EOL;
 }
 /*
@@ -454,14 +456,14 @@ complex
  */
 
 /* get desired nested element */
-/** @var SbWereWolf\XmlNavigator\IXmlElement $elem */
+/** @var \SbWereWolf\XmlNavigator\Navigation\IXmlElement $elem */
 $elem = $navigator->pull('valuable')->current();
 echo $elem->name() . PHP_EOL;
 /* valuable */
 
 /* get all nested elements */
 foreach ($navigator->pull() as $pulled) {
-    /** @var SbWereWolf\XmlNavigator\IXmlElement $pulled */
+    /** @var \SbWereWolf\XmlNavigator\Navigation\IXmlElement $pulled */
     echo $pulled->name() . PHP_EOL;
     /*
     base
@@ -471,7 +473,7 @@ foreach ($navigator->pull() as $pulled) {
 }
 
 /* get nested element with given name */
-/** @var SbWereWolf\XmlNavigator\IXmlElement $nested */
+/** @var \SbWereWolf\XmlNavigator\Navigation\IXmlElement $nested */
 $nested = $navigator->pull('complex')->current();
 /* get names of all elements of nested element */
 $elements = $nested->elements();
@@ -491,7 +493,7 @@ different
 
 /* pull all elements with name `b` */
 foreach ($nested->pull('b') as $b) {
-    /** @var SbWereWolf\XmlNavigator\IXmlElement $b */
+    /** @var \SbWereWolf\XmlNavigator\Navigation\IXmlElement $b */
     echo ' element with name' .
         ' `' . $b->name() .
         '` have attribute `val` with value' .

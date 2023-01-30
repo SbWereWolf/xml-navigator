@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SbWereWolf\XmlNavigator;
+namespace SbWereWolf\XmlNavigator\Navigation;
 
 use Generator;
 use InvalidArgumentException;
@@ -10,6 +10,7 @@ use JsonSerializable;
 use LanguageSpecific\ArrayHandler;
 use LanguageSpecific\IArrayHandler;
 use SbWereWolf\JsonSerializable\JsonSerializeTrait;
+use SbWereWolf\XmlNavigator\General\Notation;
 
 /**
  * Объект для XML элемента
@@ -38,10 +39,10 @@ class XmlElement implements IXmlElement, JsonSerializable
      */
     public function __construct(
         array $data,
-        string $name = IElementComposer::NAME,
-        string $val = IElementComposer::VALUE,
-        string $attr = IElementComposer::ATTRIBUTES,
-        string $seq = IElementComposer::SEQUENCE,
+        string $name = Notation::NAME,
+        string $val = Notation::VALUE,
+        string $attr = Notation::ATTRIBUTES,
+        string $seq = Notation::SEQUENCE,
     ) {
         $keys = array_keys($data);
         if (key_exists($name, $keys)) {

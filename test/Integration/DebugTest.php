@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace Integration;
 
 use PHPUnit\Framework\TestCase;
-use SbWereWolf\XmlNavigator\FastXmlParser;
-use SbWereWolf\XmlNavigator\FastXmlToArray;
-use SbWereWolf\XmlNavigator\HierarchyComposer;
-use SbWereWolf\XmlNavigator\IElementComposer;
-use SbWereWolf\XmlNavigator\IXmlElement;
-use SbWereWolf\XmlNavigator\PrettyPrintComposer;
-use SbWereWolf\XmlNavigator\XmlConverter;
-use SbWereWolf\XmlNavigator\XmlElement;
-use SbWereWolf\XmlNavigator\XmlParser;
+use SbWereWolf\XmlNavigator\Converting\FastXmlToArray;
+use SbWereWolf\XmlNavigator\Converting\XmlConverter;
+use SbWereWolf\XmlNavigator\Extracting\HierarchyComposer;
+use SbWereWolf\XmlNavigator\Extracting\PrettyPrintComposer;
+use SbWereWolf\XmlNavigator\General\Notation;
+use SbWereWolf\XmlNavigator\Navigation\IXmlElement;
+use SbWereWolf\XmlNavigator\Navigation\XmlElement;
+use SbWereWolf\XmlNavigator\Parsing\FastXmlParser;
+use SbWereWolf\XmlNavigator\Parsing\XmlParser;
 use XMLReader;
 
 /**
@@ -1059,8 +1059,8 @@ XML;
         $reader = XMLReader::XML(static::NS_QUERY);
         $parser = new XmlParser(
             $reader,
-            IElementComposer::VAL,
-            IElementComposer::ATTR,
+            Notation::VAL,
+            Notation::ATTR,
         );
 
         $results = [];
@@ -1108,8 +1108,8 @@ XML;
         $reader = XMLReader::XML(static::CARPLACE);
         $parser = new XmlParser(
             $reader,
-            IElementComposer::VAL,
-            IElementComposer::ATTR,
+            Notation::VAL,
+            Notation::ATTR,
         );
 
         $results = [];

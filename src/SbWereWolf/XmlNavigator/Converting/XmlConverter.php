@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace SbWereWolf\XmlNavigator;
+namespace SbWereWolf\XmlNavigator\Converting;
 
 use JsonSerializable;
 use SbWereWolf\JsonSerializable\JsonSerializeTrait;
+use SbWereWolf\XmlNavigator\General\Notation;
 
 /**
  * Конвертор XML документа в PHP массив
@@ -44,10 +45,10 @@ class XmlConverter implements IXmlConverter, JsonSerializable
      * @param int $flags
      */
     public function __construct(
-        string $val = IElementComposer::VALUE,
-        string $attr = IElementComposer::ATTRIBUTES,
-        string $name = IElementComposer::NAME,
-        string $seq = IElementComposer::SEQUENCE,
+        string $val = Notation::VALUE,
+        string $attr = Notation::ATTRIBUTES,
+        string $name = Notation::NAME,
+        string $seq = Notation::SEQUENCE,
         string $encoding = null,
         int $flags = LIBXML_BIGLINES | LIBXML_COMPACT,
     ) {

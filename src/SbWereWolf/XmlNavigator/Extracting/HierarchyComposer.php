@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace SbWereWolf\XmlNavigator;
+namespace SbWereWolf\XmlNavigator\Extracting;
 
+use SbWereWolf\XmlNavigator\General\Notation;
 use XMLReader;
 
 /**
@@ -11,7 +12,7 @@ use XMLReader;
  */
 class HierarchyComposer
     extends ElementComposer
-    implements IElementComposer
+    implements Notation
 {
     /**
      * @param XMLReader $reader
@@ -23,10 +24,10 @@ class HierarchyComposer
      */
     public static function compose(
         XMLReader $reader,
-        string $valueIndex = IElementComposer::VALUE,
-        string $attributesIndex = IElementComposer::ATTRIBUTES,
-        string $nameIndex = IElementComposer::NAME,
-        string $elementsIndex = IElementComposer::SEQUENCE,
+        string $valueIndex = Notation::VALUE,
+        string $attributesIndex = Notation::ATTRIBUTES,
+        string $nameIndex = Notation::NAME,
+        string $elementsIndex = Notation::SEQUENCE,
     ): array {
         $elems = ElementExtractor::extractElements(
             $reader,
