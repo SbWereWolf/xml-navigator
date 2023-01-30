@@ -107,7 +107,8 @@ function parseFirstElement(string $filename): void
     }
     
     $result =
-        \SbWereWolf\XmlNavigator\Extracting\PrettyPrintComposer::compose($reader);
+        \SbWereWolf\XmlNavigator\Extracting\PrettyPrintComposer
+        ::compose($reader);
 
     $finish = hrtime(true);
     $duration = $finish - $start;
@@ -417,9 +418,10 @@ $xml = <<<XML
 </doc>
 XML;
 
-$converter = new \SbWereWolf\XmlNavigator\Converting\XmlConverter();
-$content = $converter->toHierarchyOfElements($xml);
-$navigator = new \SbWereWolf\XmlNavigator\Navigation\XmlElement($content);
+$content = \SbWereWolf\XmlNavigator\Converting\FastXmlToArray
+::toHierarchyOfElements($xml);
+$navigator = 
+new \SbWereWolf\XmlNavigator\Navigation\XmlElement($content);
 
 /* get name of element */
 echo $navigator->name() . PHP_EOL;
