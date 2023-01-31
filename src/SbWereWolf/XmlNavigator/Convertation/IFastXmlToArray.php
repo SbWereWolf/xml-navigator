@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SbWereWolf\XmlNavigator\Converting;
+namespace SbWereWolf\XmlNavigator\Convertation;
 
 use SbWereWolf\XmlNavigator\General\Notation;
 

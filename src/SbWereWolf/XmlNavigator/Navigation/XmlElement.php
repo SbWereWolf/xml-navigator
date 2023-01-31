@@ -44,8 +44,9 @@ class XmlElement implements IXmlElement, JsonSerializable
         string $attr = Notation::ATTRIBUTES,
         string $seq = Notation::SEQUENCE,
     ) {
-        $keys = array_keys($data);
-        if (key_exists($name, $keys)) {
+        $keys = array_flip(array_keys($data));
+        $letThrow = !key_exists($name, $keys);
+        if ($letThrow) {
             throw new InvalidArgumentException(
                 'input array MUST BE like' .
                 ' [ `name`=>string, `value`=>string,' .
@@ -152,7 +153,8 @@ class XmlElement implements IXmlElement, JsonSerializable
     ): bool {
         $result = $this->handler->has($index);
         if ($result && '' !== $name) {
-            $result = isset($this->handler->get($index)[$name]);
+            $result =
+                isset($this->handler->get($index)->array()[$name]);
         }
         return $result;
     }
@@ -176,7 +178,16 @@ class XmlElement implements IXmlElement, JsonSerializable
     public function hasElement(string $name = ''): bool
     {
         $index = $this->seq;
-        $result = $this->checkNameInsideIndex($index, $name);
+        $result = $this->handler->has($index);
+        if ($result && '' !== $name) {
+            $elems = $this->handler->get($index)->array();
+            foreach ($elems as $elem) {
+                $result = $elem[$this->name] === $name;
+                if ($result) {
+                    break;
+                }
+            }
+        }
 
         return $result;
     }

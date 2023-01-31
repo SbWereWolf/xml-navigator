@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SbWereWolf\XmlNavigator\Extracting;
+namespace SbWereWolf\XmlNavigator\Extraction;
 
 /**
  * Parent class for composers

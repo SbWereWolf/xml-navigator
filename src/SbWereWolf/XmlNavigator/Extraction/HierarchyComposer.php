@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SbWereWolf\XmlNavigator\Extracting;
+namespace SbWereWolf\XmlNavigator\Extraction;
 
 use SbWereWolf\XmlNavigator\General\Notation;
 use XMLReader;
@@ -121,14 +121,7 @@ class HierarchyComposer
             /*$logger->debug("предыдущий уровень вложенности `$prev`");*/
         }
 
-        $result = [];
-        $hasRoot = 1 === count($hierarchy[$elementsIndex]);
-        if ($hasRoot) {
-            $result = &$hierarchy[$elementsIndex][0];
-        }
-        if (!$hasRoot) {
-            $result = &$hierarchy[$elementsIndex];
-        }
+        $result = &$hierarchy[$elementsIndex][0];
 
         return $result;
     }

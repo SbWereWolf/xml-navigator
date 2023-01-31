@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace SbWereWolf\XmlNavigator\Parsing;
 
 use Generator;
-use SbWereWolf\XmlNavigator\Extracting\HierarchyComposer;
-use SbWereWolf\XmlNavigator\Extracting\PrettyPrintComposer;
+use SbWereWolf\XmlNavigator\Extraction\HierarchyComposer;
+use SbWereWolf\XmlNavigator\Extraction\PrettyPrintComposer;
 use SbWereWolf\XmlNavigator\General\Notation;
 use XMLReader;
 

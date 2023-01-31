@@ -16,7 +16,7 @@ $xml =<<<XML
 </outer>
 XML;
 $result =
-    \SbWereWolf\XmlNavigator\Converting\FastXmlToArray
+    \SbWereWolf\XmlNavigator\Convertation\FastXmlToArray
     ::prettyPrint($xml);
 echo json_encode($result, JSON_PRETTY_PRINT);
 ```
@@ -107,7 +107,7 @@ function parseFirstElement(string $filename): void
     }
     
     $result =
-        \SbWereWolf\XmlNavigator\Extracting\PrettyPrintComposer
+        \SbWereWolf\XmlNavigator\Extraction\PrettyPrintComposer
         ::compose($reader);
 
     $finish = hrtime(true);
@@ -303,7 +303,7 @@ $xml = <<<XML
 </complex>
 XML;
 
-$converter = new \SbWereWolf\XmlNavigator\Converting\XmlConverter(
+$converter = new \SbWereWolf\XmlNavigator\Convertation\XmlConverter(
     \SbWereWolf\XmlNavigator\General\Notation::VAL,
     \SbWereWolf\XmlNavigator\General\Notation::ATTR,
 );
@@ -418,8 +418,8 @@ $xml = <<<XML
 </doc>
 XML;
 
-$content = \SbWereWolf\XmlNavigator\Converting\FastXmlToArray
-::toHierarchyOfElements($xml);
+$content = \SbWereWolf\XmlNavigator\Convertation\FastXmlToArray
+::convert($xml);
 $navigator = 
 new \SbWereWolf\XmlNavigator\Navigation\XmlElement($content);
 
@@ -514,6 +514,12 @@ foreach ($nested->pull('b') as $b) {
 [Unit tests](test/Integration/DebugTest.php) have more examples of
 using, please investigate them.
 
+## Run tests
+
+```bash 
+composer test
+```
+
 ## Contacts
 
 ```
@@ -523,5 +529,5 @@ phone +7-902-272-65-35
 Telegram @sbwerewolf
 ```
 
-[Telegram chat with me](https://t.me/SbWereWolf)
-[WhatsApp chat with me](https://wa.me/79022726535) 
+- [Telegram chat with me](https://t.me/SbWereWolf)
+- [WhatsApp chat with me](https://wa.me/79022726535) 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SbWereWolf\XmlNavigator\Converting;
+namespace SbWereWolf\XmlNavigator\Convertation;
 
 /**
  * Интерфейс для конвертеров XML документов в PHP массивы

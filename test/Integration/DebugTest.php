@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Integration;
 
 use PHPUnit\Framework\TestCase;
-use SbWereWolf\XmlNavigator\Converting\FastXmlToArray;
-use SbWereWolf\XmlNavigator\Converting\XmlConverter;
-use SbWereWolf\XmlNavigator\Extracting\HierarchyComposer;
-use SbWereWolf\XmlNavigator\Extracting\PrettyPrintComposer;
+use SbWereWolf\XmlNavigator\Convertation\FastXmlToArray;
+use SbWereWolf\XmlNavigator\Convertation\XmlConverter;
+use SbWereWolf\XmlNavigator\Extraction\ElementExtractor;
+use SbWereWolf\XmlNavigator\Extraction\HierarchyComposer;
+use SbWereWolf\XmlNavigator\Extraction\PrettyPrintComposer;
 use SbWereWolf\XmlNavigator\General\Notation;
 use SbWereWolf\XmlNavigator\Navigation\IXmlElement;
 use SbWereWolf\XmlNavigator\Navigation\XmlElement;
@@ -499,6 +500,16 @@ XML;
             )
         );
 
+
+    /**
+     * @return void
+     */
+    public function testXmlNavigatorEmpty(): void
+    {
+        self::expectExceptionCode(-666);
+        new XmlElement([]);
+    }
+
     /**
      * @return void
      */
@@ -604,9 +615,18 @@ XML;
         $exported = $navigator->name();
         $this->assertEquals('complex', $exported);
 
+        /* check has element value */
+        $exported = $navigator->hasValue();
+        $this->assertEquals(false, $exported);
+
         /* get element value */
         $exported = $navigator->value();
         $this->assertEquals('', $exported);
+
+        /* check has element attribute */
+        $exported = $navigator->hasAttribute('str');
+        $this->assertEquals(true, $exported);
+
 
         /* get list of attributes */
         $attributes = $navigator->attributes();
@@ -631,6 +651,10 @@ XML;
         $val = $navigator->get('str');
         self::assertEquals('text', $val);
         /* text */
+
+        /* check has element attribute */
+        $exported = $navigator->hasElement('empty');
+        $this->assertEquals(true, $exported);
 
         /* get list of nested elements */
         $elements = $navigator->elements();
@@ -713,6 +737,42 @@ XML;
     /**
      * @return void
      */
+    public function testElementExtractorExtractElements(): void
+    {
+        $xml = <<<XML
+<complex>
+    <ONLY_VALUE>element has only value</ONLY_VALUE>
+    <empty/>
+</complex>
+XML;
+        $reader = XMLReader::XML($xml);
+
+        $mayRead = true;
+        while (
+            $mayRead &&
+            $reader->nodeType !== XMLReader::TEXT
+        ) {
+            $mayRead = $reader->read();
+        }
+        $arrayRepresentationOfXml =
+            ElementExtractor::extractElements($reader, 'v', 'a');
+
+        $expected = array
+        (
+            0 => array
+            (
+                'empty' => array
+                (
+                    'depth' => 1
+                )
+            )
+        );
+        self::assertEquals($expected, $arrayRepresentationOfXml);
+    }
+
+    /**
+     * @return void
+     */
     public function testXmlConverterToHierarchyOfElements(): void
     {
         $xml = <<<XML
@@ -757,13 +817,41 @@ XML;
 </complex>
 XML;
 
+        $converter = new XmlConverter();
         $arrayRepresentationOfXml =
-            (new XmlConverter())->toPrettyPrint($xml);
+            $converter->toPrettyPrint($xml);
 
         self::assertEquals(
             static::CONVERTER_PRETTY_PRINT,
             $arrayRepresentationOfXml
         );
+
+        $path = __DIR__ . DIRECTORY_SEPARATOR . 'text.xml';
+        $actual[] =
+            $converter->toPrettyPrint('', $path);
+
+        $expected = array(
+            0 => array(
+                'e' => array
+                (
+                    'v' => 'v',
+                    'a' => array
+                    (
+                        'a' => ''
+                    )
+                )
+            )
+        );
+        self::assertEquals($expected, $actual);
+    }
+
+    /**
+     * @return void
+     */
+    public function testFastXmlToArrayConvertWithEmpty(): void
+    {
+        static::expectExceptionCode(-667);
+        FastXmlToArray::convert();
     }
 
     /**
@@ -907,6 +995,42 @@ XML;
 
 
         self::assertEquals(static::NS_QUERY_PRETTY_PRINT, $results);
+
+
+        $reader = XMLReader::XML('<e a="">v</e>');
+
+        $mayRead = true;
+        while ($mayRead && $reader->nodeType !== XMLReader::ELEMENT) {
+            $mayRead = $reader->read();
+        }
+
+        $results = [];
+        while ($reader->nodeType === XMLReader::ELEMENT) {
+            $result = PrettyPrintComposer::compose($reader);
+            $results[] = $result;
+
+            while (
+                $mayRead &&
+                $reader->nodeType !== XMLReader::ELEMENT
+            ) {
+                $mayRead = $reader->read();
+            }
+        }
+        $reader->close();
+
+        $expected = array(
+            0 => array(
+                'e' => array
+                (
+                    '@value' => 'v',
+                    '@attributes' => array
+                    (
+                        'a' => ''
+                    )
+                )
+            )
+        );
+        self::assertEquals($expected, $results);
     }
 
     /**

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SbWereWolf\XmlNavigator\Converting;
+namespace SbWereWolf\XmlNavigator\Convertation;
 
 use InvalidArgumentException;
 use SbWereWolf\XmlNavigator\General\Notation;
@@ -98,7 +98,8 @@ class FastXmlToArray implements IFastXmlToArray
         if ($xmlText === '' && $xmlUri === '') {
             throw new InvalidArgumentException(
                 'One of $xmlText or $xmlUri MUST BE defined,' .
-                ' please assign only one of them, other MUST BE empty'
+                ' please assign only one of them, other MUST BE empty',
+                -667
             );
         }
 
