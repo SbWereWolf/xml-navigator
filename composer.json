@@ -1,6 +1,6 @@
 {
   "name": "sbwerewolf/xml-navigator",
-  "description": "Library for navigation through xml",
+  "description": "Easy XML to PHP array conversion and fast XML streaming conversion",
   "type": "library",
   "license": "Apache-2.0",
   "authors": [
