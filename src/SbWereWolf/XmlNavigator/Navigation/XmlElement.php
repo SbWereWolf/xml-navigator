@@ -20,15 +20,15 @@ class XmlElement implements IXmlElement, JsonSerializable
     use JsonSerializeTrait;
 
     /** @var IArrayHandler Массив со свойствами XML элемента */
-    private IArrayHandler $handler;
+    private $handler;
     /** @var string Индекс имени элемента */
-    private string $name;
+    private $name;
     /** @var string Индекс значения элемента */
-    private string $val;
+    private $val;
     /** @var string Индекс для атрибутов элемента */
-    private string $attr;
+    private $attr;
     /** @var string Индекс для вложенных элементов */
-    private string $seq;
+    private $seq;
 
     /**
      * @param array $data Массив со свойствами XML элемента
@@ -42,7 +42,7 @@ class XmlElement implements IXmlElement, JsonSerializable
         string $name = Notation::NAME,
         string $val = Notation::VALUE,
         string $attr = Notation::ATTRIBUTES,
-        string $seq = Notation::SEQUENCE,
+        string $seq = Notation::SEQUENCE
     ) {
         $keys = array_flip(array_keys($data));
         $letThrow = !key_exists($name, $keys);
@@ -80,7 +80,7 @@ class XmlElement implements IXmlElement, JsonSerializable
      * @param string $index
      * @return null|string|array
      */
-    private function getIndexContent(string $index): array|string|null
+    private function getIndexContent(string $index)
     {
         $content = null;
         if ($this->handler->has($index)) {

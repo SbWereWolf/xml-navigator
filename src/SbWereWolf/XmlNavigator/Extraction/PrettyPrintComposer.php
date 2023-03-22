@@ -23,19 +23,19 @@ class PrettyPrintComposer
     public static function compose(
         XMLReader $reader,
         string $valueIndex = Notation::VAL,
-        string $attributesIndex = Notation::ATTR,
+        string $attributesIndex = Notation::ATTR
     ): array {
         $elems = ElementExtractor::extractElements(
             $reader,
             $valueIndex,
-            $attributesIndex,
+            $attributesIndex
         );
 
         /** @noinspection PhpUnnecessaryLocalVariableInspection */
         $result = static::composePrettyPrintByXmlElements(
             $elems,
             $valueIndex,
-            $attributesIndex,
+            $attributesIndex
         );
 
         return $result;

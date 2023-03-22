@@ -23,7 +23,7 @@ class FastXmlToArray implements IFastXmlToArray
         string $name = Notation::NAME,
         string $seq = Notation::SEQUENCE,
         string $encoding = null,
-        int $flags = LIBXML_BIGLINES | LIBXML_COMPACT,
+        int $flags = LIBXML_BIGLINES | LIBXML_COMPACT
     ): array {
         $reader = static::createXmlReader(
             $xmlText,
@@ -41,7 +41,7 @@ class FastXmlToArray implements IFastXmlToArray
             $val,
             $attr,
             $name,
-            $seq,
+            $seq
         );
         $result = $extractor->current();
 
@@ -57,7 +57,7 @@ class FastXmlToArray implements IFastXmlToArray
         string $val = Notation::VAL,
         string $attr = Notation::ATTR,
         string $encoding = null,
-        int $flags = LIBXML_BIGLINES | LIBXML_COMPACT,
+        int $flags = LIBXML_BIGLINES | LIBXML_COMPACT
     ): array {
         $reader = static::createXmlReader(
             $xmlText,
@@ -73,7 +73,7 @@ class FastXmlToArray implements IFastXmlToArray
             $reader,
             $detectElement,
             $val,
-            $attr,
+            $attr
         );
         $result = $extractor->current();
 
@@ -92,8 +92,8 @@ class FastXmlToArray implements IFastXmlToArray
     private static function createXmlReader(
         string $xmlText,
         string $xmlUri,
-        ?string $encoding,
-        int $flags,
+        $encoding,
+        int $flags
     ): XMLReader {
         if ($xmlText === '' && $xmlUri === '') {
             throw new InvalidArgumentException(
@@ -105,17 +105,17 @@ class FastXmlToArray implements IFastXmlToArray
 
         $reader = new XMLReader();
         if ($xmlText !== '') {
-            $reader = XMLReader::XML(
+            $reader->XML(
                 $xmlText,
                 $encoding,
-                $flags,
+                $flags
             );
         }
         if ($xmlText === '' && $xmlUri !== '') {
-            $reader = XMLReader::open(
+            $reader->open(
                 $xmlUri,
                 $encoding,
-                $flags,
+                $flags
             );
         }
 

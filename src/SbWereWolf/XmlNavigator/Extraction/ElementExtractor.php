@@ -12,8 +12,8 @@ use XMLReader;
 class ElementExtractor
 {
     /** @var string Индекс для уровня вложенности элемента */
-    public const DEPTH = 'depth';
-    private const ALLOWED_NODE_TYPES = [
+    const DEPTH = 'depth';
+    const ALLOWED_NODE_TYPES = [
         XMLReader::ELEMENT,
         XMLReader::TEXT,
         XMLReader::CDATA,
@@ -28,7 +28,7 @@ class ElementExtractor
     public static function extractElements(
         XMLReader $reader,
         string $valueIndex,
-        string $attributesIndex,
+        string $attributesIndex
     ): array {
         $elems = [];
         $path = [];
@@ -128,7 +128,7 @@ class ElementExtractor
         array &$elems,
         string $attributesIndex,
         string $valueIndex
-    ): void {
+    ) {
         $name = key($props);
         $data = current($props);
         $isSet = isset($data[1]);

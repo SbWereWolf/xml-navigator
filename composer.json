@@ -20,12 +20,13 @@
     "test": "php ./vendor/phpunit/phpunit/phpunit --coverage-html build/coverage-report --debug"
   },
   "require-dev": {
-    "phpunit/phpunit": "^9.5"
+    "phpunit/phpunit": "^5.5"
   },
   "require": {
-    "sbwerewolf/language-specific": "^8.0",
+    "sbwerewolf/language-specific": "^7.0",
     "ext-xmlreader": "*",
     "ext-libxml": "*",
-    "sbwerewolf/json-serialize-trait": "^1.0"
+    "sbwerewolf/json-serialize-trait": "^1.0",
+    "ext-json": "*"
   }
 }

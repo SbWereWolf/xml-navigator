@@ -16,25 +16,25 @@ class XmlConverter implements IXmlConverter, JsonSerializable
     use JsonSerializeTrait;
 
     /** @var array Структура XML документа в нормализованном виде */
-    private array $xmlStructure = [];
+    private $xmlStructure = [];
     /** @var array  XML документа в виде удобном для чтения */
-    private array $prettyXml = [];
+    private $prettyXml = [];
     /** @var string Индекс для Имени */
-    private string $name;
+    private $name;
     /** @var string Индекс для Значения */
-    private string $val;
+    private $val;
     /** @var string Индекс для Атрибутов */
-    private string $attribs;
+    private $attribs;
     /** @var string  Индекс для вложенных элементов */
-    private string $seq;
+    private $seq;
     /** @var string|null Кодировка XML Документа */
-    private ?string $encoding;
+    private $encoding;
     /** @var int Битовая маска из констант LIBXML_* */
-    private int $flags;
+    private $flags;
     /** @var string Previous text of XML document */
-    private string $previousXmlText = '';
+    private $previousXmlText = '';
     /** @var string Previous path or link to XML document */
-    private string $previousXmlUri = '';
+    private $previousXmlUri = '';
 
     /**
      * @param string $val Индекс для значения
@@ -50,7 +50,7 @@ class XmlConverter implements IXmlConverter, JsonSerializable
         string $name = Notation::NAME,
         string $seq = Notation::SEQUENCE,
         string $encoding = null,
-        int $flags = LIBXML_BIGLINES | LIBXML_COMPACT,
+        int $flags = LIBXML_BIGLINES | LIBXML_COMPACT
     ) {
         $this->name = $name;
         $this->val = $val;
@@ -63,7 +63,7 @@ class XmlConverter implements IXmlConverter, JsonSerializable
     /* @inheritdoc */
     public function toPrettyPrint(
         string $xmlText = '',
-        string $xmlUri = '',
+        string $xmlUri = ''
     ): array {
         $isPrevious = $this->isPrevious($xmlText, $xmlUri);
         if (!$isPrevious || !count($this->prettyXml)) {
@@ -74,7 +74,7 @@ class XmlConverter implements IXmlConverter, JsonSerializable
                     $this->val,
                     $this->attribs,
                     $this->encoding,
-                    $this->flags,
+                    $this->flags
                 );
 
             $this->previousXmlText = $xmlText;
@@ -87,7 +87,7 @@ class XmlConverter implements IXmlConverter, JsonSerializable
     /* @inheritdoc */
     public function toHierarchyOfElements(
         string $xmlText = '',
-        string $xmlUri = '',
+        string $xmlUri = ''
     ): array {
         $isPrevious = $this->isPrevious($xmlText, $xmlUri);
         if (!$isPrevious || !count($this->xmlStructure)) {
@@ -100,7 +100,7 @@ class XmlConverter implements IXmlConverter, JsonSerializable
                     $this->name,
                     $this->seq,
                     $this->encoding,
-                    $this->flags,
+                    $this->flags
                 );
 
             $this->previousXmlText = $xmlText;

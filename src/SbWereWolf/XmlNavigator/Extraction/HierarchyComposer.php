@@ -27,12 +27,12 @@ class HierarchyComposer
         string $valueIndex = Notation::VALUE,
         string $attributesIndex = Notation::ATTRIBUTES,
         string $nameIndex = Notation::NAME,
-        string $elementsIndex = Notation::SEQUENCE,
+        string $elementsIndex = Notation::SEQUENCE
     ): array {
         $elems = ElementExtractor::extractElements(
             $reader,
             $valueIndex,
-            $attributesIndex,
+            $attributesIndex
         );
         /** @noinspection PhpUnnecessaryLocalVariableInspection */
         $result = static::createTheHierarchyOfElements(
@@ -40,7 +40,7 @@ class HierarchyComposer
             $elementsIndex,
             $nameIndex,
             $valueIndex,
-            $attributesIndex,
+            $attributesIndex
         );
 
         return $result;

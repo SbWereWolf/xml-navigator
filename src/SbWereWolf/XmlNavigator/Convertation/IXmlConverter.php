@@ -16,7 +16,7 @@ interface IXmlConverter
      */
     public function toPrettyPrint(
         string $xmlText = '',
-        string $xmlUri = '',
+        string $xmlUri = ''
     ): array;
 
     /** Convert xml document into normalized array
@@ -26,6 +26,6 @@ interface IXmlConverter
      */
     public function toHierarchyOfElements(
         string $xmlText = '',
-        string $xmlUri = '',
+        string $xmlUri = ''
     ): array;
 }

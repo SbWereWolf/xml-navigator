@@ -31,7 +31,7 @@ interface IFastXmlToArray
         string $name = Notation::NAME,
         string $seq = Notation::SEQUENCE,
         string $encoding = null,
-        int $flags = LIBXML_BIGLINES | LIBXML_COMPACT,
+        int $flags = LIBXML_BIGLINES | LIBXML_COMPACT
     ): array;
 
     /** Convert xml document into compact array
@@ -49,6 +49,6 @@ interface IFastXmlToArray
         string $val = Notation::VAL,
         string $attr = Notation::ATTR,
         string $encoding = null,
-        int $flags = LIBXML_BIGLINES | LIBXML_COMPACT,
+        int $flags = LIBXML_BIGLINES | LIBXML_COMPACT
     ): array;
 }

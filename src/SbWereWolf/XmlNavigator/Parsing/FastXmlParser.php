@@ -30,7 +30,7 @@ class FastXmlParser
         string $val = Notation::VALUE,
         string $attr = Notation::ATTRIBUTES,
         string $name = Notation::NAME,
-        string $seq = Notation::SEQUENCE,
+        string $seq = Notation::SEQUENCE
     ): Generator {
         $isSuitable = $detectElement($reader);
         $mayRead = true;
@@ -46,7 +46,7 @@ class FastXmlParser
                 $val,
                 $attr,
                 $name,
-                $seq,
+                $seq
             );
 
             yield $result;
@@ -73,7 +73,7 @@ class FastXmlParser
         XMLReader $reader,
         callable $detectElement,
         string $val = Notation::VAL,
-        string $attr = Notation::ATTR,
+        string $attr = Notation::ATTR
     ): Generator {
         $isSuitable = $detectElement($reader);
         $mayRead = true;
@@ -87,7 +87,7 @@ class FastXmlParser
             $result = PrettyPrintComposer::compose(
                 $reader,
                 $val,
-                $attr,
+                $attr
             );
 
             yield $result;

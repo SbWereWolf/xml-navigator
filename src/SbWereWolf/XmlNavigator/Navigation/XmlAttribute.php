@@ -14,14 +14,14 @@ class XmlAttribute implements IXmlAttribute, JsonSerializable
 {
     use JsonSerializeTrait;
 
-    private string $name;
-    private string $value;
+    private $name;
+    private $value;
 
     /**
      * @param string $name Имя атрибута
      * @param string $value Значение атрибута
      */
-    public function __construct(string $name, string $value,)
+    public function __construct(string $name, string $value)
     {
         $this->name = $name;
         $this->value = $value;

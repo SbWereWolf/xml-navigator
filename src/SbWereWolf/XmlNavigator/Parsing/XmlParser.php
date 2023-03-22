@@ -13,11 +13,11 @@ use XMLReader;
  */
 class XmlParser
 {
-    private XMLReader $reader;
-    private string $val;
-    private string $attr;
-    private string $name;
-    private string $seq;
+    private $reader;
+    private $val;
+    private $attr;
+    private $name;
+    private $seq;
 
     /**
      * @param XMLReader $reader
@@ -31,7 +31,7 @@ class XmlParser
         string $val = Notation::VALUE,
         string $attr = Notation::ATTRIBUTES,
         string $name = Notation::NAME,
-        string $seq = Notation::SEQUENCE,
+        string $seq = Notation::SEQUENCE
     ) {
         $this->reader = $reader;
         $this->val = $val;
@@ -45,7 +45,7 @@ class XmlParser
      * @return Generator
      */
     public function extractHierarchy(
-        callable $detectElement,
+        callable $detectElement
     ): Generator
     {
         $extractor = FastXmlParser::extractHierarchy(
@@ -54,7 +54,7 @@ class XmlParser
             $this->val,
             $this->attr,
             $this->name,
-            $this->seq,
+            $this->seq
         );
 
         foreach ($extractor as $result) {
@@ -67,14 +67,14 @@ class XmlParser
      * @return Generator
      */
     public function extractPrettyPrint(
-        callable $detectElement,
+        callable $detectElement
     ): Generator
     {
         $extractor = FastXmlParser::extractPrettyPrint(
             $this->reader,
             $detectElement,
             $this->val,
-            $this->attr,
+            $this->attr
         );
 
         foreach ($extractor as $result) {

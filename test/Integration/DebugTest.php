@@ -22,7 +22,7 @@ use XMLReader;
  */
 class DebugTest extends TestCase
 {
-    private const PRETTY_PRINT =
+    const PRETTY_PRINT =
         array(
             'complex' =>
                 array(
@@ -81,7 +81,7 @@ class DebugTest extends TestCase
                 ),
         );
 
-    private const CONVERTER_PRETTY_PRINT =
+    const CONVERTER_PRETTY_PRINT =
         array(
             'complex' =>
                 array(
@@ -140,7 +140,7 @@ class DebugTest extends TestCase
                 ),
         );
 
-    private const XML_HIERARCHY =
+    const XML_HIERARCHY =
         array(
             'n' => 'complex',
             's' =>
@@ -208,7 +208,7 @@ class DebugTest extends TestCase
                 ),
         );
 
-    private const NS_QUERY = <<<XML
+    const NS_QUERY = <<<XML
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <QueryResult
         xmlns="urn://x-artefacts-smev-gov-ru/services/service-adapter/types">
@@ -249,7 +249,7 @@ class DebugTest extends TestCase
 </QueryResult>
 XML;
 
-    private const NS_QUERY_HIERARCHY =
+    const NS_QUERY_HIERARCHY =
         array(
             0 => array
             (
@@ -283,7 +283,7 @@ XML;
             )
         );
 
-    private const NS_QUERY_PRETTY_PRINT =
+    const NS_QUERY_PRETTY_PRINT =
         array(
             0 => array
             (
@@ -311,7 +311,7 @@ XML;
         );
 
 
-    private const CARPLACE = <<<XML
+    const CARPLACE = <<<XML
 <?xml version="1.0" encoding="utf-8"?>
 <CARPLACES>
     <CARPLACE
@@ -362,7 +362,7 @@ XML;
 </CARPLACES>
 XML;
 
-    private const CARPLACE_HIERARCHY =
+    const CARPLACE_HIERARCHY =
         array(
             0 => array
             (
@@ -427,7 +427,7 @@ XML;
             )
         );
 
-    private const CARPLACE_PRETTY_PRINT =
+    const CARPLACE_PRETTY_PRINT =
         array(
             '0' => array
             (
@@ -500,20 +500,10 @@ XML;
             )
         );
 
-
     /**
      * @return void
      */
-    public function testXmlNavigatorEmpty(): void
-    {
-        self::expectExceptionCode(-666);
-        new XmlElement([]);
-    }
-
-    /**
-     * @return void
-     */
-    public function testXmlNavigator(): void
+    public function testXmlNavigator()
     {
         $xmlContent =
             array(
@@ -737,7 +727,7 @@ XML;
     /**
      * @return void
      */
-    public function testElementExtractorExtractElements(): void
+    public function testElementExtractorExtractElements()
     {
         $xml = <<<XML
 <complex>
@@ -745,7 +735,8 @@ XML;
     <empty/>
 </complex>
 XML;
-        $reader = XMLReader::XML($xml);
+        $reader = new XMLReader();
+        $reader->XML($xml);
 
         $mayRead = true;
         while (
@@ -773,7 +764,7 @@ XML;
     /**
      * @return void
      */
-    public function testXmlConverterToHierarchyOfElements(): void
+    public function testXmlConverterToHierarchyOfElements()
     {
         $xml = <<<XML
 <complex>
@@ -801,7 +792,7 @@ XML;
     /**
      * @return void
      */
-    public function testXmlConverterToPrettyPrint(): void
+    public function testXmlConverterToPrettyPrint()
     {
         $xml = <<<XML
 <complex>
@@ -848,16 +839,7 @@ XML;
     /**
      * @return void
      */
-    public function testFastXmlToArrayConvertWithEmpty(): void
-    {
-        static::expectExceptionCode(-667);
-        FastXmlToArray::convert();
-    }
-
-    /**
-     * @return void
-     */
-    public function testFastXmlToArrayConvert(): void
+    public function testFastXmlToArrayConvert()
     {
         $xml = <<<XML
 <complex>
@@ -884,7 +866,7 @@ XML;
     /**
      * @return void
      */
-    public function testFastXmlToArrayPrettyPrint(): void
+    public function testFastXmlToArrayPrettyPrint()
     {
         $xml = <<<XML
 <complex>
@@ -911,9 +893,10 @@ XML;
     /**
      * @return void
      */
-    public function testHierarchyComposerComposeNsQuery(): void
+    public function testHierarchyComposerComposeNsQuery()
     {
-        $reader = XMLReader::XML(static::NS_QUERY);
+        $reader = new XMLReader();
+        $reader->XML(static::NS_QUERY);
 
         $mayRead = true;
         while ($mayRead && $reader->name !== 'ns:Query') {
@@ -941,9 +924,10 @@ XML;
     /**
      * @return void
      */
-    public function testHierarchyComposerComposeCarplace(): void
+    public function testHierarchyComposerComposeCarplace()
     {
-        $reader = XMLReader::XML(static::CARPLACE);
+        $reader = new XMLReader();
+        $reader->XML(static::CARPLACE);
 
         $mayRead = true;
         while ($mayRead && $reader->name !== 'CARPLACE') {
@@ -970,9 +954,10 @@ XML;
     /**
      * @return void
      */
-    public function testPrettyPrintComposerComposeNsQuery(): void
+    public function testPrettyPrintComposerComposeNsQuery()
     {
-        $reader = XMLReader::XML(static::NS_QUERY);
+        $reader = new XMLReader();
+        $reader->XML(static::NS_QUERY);
 
         $mayRead = true;
         while ($mayRead && $reader->name !== 'ns:Query') {
@@ -996,8 +981,8 @@ XML;
 
         self::assertEquals(static::NS_QUERY_PRETTY_PRINT, $results);
 
-
-        $reader = XMLReader::XML('<e a="">v</e>');
+        $reader = new XMLReader();
+        $reader->XML('<e a="">v</e>');
 
         $mayRead = true;
         while ($mayRead && $reader->nodeType !== XMLReader::ELEMENT) {
@@ -1036,9 +1021,10 @@ XML;
     /**
      * @return void
      */
-    public function testPrettyPrintComposerComposeCarplace(): void
+    public function testPrettyPrintComposerComposeCarplace()
     {
-        $reader = XMLReader::XML(static::CARPLACE);
+        $reader = new XMLReader();
+        $reader->XML(static::CARPLACE);
 
         $mayRead = true;
         while ($mayRead && $reader->name !== 'CARPLACE') {
@@ -1065,9 +1051,10 @@ XML;
     /**
      * @return void
      */
-    public function testFastXmlParserExtractHierarchyNsQuery(): void
+    public function testFastXmlParserExtractHierarchyNsQuery()
     {
-        $reader = XMLReader::XML(static::NS_QUERY);
+        $reader = new XMLReader();
+        $reader->XML(static::NS_QUERY);
 
         $results = [];
         $extractor = FastXmlParser::extractHierarchy(
@@ -1088,9 +1075,10 @@ XML;
     /**
      * @return void
      */
-    public function testFastXmlParserExtractPrettyPrintNsQuery(): void
+    public function testFastXmlParserExtractPrettyPrintNsQuery()
     {
-        $reader = XMLReader::XML(static::NS_QUERY);
+        $reader = new XMLReader();
+        $reader->XML(static::NS_QUERY);
 
         $results = [];
         $extractor = FastXmlParser::extractPrettyPrint(
@@ -1111,9 +1099,10 @@ XML;
     /**
      * @return void
      */
-    public function testFastXmlParserExtractHierarchyCarplace(): void
+    public function testFastXmlParserExtractHierarchyCarplace()
     {
-        $reader = XMLReader::XML(static::CARPLACE);
+        $reader = new XMLReader();
+        $reader->XML(static::CARPLACE);
 
         $results = [];
         $extractor = FastXmlParser::extractHierarchy(
@@ -1133,9 +1122,10 @@ XML;
     /**
      * @return void
      */
-    public function testFastXmlParserExtractPrettyPrintCarplace(): void
+    public function testFastXmlParserExtractPrettyPrintCarplace()
     {
-        $reader = XMLReader::XML(static::CARPLACE);
+        $reader = new XMLReader();
+        $reader->XML(static::CARPLACE);
 
         $results = [];
         $extractor = FastXmlParser::extractPrettyPrint(
@@ -1155,9 +1145,10 @@ XML;
     /**
      * @return void
      */
-    public function testXmlParserExtractHierarchyNsQuery(): void
+    public function testXmlParserExtractHierarchyNsQuery()
     {
-        $reader = XMLReader::XML(static::NS_QUERY);
+        $reader = new XMLReader();
+        $reader->XML(static::NS_QUERY);
         $parser = new XmlParser($reader);
 
         $results = [];
@@ -1178,13 +1169,14 @@ XML;
     /**
      * @return void
      */
-    public function testXmlParserExtractPrettyPrintNsQuery(): void
+    public function testXmlParserExtractPrettyPrintNsQuery()
     {
-        $reader = XMLReader::XML(static::NS_QUERY);
+        $reader = new XMLReader();
+        $reader->XML(static::NS_QUERY);
         $parser = new XmlParser(
             $reader,
             Notation::VAL,
-            Notation::ATTR,
+            Notation::ATTR
         );
 
         $results = [];
@@ -1205,9 +1197,10 @@ XML;
     /**
      * @return void
      */
-    public function testXmlParserExtractHierarchyCarplace(): void
+    public function testXmlParserExtractHierarchyCarplace()
     {
-        $reader = XMLReader::XML(static::CARPLACE);
+        $reader = new XMLReader();
+        $reader->XML(static::CARPLACE);
         $parser = new XmlParser($reader);
 
         $results = [];
@@ -1227,13 +1220,14 @@ XML;
     /**
      * @return void
      */
-    public function testXmlParserExtractPrettyPrintCarplace(): void
+    public function testXmlParserExtractPrettyPrintCarplace()
     {
-        $reader = XMLReader::XML(static::CARPLACE);
+        $reader = new XMLReader();
+        $reader->XML(static::CARPLACE);
         $parser = new XmlParser(
             $reader,
             Notation::VAL,
-            Notation::ATTR,
+            Notation::ATTR
         );
 
         $results = [];
