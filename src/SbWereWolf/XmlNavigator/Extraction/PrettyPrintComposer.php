@@ -56,6 +56,7 @@ class PrettyPrintComposer
         $prev = $base;
         $result = [];
         $ptr = &$result;
+        $isMulti = false;
         foreach ($elems as $elem) {
             $data = current($elem);
 
@@ -68,6 +69,11 @@ class PrettyPrintComposer
                 for ($d = $base; $d < $curr; $d++) {
                     $end = 0;
                     if (count($ptr)) {
+                        end($ptr);
+                        $end = key($ptr);
+                    }
+                    if ($isMulti && ($d + 1) === $curr) {
+                        $ptr = &$ptr[$end];
                         end($ptr);
                         $end = key($ptr);
                     }
@@ -96,12 +102,14 @@ class PrettyPrintComposer
             }
 
             /* Order of IF operators is most important */
+            $isMulti = false;
             if (
                 key_exists($name, $ptr) &&
                 is_array($ptr[$name]) &&
                 key_exists(0, $ptr[$name])
             ) {
                 $ptr[$name][] = $new;
+                $isMulti = true;
             }
 
             if (
@@ -120,7 +128,9 @@ class PrettyPrintComposer
                 if (!$isStr) {
                     $ptr[$name][] = $first;
                 }
+
                 $ptr[$name][] = $new;
+                $isMulti = true;
             }
 
             if (!key_exists($name, $ptr)) {
