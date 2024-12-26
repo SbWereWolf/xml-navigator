@@ -23,7 +23,7 @@
     "phpunit/phpunit": "^9.5"
   },
   "require": {
-    "sbwerewolf/language-specific": "^8.0",
+    "sbwerewolf/language-specific": "8.0.*",
     "ext-xmlreader": "*",
     "ext-libxml": "*",
     "sbwerewolf/json-serialize-trait": "^1.0"
