@@ -17,15 +17,21 @@
     }
   },
   "scripts": {
-    "test": "php ./vendor/phpunit/phpunit/phpunit --coverage-html build/coverage-report --debug"
+    "test": "php ./vendor/phpunit/phpunit/phpunit --coverage-html ./build/coverage-report --coverage-filter ./src",
+    "mass-detector": "php vendor/bin/phpstan analyse --level=10 src test"
   },
   "require-dev": {
-    "phpunit/phpunit": "^9.5"
+    "phpunit/phpunit": "^11",
+    "buggregator/trap": "*",
+    "phpstan/phpstan": "*",
+    "phpmd/phpmd": "*",
+    "vimeo/psalm": "*",
+    "squizlabs/php_codesniffer": "*"
   },
   "require": {
-    "sbwerewolf/language-specific": "8.0.*",
+    "sbwerewolf/language-specific": "8.4.*",
     "ext-xmlreader": "*",
     "ext-libxml": "*",
-    "sbwerewolf/json-serialize-trait": "^1.0"
+    "sbwerewolf/json-serialize-trait": "^1"
   }
 }
