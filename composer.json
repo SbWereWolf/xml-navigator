@@ -24,7 +24,7 @@
     "phpunit/phpunit": "^11",
     "buggregator/trap": "*",
     "phpstan/phpstan": "*",
-    "phpmd/phpmd": "*",
+    "phpmd/phpmd": "^2",
     "vimeo/psalm": "*",
     "squizlabs/php_codesniffer": "*"
   },
