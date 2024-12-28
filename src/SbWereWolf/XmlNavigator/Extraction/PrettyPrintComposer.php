@@ -18,7 +18,7 @@ class PrettyPrintComposer
      * @param XMLReader $reader
      * @param string $valueIndex index for element value
      * @param string $attributesIndex index for attributes collection
-     * @return array[]
+     * @return array<string,array>
      */
     public static function compose(
         XMLReader $reader,
@@ -32,7 +32,7 @@ class PrettyPrintComposer
         );
 
         /** @noinspection PhpUnnecessaryLocalVariableInspection */
-        $result = static::composePrettyPrintByXmlElements(
+        $result = self::composePrettyPrintByXmlElements(
             $elems,
             $valueIndex,
             $attributesIndex,
@@ -42,10 +42,10 @@ class PrettyPrintComposer
     }
 
     /**
-     * @param array $elems
+     * @param array<int,array<string,array<string,int|string>>> $elems
      * @param string $valueIndex
      * @param string $attributesIndex
-     * @return array|array[]
+     * @return array<string,array>
      */
     private static function composePrettyPrintByXmlElements(
         array $elems,

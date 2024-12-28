@@ -12,7 +12,7 @@ interface IXmlConverter
     /** Convert xml document into compact array
      * @param string $xmlText The text of XML document
      * @param string $xmlUri Path or link to XML document
-     * @return array
+     * @return array<string,string|array<string,string>>
      */
     public function toPrettyPrint(
         string $xmlText = '',
@@ -22,7 +22,7 @@ interface IXmlConverter
     /** Convert xml document into normalized array
      * @param string $xmlText The text of XML document
      * @param string $xmlUri Path or link to XML document
-     * @return array
+     * @return array<string,string|array<string,string>>
      */
     public function toHierarchyOfElements(
         string $xmlText = '',

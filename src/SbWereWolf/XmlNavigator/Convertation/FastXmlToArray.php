@@ -22,10 +22,10 @@ class FastXmlToArray implements IFastXmlToArray
         string $attr = Notation::ATTRIBUTES,
         string $name = Notation::NAME,
         string $seq = Notation::SEQUENCE,
-        string $encoding = null,
+        string|null $encoding = null,
         int $flags = LIBXML_BIGLINES | LIBXML_COMPACT,
     ): array {
-        $reader = static::createXmlReader(
+        $reader = self::createXmlReader(
             $xmlText,
             $xmlUri,
             $encoding,
@@ -56,10 +56,10 @@ class FastXmlToArray implements IFastXmlToArray
         string $xmlUri = '',
         string $val = Notation::VAL,
         string $attr = Notation::ATTR,
-        string $encoding = null,
+        string|null $encoding = null,
         int $flags = LIBXML_BIGLINES | LIBXML_COMPACT,
     ): array {
-        $reader = static::createXmlReader(
+        $reader = self::createXmlReader(
             $xmlText,
             $xmlUri,
             $encoding,
@@ -92,7 +92,7 @@ class FastXmlToArray implements IFastXmlToArray
     private static function createXmlReader(
         string $xmlText,
         string $xmlUri,
-        ?string $encoding,
+        string|null $encoding,
         int $flags,
     ): XMLReader {
         if ($xmlText === '' && $xmlUri === '') {

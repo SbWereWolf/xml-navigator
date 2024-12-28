@@ -15,9 +15,11 @@ class XmlConverter implements IXmlConverter, JsonSerializable
 {
     use JsonSerializeTrait;
 
-    /** @var array Структура XML документа в нормализованном виде */
+    /** @var array<string,string|array<string,string>>
+     *      Структура XML документа в нормализованном виде */
     private array $xmlStructure = [];
-    /** @var array  XML документа в виде удобном для чтения */
+    /** @var array<string,string|array<string,string>>
+     *       XML документа в виде удобном для чтения */
     private array $prettyXml = [];
     /** @var string Индекс для Имени */
     private string $name;
@@ -49,7 +51,7 @@ class XmlConverter implements IXmlConverter, JsonSerializable
         string $attr = Notation::ATTRIBUTES,
         string $name = Notation::NAME,
         string $seq = Notation::SEQUENCE,
-        string $encoding = null,
+        string|null $encoding = null,
         int $flags = LIBXML_BIGLINES | LIBXML_COMPACT,
     ) {
         $this->name = $name;

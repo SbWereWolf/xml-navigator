@@ -7,9 +7,9 @@ namespace SbWereWolf\XmlNavigator\Navigation;
 use Generator;
 use InvalidArgumentException;
 use JsonSerializable;
-use LanguageSpecific\ArrayHandler;
-use LanguageSpecific\IArrayHandler;
 use SbWereWolf\JsonSerializable\JsonSerializeTrait;
+use SbWereWolf\LanguageSpecific\AdvancedArrayFactory;
+use SbWereWolf\LanguageSpecific\AdvancedArrayInterface;
 use SbWereWolf\XmlNavigator\General\Notation;
 
 /**
@@ -19,8 +19,8 @@ class XmlElement implements IXmlElement, JsonSerializable
 {
     use JsonSerializeTrait;
 
-    /** @var IArrayHandler Массив со свойствами XML элемента */
-    private IArrayHandler $handler;
+    /** @var AdvancedArrayInterface Массив со свойствами XML элемента */
+    private  AdvancedArrayInterface $handler;
     /** @var string Индекс имени элемента */
     private string $name;
     /** @var string Индекс значения элемента */
@@ -31,7 +31,7 @@ class XmlElement implements IXmlElement, JsonSerializable
     private string $seq;
 
     /**
-     * @param array $data Массив со свойствами XML элемента
+     * @param array<string,string|array> $data Массив со свойствами XML элемента
      * @param string $name Индекс для имени
      * @param string $val Индекс для значения
      * @param string $attr Индекс для атрибутов
@@ -60,7 +60,8 @@ class XmlElement implements IXmlElement, JsonSerializable
         $this->attr = $attr;
         $this->seq = $seq;
 
-        $this->handler = new ArrayHandler($data);
+        $this->handler = (new AdvancedArrayFactory())
+            ->makeAdvancedArray($data);
     }
 
     /* @inheritdoc */
@@ -78,7 +79,7 @@ class XmlElement implements IXmlElement, JsonSerializable
 
     /** Get content of XmlElement::$handler with given key $index
      * @param string $index
-     * @return null|string|array
+     * @return null|string|array<string,string>
      */
     private function getIndexContent(string $index): array|string|null
     {
@@ -91,7 +92,7 @@ class XmlElement implements IXmlElement, JsonSerializable
     }
 
     /* @inheritdoc */
-    public function get(string $name = null): string
+    public function get(string|null $name = null): string
     {
         $value = $this->handler->pull($this->attr)->get($name)->str();
 

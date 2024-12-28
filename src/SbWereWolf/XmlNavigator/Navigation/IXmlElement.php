@@ -44,7 +44,7 @@ interface IXmlElement
      * @param string|null $name
      * @return string
      */
-    public function get(string $name = null): string;
+    public function get(string|null $name = null): string;
 
     /** Returns true if XML element has nested element with `$name`.
      * If $name omitted, than
@@ -60,9 +60,10 @@ interface IXmlElement
     public function elements(string $name = ''): array;
 
     /** Pull IXmlElement for nested elements,
-     * if $name is defined, than pull elements with the $name
+     * if $name is defined, than pull elements with the $name,
+     * elements will be type of IXmlElement
      * @param string $name
-     * @return IXmlElement
+     * @return Generator<IXmlElement>
      */
     public function pull(string $name = ''): Generator;
 }
