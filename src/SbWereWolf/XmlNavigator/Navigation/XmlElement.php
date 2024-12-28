@@ -2,14 +2,15 @@
 
 declare(strict_types=1);
 
-namespace SbWereWolf\XmlNavigator;
+namespace SbWereWolf\XmlNavigator\Navigation;
 
 use Generator;
 use InvalidArgumentException;
 use JsonSerializable;
-use LanguageSpecific\ArrayHandler;
-use LanguageSpecific\IArrayHandler;
 use SbWereWolf\JsonSerializable\JsonSerializeTrait;
+use SbWereWolf\LanguageSpecific\AdvancedArrayFactory;
+use SbWereWolf\LanguageSpecific\AdvancedArrayInterface;
+use SbWereWolf\XmlNavigator\General\Notation;
 
 /**
  * Объект для XML элемента
@@ -18,8 +19,8 @@ class XmlElement implements IXmlElement, JsonSerializable
 {
     use JsonSerializeTrait;
 
-    /** @var IArrayHandler Массив со свойствами XML элемента */
-    private IArrayHandler $handler;
+    /** @var AdvancedArrayInterface Массив со свойствами XML элемента */
+    private  AdvancedArrayInterface $handler;
     /** @var string Индекс имени элемента */
     private string $name;
     /** @var string Индекс значения элемента */
@@ -30,7 +31,7 @@ class XmlElement implements IXmlElement, JsonSerializable
     private string $seq;
 
     /**
-     * @param array $data Массив со свойствами XML элемента
+     * @param array<string,string|array> $data Массив со свойствами XML элемента
      * @param string $name Индекс для имени
      * @param string $val Индекс для значения
      * @param string $attr Индекс для атрибутов
@@ -38,13 +39,14 @@ class XmlElement implements IXmlElement, JsonSerializable
      */
     public function __construct(
         array $data,
-        string $name = IElementComposer::NAME,
-        string $val = IElementComposer::VALUE,
-        string $attr = IElementComposer::ATTRIBUTES,
-        string $seq = IElementComposer::SEQUENCE,
+        string $name = Notation::NAME,
+        string $val = Notation::VALUE,
+        string $attr = Notation::ATTRIBUTES,
+        string $seq = Notation::SEQUENCE,
     ) {
-        $keys = array_keys($data);
-        if (key_exists($name, $keys)) {
+        $keys = array_flip(array_keys($data));
+        $letThrow = !key_exists($name, $keys);
+        if ($letThrow) {
             throw new InvalidArgumentException(
                 'input array MUST BE like' .
                 ' [ `name`=>string, `value`=>string,' .
@@ -58,7 +60,8 @@ class XmlElement implements IXmlElement, JsonSerializable
         $this->attr = $attr;
         $this->seq = $seq;
 
-        $this->handler = new ArrayHandler($data);
+        $this->handler = (new AdvancedArrayFactory())
+            ->makeAdvancedArray($data);
     }
 
     /* @inheritdoc */
@@ -76,7 +79,7 @@ class XmlElement implements IXmlElement, JsonSerializable
 
     /** Get content of XmlElement::$handler with given key $index
      * @param string $index
-     * @return null|string|array
+     * @return null|string|array<string,string>
      */
     private function getIndexContent(string $index): array|string|null
     {
@@ -89,7 +92,7 @@ class XmlElement implements IXmlElement, JsonSerializable
     }
 
     /* @inheritdoc */
-    public function get(string $name = null): string
+    public function get(string|null $name = null): string
     {
         $value = $this->handler->pull($this->attr)->get($name)->str();
 
@@ -151,7 +154,8 @@ class XmlElement implements IXmlElement, JsonSerializable
     ): bool {
         $result = $this->handler->has($index);
         if ($result && '' !== $name) {
-            $result = isset($this->handler->get($index)[$name]);
+            $result =
+                isset($this->handler->get($index)->array()[$name]);
         }
         return $result;
     }
@@ -175,7 +179,16 @@ class XmlElement implements IXmlElement, JsonSerializable
     public function hasElement(string $name = ''): bool
     {
         $index = $this->seq;
-        $result = $this->checkNameInsideIndex($index, $name);
+        $result = $this->handler->has($index);
+        if ($result && '' !== $name) {
+            $elems = $this->handler->get($index)->array();
+            foreach ($elems as $elem) {
+                $result = $elem[$this->name] === $name;
+                if ($result) {
+                    break;
+                }
+            }
+        }
 
         return $result;
     }

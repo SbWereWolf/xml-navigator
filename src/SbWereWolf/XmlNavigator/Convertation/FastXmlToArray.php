@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
-namespace SbWereWolf\XmlNavigator;
+namespace SbWereWolf\XmlNavigator\Convertation;
 
 use InvalidArgumentException;
+use SbWereWolf\XmlNavigator\General\Notation;
+use SbWereWolf\XmlNavigator\Parsing\FastXmlParser;
 use XMLReader;
 
 /**
@@ -16,26 +18,32 @@ class FastXmlToArray implements IFastXmlToArray
     public static function convert(
         string $xmlText = '',
         string $xmlUri = '',
-        string $val = IElementComposer::VALUE,
-        string $attribs = IElementComposer::ATTRIBUTES,
-        string $name = IElementComposer::NAME,
-        string $seq = IElementComposer::SEQUENCE,
-        string $encoding = null,
+        string $val = Notation::VALUE,
+        string $attr = Notation::ATTRIBUTES,
+        string $name = Notation::NAME,
+        string $seq = Notation::SEQUENCE,
+        string|null $encoding = null,
         int $flags = LIBXML_BIGLINES | LIBXML_COMPACT,
     ): array {
-        $reader = static::createXmlReader(
+        $reader = self::createXmlReader(
             $xmlText,
             $xmlUri,
             $encoding,
             $flags
         );
-        $result = HierarchyComposer::compose(
+
+        $detectElement = function (XMLReader $cursor) {
+            return $cursor->nodeType === XMLReader::ELEMENT;
+        };
+        $extractor = FastXmlParser::extractHierarchy(
             $reader,
+            $detectElement,
             $val,
-            $attribs,
+            $attr,
             $name,
             $seq,
         );
+        $result = $extractor->current();
 
         $reader->close();
 
@@ -46,22 +54,28 @@ class FastXmlToArray implements IFastXmlToArray
     public static function prettyPrint(
         string $xmlText = '',
         string $xmlUri = '',
-        string $val = IElementComposer::VAL,
-        string $attribs = IElementComposer::ATTR,
-        string $encoding = null,
+        string $val = Notation::VAL,
+        string $attr = Notation::ATTR,
+        string|null $encoding = null,
         int $flags = LIBXML_BIGLINES | LIBXML_COMPACT,
     ): array {
-        $reader = static::createXmlReader(
+        $reader = self::createXmlReader(
             $xmlText,
             $xmlUri,
             $encoding,
             $flags
         );
-        $result = PrettyPrintComposer::compose(
+
+        $detectElement = function (XMLReader $cursor) {
+            return $cursor->nodeType === XMLReader::ELEMENT;
+        };
+        $extractor = FastXmlParser::extractPrettyPrint(
             $reader,
+            $detectElement,
             $val,
-            $attribs,
+            $attr,
         );
+        $result = $extractor->current();
 
         $reader->close();
 
@@ -78,13 +92,14 @@ class FastXmlToArray implements IFastXmlToArray
     private static function createXmlReader(
         string $xmlText,
         string $xmlUri,
-        ?string $encoding,
+        string|null $encoding,
         int $flags,
     ): XMLReader {
         if ($xmlText === '' && $xmlUri === '') {
             throw new InvalidArgumentException(
                 'One of $xmlText or $xmlUri MUST BE defined,' .
-                ' please assign only one of them, other MUST BE empty'
+                ' please assign only one of them, other MUST BE empty',
+                -667
             );
         }
 

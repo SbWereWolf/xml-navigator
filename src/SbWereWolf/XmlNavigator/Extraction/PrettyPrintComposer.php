@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace SbWereWolf\XmlNavigator;
+namespace SbWereWolf\XmlNavigator\Extraction;
 
+use SbWereWolf\XmlNavigator\General\Notation;
 use XMLReader;
 
 /**
@@ -11,18 +12,18 @@ use XMLReader;
  */
 class PrettyPrintComposer
     extends ElementComposer
-    implements IElementComposer
+    implements Notation
 {
     /**
      * @param XMLReader $reader
      * @param string $valueIndex index for element value
      * @param string $attributesIndex index for attributes collection
-     * @return array[]
+     * @return array<string,array>
      */
     public static function compose(
         XMLReader $reader,
-        string $valueIndex = IElementComposer::VAL,
-        string $attributesIndex = IElementComposer::ATTR,
+        string $valueIndex = Notation::VAL,
+        string $attributesIndex = Notation::ATTR,
     ): array {
         $elems = ElementExtractor::extractElements(
             $reader,
@@ -31,7 +32,7 @@ class PrettyPrintComposer
         );
 
         /** @noinspection PhpUnnecessaryLocalVariableInspection */
-        $result = static::composePrettyPrintByXmlElements(
+        $result = self::composePrettyPrintByXmlElements(
             $elems,
             $valueIndex,
             $attributesIndex,
@@ -41,10 +42,10 @@ class PrettyPrintComposer
     }
 
     /**
-     * @param array $elems
+     * @param array<int,array<string,array<string,int|string>>> $elems
      * @param string $valueIndex
      * @param string $attributesIndex
-     * @return array|array[]
+     * @return array<string,array>
      */
     private static function composePrettyPrintByXmlElements(
         array $elems,

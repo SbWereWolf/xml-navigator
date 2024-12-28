@@ -5,15 +5,16 @@ declare(strict_types=1);
 namespace Integration;
 
 use PHPUnit\Framework\TestCase;
-use SbWereWolf\XmlNavigator\FastXmlParser;
-use SbWereWolf\XmlNavigator\FastXmlToArray;
-use SbWereWolf\XmlNavigator\HierarchyComposer;
-use SbWereWolf\XmlNavigator\IElementComposer;
-use SbWereWolf\XmlNavigator\IXmlElement;
-use SbWereWolf\XmlNavigator\PrettyPrintComposer;
-use SbWereWolf\XmlNavigator\XmlConverter;
-use SbWereWolf\XmlNavigator\XmlElement;
-use SbWereWolf\XmlNavigator\XmlParser;
+use SbWereWolf\XmlNavigator\Convertation\FastXmlToArray;
+use SbWereWolf\XmlNavigator\Convertation\XmlConverter;
+use SbWereWolf\XmlNavigator\Extraction\ElementExtractor;
+use SbWereWolf\XmlNavigator\Extraction\HierarchyComposer;
+use SbWereWolf\XmlNavigator\Extraction\PrettyPrintComposer;
+use SbWereWolf\XmlNavigator\General\Notation;
+use SbWereWolf\XmlNavigator\Navigation\IXmlElement;
+use SbWereWolf\XmlNavigator\Navigation\XmlElement;
+use SbWereWolf\XmlNavigator\Parsing\FastXmlParser;
+use SbWereWolf\XmlNavigator\Parsing\XmlParser;
 use XMLReader;
 
 /**
@@ -499,6 +500,149 @@ XML;
             )
         );
 
+    private const MULTI_NESTED =
+        'a:1:{i:0;a:1:{s:10:"Товар";a:3:{s:36:' .
+        '"ЗначенияРеквизитов";a:1:{s:34:"ЗначениеРеквизита";a:3:{i:0;a:' .
+        '2:{s:24:"Наименование";s:30:"ВидНоменклатуры";s:16:"Значение";' .
+        's:10:"Товар";}i:1;a:2:{s:24:"Наименование";s:30:"ТипНоменклату' .
+        'ры";s:16:"Значение";s:10:"Товар";}i:2;a:2:{s:24:"Наименование"' .
+        ';s:37:"Полное наименование";s:16:"Значение";s:29:"Фильтр масля' .
+        'ный";}}}s:36:"Взаимозаменяемости";a:1:{s:36:"Взаимозаменяемост' .
+        'ь";a:5:{i:0;a:3:{s:10:"Марка";s:7:"CUMMINS";s:12:"Модель";s:10' .
+        ':"B3.9 (4BT)";s:22:"КатегорияТС";s:18:"Двигатели";}i:1;a:3:{s:' .
+        '10:"Марка";s:10:"КАМАЗ";s:12:"Модель";s:4:"4308";s:22:"Категор' .
+        'ияТС";s:37:"Грузовые автомобили";}i:2;a:3:{s:10:"Марка";s:8:"D' .
+        'ONGFENG";s:12:"Модель";s:7:"DFA1063";s:22:"КатегорияТС";s:37:"' .
+        'Грузовые автомобили";}i:3;a:3:{s:10:"Марка";s:13:"GOLDEN DRAGO' .
+        'N";s:12:"Модель";s:7:"XML6720";s:22:"КатегорияТС";s:16:"Автобу' .
+        'сы";}i:4;a:3:{s:10:"Марка";s:6:"YUTONG";s:12:"Модель";s:12:"ZK' .
+        '6737D (E2)";s:22:"КатегорияТС";s:16:"Автобусы";}}}s:44:"Дополн' .
+        'ительныеАртикулы";a:1:{s:42:"ДополнительныйАртикул";a:5:{i:0;a' .
+        ':4:{s:14:"Артикул";s:6:"LF3345";s:10:"Марка";a:0:{}s:26:"Произ' .
+        'водитель";a:0:{}s:22:"ТипАртикула";s:31:"Артикул Основной";}i:' .
+        '1;a:4:{s:14:"Артикул";s:11:"1012Q01-010";s:10:"Марка";a:0:{}s:' .
+        '26:"Производитель";a:0:{}s:22:"ТипАртикула";s:12:"Аналог";}i:2' .
+        ';a:4:{s:14:"Артикул";s:10:"1012-00121";s:10:"Марка";a:0:{}s:26' .
+        ':"Производитель";a:0:{}s:22:"ТипАртикула";s:12:"Аналог";}i:3;a' .
+        ':4:{s:14:"Артикул";s:7:"3908616";s:10:"Марка";a:0:{}s:26:"Прои' .
+        'зводитель";a:0:{}s:22:"ТипАртикула";s:12:"Аналог";}i:4;a:4:{s:' .
+        '14:"Артикул";s:7:"3903224";s:10:"Марка";a:0:{}s:26:"Производит' .
+        'ель";a:0:{}s:22:"ТипАртикула";s:12:"Аналог";}}}}}}';
+
+    /**
+     * @return void
+     */
+    public function testPrettyPrintWithNestedMultiElements(): void
+    {
+        $xml = <<<XML
+			<Товар>
+				<ЗначенияРеквизитов>
+					<ЗначениеРеквизита>
+						<Наименование>ВидНоменклатуры</Наименование>
+						<Значение>Товар</Значение>
+					</ЗначениеРеквизита>
+					<ЗначениеРеквизита>
+						<Наименование>ТипНоменклатуры</Наименование>
+						<Значение>Товар</Значение>
+					</ЗначениеРеквизита>
+					<ЗначениеРеквизита>
+						<Наименование>Полное наименование</Наименование>
+						<Значение>Фильтр масляный</Значение>
+					</ЗначениеРеквизита>
+				</ЗначенияРеквизитов>
+				<Взаимозаменяемости>
+					<Взаимозаменяемость>
+						<Марка>CUMMINS</Марка>
+						<Модель>B3.9 (4BT)</Модель>
+						<КатегорияТС>Двигатели</КатегорияТС>
+					</Взаимозаменяемость>
+					<Взаимозаменяемость>
+						<Марка>КАМАЗ</Марка>
+						<Модель>4308</Модель>
+						<КатегорияТС>Грузовые автомобили</КатегорияТС>
+					</Взаимозаменяемость>
+					<Взаимозаменяемость>
+						<Марка>DONGFENG</Марка>
+						<Модель>DFA1063</Модель>
+						<КатегорияТС>Грузовые автомобили</КатегорияТС>
+					</Взаимозаменяемость>
+					<Взаимозаменяемость>
+						<Марка>GOLDEN DRAGON</Марка>
+						<Модель>XML6720</Модель>
+						<КатегорияТС>Автобусы</КатегорияТС>
+					</Взаимозаменяемость>
+					<Взаимозаменяемость>
+						<Марка>YUTONG</Марка>
+						<Модель>ZK6737D (E2)</Модель>
+						<КатегорияТС>Автобусы</КатегорияТС>
+					</Взаимозаменяемость>
+				</Взаимозаменяемости>
+				<ДополнительныеАртикулы>
+					<ДополнительныйАртикул>
+						<Артикул>LF3345</Артикул>
+						<Марка/>
+						<Производитель/>
+						<ТипАртикула>Артикул Основной</ТипАртикула>
+					</ДополнительныйАртикул>
+					<ДополнительныйАртикул>
+						<Артикул>1012Q01-010</Артикул>
+						<Марка/>
+						<Производитель/>
+						<ТипАртикула>Аналог</ТипАртикула>
+					</ДополнительныйАртикул>
+					<ДополнительныйАртикул>
+						<Артикул>1012-00121</Артикул>
+						<Марка/>
+						<Производитель/>
+						<ТипАртикула>Аналог</ТипАртикула>
+					</ДополнительныйАртикул>
+					<ДополнительныйАртикул>
+						<Артикул>3908616</Артикул>
+						<Марка/>
+						<Производитель/>
+						<ТипАртикула>Аналог</ТипАртикула>
+					</ДополнительныйАртикул>
+					<ДополнительныйАртикул>
+						<Артикул>3903224</Артикул>
+						<Марка/>
+						<Производитель/>
+						<ТипАртикула>Аналог</ТипАртикула>
+					</ДополнительныйАртикул>
+				</ДополнительныеАртикулы>
+			</Товар>
+XML;
+        /* @var XMLReader $reader */
+        $reader = XMLReader::XML($xml);
+
+        $results = [];
+        $extractor = FastXmlParser
+            ::extractPrettyPrint(
+                $reader,
+                function (XMLReader $cursor) {
+                    return $cursor->name === 'Товар';
+                }
+            );
+        foreach ($extractor as $element) {
+            $results[] = $element;
+        }
+
+        $reader->close();
+
+        self::assertEquals(
+            static::MULTI_NESTED,
+            serialize($results)
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testXmlNavigatorEmpty(): void
+    {
+        self::expectExceptionCode(-666);
+        new XmlElement([]);
+    }
+
     /**
      * @return void
      */
@@ -604,9 +748,18 @@ XML;
         $exported = $navigator->name();
         $this->assertEquals('complex', $exported);
 
+        /* check has element value */
+        $exported = $navigator->hasValue();
+        $this->assertEquals(false, $exported);
+
         /* get element value */
         $exported = $navigator->value();
         $this->assertEquals('', $exported);
+
+        /* check has element attribute */
+        $exported = $navigator->hasAttribute('str');
+        $this->assertEquals(true, $exported);
+
 
         /* get list of attributes */
         $attributes = $navigator->attributes();
@@ -631,6 +784,10 @@ XML;
         $val = $navigator->get('str');
         self::assertEquals('text', $val);
         /* text */
+
+        /* check has element attribute */
+        $exported = $navigator->hasElement('empty');
+        $this->assertEquals(true, $exported);
 
         /* get list of nested elements */
         $elements = $navigator->elements();
@@ -713,6 +870,42 @@ XML;
     /**
      * @return void
      */
+    public function testElementExtractorExtractElements(): void
+    {
+        $xml = <<<XML
+<complex>
+    <ONLY_VALUE>element has only value</ONLY_VALUE>
+    <empty/>
+</complex>
+XML;
+        $reader = XMLReader::XML($xml);
+
+        $mayRead = true;
+        while (
+            $mayRead &&
+            $reader->nodeType !== XMLReader::TEXT
+        ) {
+            $mayRead = $reader->read();
+        }
+        $arrayRepresentationOfXml =
+            ElementExtractor::extractElements($reader, 'v', 'a');
+
+        $expected = array
+        (
+            0 => array
+            (
+                'empty' => array
+                (
+                    'depth' => 1
+                )
+            )
+        );
+        self::assertEquals($expected, $arrayRepresentationOfXml);
+    }
+
+    /**
+     * @return void
+     */
     public function testXmlConverterToHierarchyOfElements(): void
     {
         $xml = <<<XML
@@ -757,13 +950,41 @@ XML;
 </complex>
 XML;
 
+        $converter = new XmlConverter();
         $arrayRepresentationOfXml =
-            (new XmlConverter())->toPrettyPrint($xml);
+            $converter->toPrettyPrint($xml);
 
         self::assertEquals(
             static::CONVERTER_PRETTY_PRINT,
             $arrayRepresentationOfXml
         );
+
+        $path = __DIR__ . DIRECTORY_SEPARATOR . 'text.xml';
+        $actual[] =
+            $converter->toPrettyPrint('', $path);
+
+        $expected = array(
+            0 => array(
+                'e' => array
+                (
+                    'v' => 'v',
+                    'a' => array
+                    (
+                        'a' => ''
+                    )
+                )
+            )
+        );
+        self::assertEquals($expected, $actual);
+    }
+
+    /**
+     * @return void
+     */
+    public function testFastXmlToArrayConvertWithEmpty(): void
+    {
+        static::expectExceptionCode(-667);
+        FastXmlToArray::convert();
     }
 
     /**
@@ -907,6 +1128,42 @@ XML;
 
 
         self::assertEquals(static::NS_QUERY_PRETTY_PRINT, $results);
+
+
+        $reader = XMLReader::XML('<e a="">v</e>');
+
+        $mayRead = true;
+        while ($mayRead && $reader->nodeType !== XMLReader::ELEMENT) {
+            $mayRead = $reader->read();
+        }
+
+        $results = [];
+        while ($reader->nodeType === XMLReader::ELEMENT) {
+            $result = PrettyPrintComposer::compose($reader);
+            $results[] = $result;
+
+            while (
+                $mayRead &&
+                $reader->nodeType !== XMLReader::ELEMENT
+            ) {
+                $mayRead = $reader->read();
+            }
+        }
+        $reader->close();
+
+        $expected = array(
+            0 => array(
+                'e' => array
+                (
+                    '@value' => 'v',
+                    '@attributes' => array
+                    (
+                        'a' => ''
+                    )
+                )
+            )
+        );
+        self::assertEquals($expected, $results);
     }
 
     /**
@@ -1059,8 +1316,8 @@ XML;
         $reader = XMLReader::XML(static::NS_QUERY);
         $parser = new XmlParser(
             $reader,
-            IElementComposer::VAL,
-            IElementComposer::ATTR,
+            Notation::VAL,
+            Notation::ATTR,
         );
 
         $results = [];
@@ -1108,8 +1365,8 @@ XML;
         $reader = XMLReader::XML(static::CARPLACE);
         $parser = new XmlParser(
             $reader,
-            IElementComposer::VAL,
-            IElementComposer::ATTR,
+            Notation::VAL,
+            Notation::ATTR,
         );
 
         $results = [];

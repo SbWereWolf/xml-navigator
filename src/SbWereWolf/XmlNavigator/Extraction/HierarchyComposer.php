@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace SbWereWolf\XmlNavigator;
+namespace SbWereWolf\XmlNavigator\Extraction;
 
+use SbWereWolf\XmlNavigator\General\Notation;
 use XMLReader;
 
 /**
@@ -11,7 +12,7 @@ use XMLReader;
  */
 class HierarchyComposer
     extends ElementComposer
-    implements IElementComposer
+    implements Notation
 {
     /**
      * @param XMLReader $reader
@@ -19,14 +20,14 @@ class HierarchyComposer
      * @param string $attributesIndex index for attributes collection
      * @param string $nameIndex index for element name
      * @param string $elementsIndex index for child elements collection
-     * @return array[]
+     * @return array<string,string|array<int,array<string,string>>>
      */
     public static function compose(
         XMLReader $reader,
-        string $valueIndex = IElementComposer::VALUE,
-        string $attributesIndex = IElementComposer::ATTRIBUTES,
-        string $nameIndex = IElementComposer::NAME,
-        string $elementsIndex = IElementComposer::SEQUENCE,
+        string $valueIndex = Notation::VALUE,
+        string $attributesIndex = Notation::ATTRIBUTES,
+        string $nameIndex = Notation::NAME,
+        string $elementsIndex = Notation::SEQUENCE,
     ): array {
         $elems = ElementExtractor::extractElements(
             $reader,
@@ -34,7 +35,7 @@ class HierarchyComposer
             $attributesIndex,
         );
         /** @noinspection PhpUnnecessaryLocalVariableInspection */
-        $result = static::createTheHierarchyOfElements(
+        $result = self::createTheHierarchyOfElements(
             $elems,
             $elementsIndex,
             $nameIndex,
@@ -46,12 +47,12 @@ class HierarchyComposer
     }
 
     /**
-     * @param array $elems
+     * @param array<int,array<string,array<string,int|string>>> $elems
      * @param string $elementsIndex
      * @param string $nameIndex
      * @param string $valueIndex
      * @param string $attributesIndex
-     * @return array
+     * @return array<string,string|array<int,array<string,string>>>
      */
     private static function createTheHierarchyOfElements(
         array $elems,
@@ -120,14 +121,7 @@ class HierarchyComposer
             /*$logger->debug("предыдущий уровень вложенности `$prev`");*/
         }
 
-        $result = [];
-        $hasRoot = 1 === count($hierarchy[$elementsIndex]);
-        if ($hasRoot) {
-            $result = &$hierarchy[$elementsIndex][0];
-        }
-        if (!$hasRoot) {
-            $result = &$hierarchy[$elementsIndex];
-        }
+        $result = &$hierarchy[$elementsIndex][0];
 
         return $result;
     }

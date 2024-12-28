@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SbWereWolf\XmlNavigator;
+namespace SbWereWolf\XmlNavigator\Extraction;
 
 /**
  * Parent class for composers
@@ -10,7 +10,7 @@ namespace SbWereWolf\XmlNavigator;
 class ElementComposer
 {
     /**
-     * @param array $elems
+     * @param array<int,array<string,array<string,int>>> $elems
      * @return int
      */
     protected static function extractBaseDepth(array $elems): int
@@ -22,7 +22,7 @@ class ElementComposer
         }
         $base = 0;
         if ($first) {
-            $base = current($first)[ElementExtractor::DEPTH];
+            $base = (int)current($first)[ElementExtractor::DEPTH];
         }
 
         return $base;

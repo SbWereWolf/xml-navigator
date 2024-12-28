@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SbWereWolf\XmlNavigator;
+namespace SbWereWolf\XmlNavigator\Navigation;
 
 use JsonSerializable;
 use SbWereWolf\JsonSerializable\JsonSerializeTrait;
