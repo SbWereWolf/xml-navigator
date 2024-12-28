@@ -22,7 +22,7 @@ use XMLReader;
  */
 class DebugTest extends TestCase
 {
-    const PRETTY_PRINT =
+    private const PRETTY_PRINT =
         array(
             'complex' =>
                 array(
@@ -81,7 +81,7 @@ class DebugTest extends TestCase
                 ),
         );
 
-    const CONVERTER_PRETTY_PRINT =
+    private const CONVERTER_PRETTY_PRINT =
         array(
             'complex' =>
                 array(
@@ -140,7 +140,7 @@ class DebugTest extends TestCase
                 ),
         );
 
-    const XML_HIERARCHY =
+    private const XML_HIERARCHY =
         array(
             'n' => 'complex',
             's' =>
@@ -208,7 +208,7 @@ class DebugTest extends TestCase
                 ),
         );
 
-    const NS_QUERY = <<<XML
+    private const NS_QUERY = <<<XML
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <QueryResult
         xmlns="urn://x-artefacts-smev-gov-ru/services/service-adapter/types">
@@ -249,7 +249,7 @@ class DebugTest extends TestCase
 </QueryResult>
 XML;
 
-    const NS_QUERY_HIERARCHY =
+    private const NS_QUERY_HIERARCHY =
         array(
             0 => array
             (
@@ -283,7 +283,7 @@ XML;
             )
         );
 
-    const NS_QUERY_PRETTY_PRINT =
+    private const NS_QUERY_PRETTY_PRINT =
         array(
             0 => array
             (
@@ -305,6 +305,196 @@ XML;
                                 'Number' => '22RU006228DV'
                             )
                         )
+                    )
+                )
+            )
+        );
+
+
+    private const CARPLACE = <<<XML
+<?xml version="1.0" encoding="utf-8"?>
+<CARPLACES>
+    <CARPLACE
+            ID="11356925"
+            OBJECTID="20318444"
+            OBJECTGUID="6e237b93-09d6-4adf-9567-e9678608543b"
+            CHANGEID="31810106"
+            NUMBER="1"
+            OPERTYPEID="10"
+            PREVID="0"
+            NEXTID="0"
+            UPDATEDATE="2019-07-09"
+            STARTDATE="2019-07-09"
+            ENDDATE="2079-06-06"
+            ISACTUAL="1"
+            ISACTIVE="1"
+    />
+    <CARPLACE
+            ID="11361653"
+            OBJECTID="20326793"
+            OBJECTGUID="11d9f79b-be6f-43dc-bdcc-70bbfc9f86b0"
+            CHANGEID="31822630"
+            NUMBER="1"
+            OPERTYPEID="10"
+            PREVID="0"
+            NEXTID="0"
+            UPDATEDATE="2019-07-30"
+            STARTDATE="2019-07-30"
+            ENDDATE="2079-06-06"
+            ISACTUAL="1"
+            ISACTIVE="1"
+    />
+    <CARPLACE
+            ID="94824"
+            OBJECTID="101032823"
+            OBJECTGUID="4f37e0eb-141f-4c19-b416-0ec85e2e9e76"
+            CHANGEID="192339336"
+            NUMBER="0"
+            OPERTYPEID="10"
+            PREVID="0"
+            NEXTID="0"
+            UPDATEDATE="2021-04-22"
+            STARTDATE="2021-04-22"
+            ENDDATE="2079-06-06"
+            ISACTUAL="1"
+            ISACTIVE="1"
+    />
+</CARPLACES>
+XML;
+
+    private const CARPLACE_HIERARCHY =
+        array(
+            0 => array
+            (
+                'n' => 'CARPLACE',
+                'a' => array
+                (
+                    'ID' => '11356925',
+                    'OBJECTID' => '20318444',
+                    'OBJECTGUID' => '6e237b93-09d6-4adf-9567-e9678608543b',
+                    'CHANGEID' => '31810106',
+                    'NUMBER' => '1',
+                    'OPERTYPEID' => '10',
+                    'PREVID' => '0',
+                    'NEXTID' => '0',
+                    'UPDATEDATE' => '2019-07-09',
+                    'STARTDATE' => '2019-07-09',
+                    'ENDDATE' => '2079-06-06',
+                    'ISACTUAL' => '1',
+                    'ISACTIVE' => '1',
+                )
+            ),
+            1 => array
+            (
+                'n' => 'CARPLACE',
+                'a' => array
+                (
+                    'ID' => '11361653',
+                    'OBJECTID' => '20326793',
+                    'OBJECTGUID' => '11d9f79b-be6f-43dc-bdcc-70bbfc9f86b0',
+                    'CHANGEID' => '31822630',
+                    'NUMBER' => '1',
+                    'OPERTYPEID' => '10',
+                    'PREVID' => '0',
+                    'NEXTID' => '0',
+                    'UPDATEDATE' => '2019-07-30',
+                    'STARTDATE' => '2019-07-30',
+                    'ENDDATE' => '2079-06-06',
+                    'ISACTUAL' => '1',
+                    'ISACTIVE' => '1',
+                )
+
+            ),
+            2 => array
+            (
+                'n' => 'CARPLACE',
+                'a' => array
+                (
+                    'ID' => '94824',
+                    'OBJECTID' => '101032823',
+                    'OBJECTGUID' => '4f37e0eb-141f-4c19-b416-0ec85e2e9e76',
+                    'CHANGEID' => '192339336',
+                    'NUMBER' => '0',
+                    'OPERTYPEID' => '10',
+                    'PREVID' => '0',
+                    'NEXTID' => '0',
+                    'UPDATEDATE' => '2021-04-22',
+                    'STARTDATE' => '2021-04-22',
+                    'ENDDATE' => '2079-06-06',
+                    'ISACTUAL' => '1',
+                    'ISACTIVE' => '1',
+                )
+            )
+        );
+
+    private const CARPLACE_PRETTY_PRINT =
+        array(
+            '0' => array
+            (
+                'CARPLACE' => array
+                (
+                    '@attributes' => array
+                    (
+                        'ID' => '11356925',
+                        'OBJECTID' => '20318444',
+                        'OBJECTGUID' =>
+                            '6e237b93-09d6-4adf-9567-e9678608543b',
+                        'CHANGEID' => '31810106',
+                        'NUMBER' => '1',
+                        'OPERTYPEID' => '10',
+                        'PREVID' => '0',
+                        'NEXTID' => '0',
+                        'UPDATEDATE' => '2019-07-09',
+                        'STARTDATE' => '2019-07-09',
+                        'ENDDATE' => '2079-06-06',
+                        'ISACTUAL' => '1',
+                        'ISACTIVE' => '1',
+                    )
+                )
+            ),
+            1 => array
+            (
+                'CARPLACE' => array
+                (
+                    '@attributes' => array
+                    (
+                        'ID' => '11361653',
+                        'OBJECTID' => '20326793',
+                        'OBJECTGUID' =>
+                            '11d9f79b-be6f-43dc-bdcc-70bbfc9f86b0',
+                        'CHANGEID' => '31822630',
+                        'NUMBER' => '1',
+                        'OPERTYPEID' => '10',
+                        'PREVID' => '0',
+                        'NEXTID' => '0',
+                        'UPDATEDATE' => '2019-07-30',
+                        'STARTDATE' => '2019-07-30',
+                        'ENDDATE' => '2079-06-06',
+                        'ISACTUAL' => '1',
+                        'ISACTIVE' => '1',
+                    )
+                )
+            ),
+            2 => array
+            (
+                'CARPLACE' => array
+                (
+                    '@attributes' => array
+                    (
+                        'ID' => '94824',
+                        'OBJECTID' => '101032823',
+                        'OBJECTGUID' =>
+                            '4f37e0eb-141f-4c19-b416-0ec85e2e9e76',
+                        'CHANGEID' => '192339336',
+                        'NUMBER' => '0',
+                        'OPERTYPEID' => '10',
+                        'PREVID' => '0',
+                        'NEXTID' => '0',
+                        'UPDATEDATE' => '2021-04-22',
+                        'STARTDATE' => '2021-04-22',
+                        'ENDDATE' => '2079-06-06',
+                        'ISACTUAL' => '1',
+                        'ISACTIVE' => '1',
                     )
                 )
             )
@@ -444,199 +634,19 @@ XML;
         );
     }
 
-    const CARPLACE = <<<XML
-<?xml version="1.0" encoding="utf-8"?>
-<CARPLACES>
-    <CARPLACE
-            ID="11356925"
-            OBJECTID="20318444"
-            OBJECTGUID="6e237b93-09d6-4adf-9567-e9678608543b"
-            CHANGEID="31810106"
-            NUMBER="1"
-            OPERTYPEID="10"
-            PREVID="0"
-            NEXTID="0"
-            UPDATEDATE="2019-07-09"
-            STARTDATE="2019-07-09"
-            ENDDATE="2079-06-06"
-            ISACTUAL="1"
-            ISACTIVE="1"
-    />
-    <CARPLACE
-            ID="11361653"
-            OBJECTID="20326793"
-            OBJECTGUID="11d9f79b-be6f-43dc-bdcc-70bbfc9f86b0"
-            CHANGEID="31822630"
-            NUMBER="1"
-            OPERTYPEID="10"
-            PREVID="0"
-            NEXTID="0"
-            UPDATEDATE="2019-07-30"
-            STARTDATE="2019-07-30"
-            ENDDATE="2079-06-06"
-            ISACTUAL="1"
-            ISACTIVE="1"
-    />
-    <CARPLACE
-            ID="94824"
-            OBJECTID="101032823"
-            OBJECTGUID="4f37e0eb-141f-4c19-b416-0ec85e2e9e76"
-            CHANGEID="192339336"
-            NUMBER="0"
-            OPERTYPEID="10"
-            PREVID="0"
-            NEXTID="0"
-            UPDATEDATE="2021-04-22"
-            STARTDATE="2021-04-22"
-            ENDDATE="2079-06-06"
-            ISACTUAL="1"
-            ISACTIVE="1"
-    />
-</CARPLACES>
-XML;
-
-    const CARPLACE_HIERARCHY =
-        array(
-            0 => array
-            (
-                'n' => 'CARPLACE',
-                'a' => array
-                (
-                    'ID' => '11356925',
-                    'OBJECTID' => '20318444',
-                    'OBJECTGUID' => '6e237b93-09d6-4adf-9567-e9678608543b',
-                    'CHANGEID' => '31810106',
-                    'NUMBER' => '1',
-                    'OPERTYPEID' => '10',
-                    'PREVID' => '0',
-                    'NEXTID' => '0',
-                    'UPDATEDATE' => '2019-07-09',
-                    'STARTDATE' => '2019-07-09',
-                    'ENDDATE' => '2079-06-06',
-                    'ISACTUAL' => '1',
-                    'ISACTIVE' => '1',
-                )
-            ),
-            1 => array
-            (
-                'n' => 'CARPLACE',
-                'a' => array
-                (
-                    'ID' => '11361653',
-                    'OBJECTID' => '20326793',
-                    'OBJECTGUID' => '11d9f79b-be6f-43dc-bdcc-70bbfc9f86b0',
-                    'CHANGEID' => '31822630',
-                    'NUMBER' => '1',
-                    'OPERTYPEID' => '10',
-                    'PREVID' => '0',
-                    'NEXTID' => '0',
-                    'UPDATEDATE' => '2019-07-30',
-                    'STARTDATE' => '2019-07-30',
-                    'ENDDATE' => '2079-06-06',
-                    'ISACTUAL' => '1',
-                    'ISACTIVE' => '1',
-                )
-
-            ),
-            2 => array
-            (
-                'n' => 'CARPLACE',
-                'a' => array
-                (
-                    'ID' => '94824',
-                    'OBJECTID' => '101032823',
-                    'OBJECTGUID' => '4f37e0eb-141f-4c19-b416-0ec85e2e9e76',
-                    'CHANGEID' => '192339336',
-                    'NUMBER' => '0',
-                    'OPERTYPEID' => '10',
-                    'PREVID' => '0',
-                    'NEXTID' => '0',
-                    'UPDATEDATE' => '2021-04-22',
-                    'STARTDATE' => '2021-04-22',
-                    'ENDDATE' => '2079-06-06',
-                    'ISACTUAL' => '1',
-                    'ISACTIVE' => '1',
-                )
-            )
-        );
-
-    const CARPLACE_PRETTY_PRINT =
-        array(
-            '0' => array
-            (
-                'CARPLACE' => array
-                (
-                    '@attributes' => array
-                    (
-                        'ID' => '11356925',
-                        'OBJECTID' => '20318444',
-                        'OBJECTGUID' =>
-                            '6e237b93-09d6-4adf-9567-e9678608543b',
-                        'CHANGEID' => '31810106',
-                        'NUMBER' => '1',
-                        'OPERTYPEID' => '10',
-                        'PREVID' => '0',
-                        'NEXTID' => '0',
-                        'UPDATEDATE' => '2019-07-09',
-                        'STARTDATE' => '2019-07-09',
-                        'ENDDATE' => '2079-06-06',
-                        'ISACTUAL' => '1',
-                        'ISACTIVE' => '1',
-                    )
-                )
-            ),
-            1 => array
-            (
-                'CARPLACE' => array
-                (
-                    '@attributes' => array
-                    (
-                        'ID' => '11361653',
-                        'OBJECTID' => '20326793',
-                        'OBJECTGUID' =>
-                            '11d9f79b-be6f-43dc-bdcc-70bbfc9f86b0',
-                        'CHANGEID' => '31822630',
-                        'NUMBER' => '1',
-                        'OPERTYPEID' => '10',
-                        'PREVID' => '0',
-                        'NEXTID' => '0',
-                        'UPDATEDATE' => '2019-07-30',
-                        'STARTDATE' => '2019-07-30',
-                        'ENDDATE' => '2079-06-06',
-                        'ISACTUAL' => '1',
-                        'ISACTIVE' => '1',
-                    )
-                )
-            ),
-            2 => array
-            (
-                'CARPLACE' => array
-                (
-                    '@attributes' => array
-                    (
-                        'ID' => '94824',
-                        'OBJECTID' => '101032823',
-                        'OBJECTGUID' =>
-                            '4f37e0eb-141f-4c19-b416-0ec85e2e9e76',
-                        'CHANGEID' => '192339336',
-                        'NUMBER' => '0',
-                        'OPERTYPEID' => '10',
-                        'PREVID' => '0',
-                        'NEXTID' => '0',
-                        'UPDATEDATE' => '2021-04-22',
-                        'STARTDATE' => '2021-04-22',
-                        'ENDDATE' => '2079-06-06',
-                        'ISACTUAL' => '1',
-                        'ISACTIVE' => '1',
-                    )
-                )
-            )
-        );
+    /**
+     * @return void
+     */
+    public function testXmlNavigatorEmpty(): void
+    {
+        self::expectExceptionCode(-666);
+        new XmlElement([]);
+    }
 
     /**
      * @return void
      */
-    public function testXmlNavigator()
+    public function testXmlNavigator(): void
     {
         $xmlContent =
             array(
@@ -860,7 +870,7 @@ XML;
     /**
      * @return void
      */
-    public function testElementExtractorExtractElements()
+    public function testElementExtractorExtractElements(): void
     {
         $xml = <<<XML
 <complex>
@@ -868,8 +878,7 @@ XML;
     <empty/>
 </complex>
 XML;
-        $reader = new XMLReader();
-        $reader->XML($xml);
+        $reader = XMLReader::XML($xml);
 
         $mayRead = true;
         while (
@@ -897,7 +906,7 @@ XML;
     /**
      * @return void
      */
-    public function testXmlConverterToHierarchyOfElements()
+    public function testXmlConverterToHierarchyOfElements(): void
     {
         $xml = <<<XML
 <complex>
@@ -925,7 +934,7 @@ XML;
     /**
      * @return void
      */
-    public function testXmlConverterToPrettyPrint()
+    public function testXmlConverterToPrettyPrint(): void
     {
         $xml = <<<XML
 <complex>
@@ -972,7 +981,16 @@ XML;
     /**
      * @return void
      */
-    public function testFastXmlToArrayConvert()
+    public function testFastXmlToArrayConvertWithEmpty(): void
+    {
+        static::expectExceptionCode(-667);
+        FastXmlToArray::convert();
+    }
+
+    /**
+     * @return void
+     */
+    public function testFastXmlToArrayConvert(): void
     {
         $xml = <<<XML
 <complex>
@@ -999,7 +1017,7 @@ XML;
     /**
      * @return void
      */
-    public function testFastXmlToArrayPrettyPrint()
+    public function testFastXmlToArrayPrettyPrint(): void
     {
         $xml = <<<XML
 <complex>
@@ -1026,10 +1044,9 @@ XML;
     /**
      * @return void
      */
-    public function testHierarchyComposerComposeNsQuery()
+    public function testHierarchyComposerComposeNsQuery(): void
     {
-        $reader = new XMLReader();
-        $reader->XML(static::NS_QUERY);
+        $reader = XMLReader::XML(static::NS_QUERY);
 
         $mayRead = true;
         while ($mayRead && $reader->name !== 'ns:Query') {
@@ -1057,10 +1074,9 @@ XML;
     /**
      * @return void
      */
-    public function testHierarchyComposerComposeCarplace()
+    public function testHierarchyComposerComposeCarplace(): void
     {
-        $reader = new XMLReader();
-        $reader->XML(static::CARPLACE);
+        $reader = XMLReader::XML(static::CARPLACE);
 
         $mayRead = true;
         while ($mayRead && $reader->name !== 'CARPLACE') {
@@ -1087,10 +1103,9 @@ XML;
     /**
      * @return void
      */
-    public function testPrettyPrintComposerComposeNsQuery()
+    public function testPrettyPrintComposerComposeNsQuery(): void
     {
-        $reader = new XMLReader();
-        $reader->XML(static::NS_QUERY);
+        $reader = XMLReader::XML(static::NS_QUERY);
 
         $mayRead = true;
         while ($mayRead && $reader->name !== 'ns:Query') {
@@ -1114,8 +1129,8 @@ XML;
 
         self::assertEquals(static::NS_QUERY_PRETTY_PRINT, $results);
 
-        $reader = new XMLReader();
-        $reader->XML('<e a="">v</e>');
+
+        $reader = XMLReader::XML('<e a="">v</e>');
 
         $mayRead = true;
         while ($mayRead && $reader->nodeType !== XMLReader::ELEMENT) {
@@ -1154,10 +1169,9 @@ XML;
     /**
      * @return void
      */
-    public function testPrettyPrintComposerComposeCarplace()
+    public function testPrettyPrintComposerComposeCarplace(): void
     {
-        $reader = new XMLReader();
-        $reader->XML(static::CARPLACE);
+        $reader = XMLReader::XML(static::CARPLACE);
 
         $mayRead = true;
         while ($mayRead && $reader->name !== 'CARPLACE') {
@@ -1184,10 +1198,9 @@ XML;
     /**
      * @return void
      */
-    public function testFastXmlParserExtractHierarchyNsQuery()
+    public function testFastXmlParserExtractHierarchyNsQuery(): void
     {
-        $reader = new XMLReader();
-        $reader->XML(static::NS_QUERY);
+        $reader = XMLReader::XML(static::NS_QUERY);
 
         $results = [];
         $extractor = FastXmlParser::extractHierarchy(
@@ -1208,10 +1221,9 @@ XML;
     /**
      * @return void
      */
-    public function testFastXmlParserExtractPrettyPrintNsQuery()
+    public function testFastXmlParserExtractPrettyPrintNsQuery(): void
     {
-        $reader = new XMLReader();
-        $reader->XML(static::NS_QUERY);
+        $reader = XMLReader::XML(static::NS_QUERY);
 
         $results = [];
         $extractor = FastXmlParser::extractPrettyPrint(
@@ -1232,10 +1244,9 @@ XML;
     /**
      * @return void
      */
-    public function testFastXmlParserExtractHierarchyCarplace()
+    public function testFastXmlParserExtractHierarchyCarplace(): void
     {
-        $reader = new XMLReader();
-        $reader->XML(static::CARPLACE);
+        $reader = XMLReader::XML(static::CARPLACE);
 
         $results = [];
         $extractor = FastXmlParser::extractHierarchy(
@@ -1255,10 +1266,9 @@ XML;
     /**
      * @return void
      */
-    public function testFastXmlParserExtractPrettyPrintCarplace()
+    public function testFastXmlParserExtractPrettyPrintCarplace(): void
     {
-        $reader = new XMLReader();
-        $reader->XML(static::CARPLACE);
+        $reader = XMLReader::XML(static::CARPLACE);
 
         $results = [];
         $extractor = FastXmlParser::extractPrettyPrint(
@@ -1278,10 +1288,9 @@ XML;
     /**
      * @return void
      */
-    public function testXmlParserExtractHierarchyNsQuery()
+    public function testXmlParserExtractHierarchyNsQuery(): void
     {
-        $reader = new XMLReader();
-        $reader->XML(static::NS_QUERY);
+        $reader = XMLReader::XML(static::NS_QUERY);
         $parser = new XmlParser($reader);
 
         $results = [];
@@ -1302,14 +1311,13 @@ XML;
     /**
      * @return void
      */
-    public function testXmlParserExtractPrettyPrintNsQuery()
+    public function testXmlParserExtractPrettyPrintNsQuery(): void
     {
-        $reader = new XMLReader();
-        $reader->XML(static::NS_QUERY);
+        $reader = XMLReader::XML(static::NS_QUERY);
         $parser = new XmlParser(
             $reader,
             Notation::VAL,
-            Notation::ATTR
+            Notation::ATTR,
         );
 
         $results = [];
@@ -1330,10 +1338,9 @@ XML;
     /**
      * @return void
      */
-    public function testXmlParserExtractHierarchyCarplace()
+    public function testXmlParserExtractHierarchyCarplace(): void
     {
-        $reader = new XMLReader();
-        $reader->XML(static::CARPLACE);
+        $reader = XMLReader::XML(static::CARPLACE);
         $parser = new XmlParser($reader);
 
         $results = [];
@@ -1353,14 +1360,13 @@ XML;
     /**
      * @return void
      */
-    public function testXmlParserExtractPrettyPrintCarplace()
+    public function testXmlParserExtractPrettyPrintCarplace(): void
     {
-        $reader = new XMLReader();
-        $reader->XML(static::CARPLACE);
+        $reader = XMLReader::XML(static::CARPLACE);
         $parser = new XmlParser(
             $reader,
             Notation::VAL,
-            Notation::ATTR
+            Notation::ATTR,
         );
 
         $results = [];

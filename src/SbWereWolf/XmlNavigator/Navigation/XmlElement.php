@@ -7,9 +7,9 @@ namespace SbWereWolf\XmlNavigator\Navigation;
 use Generator;
 use InvalidArgumentException;
 use JsonSerializable;
-use LanguageSpecific\ArrayHandler;
-use LanguageSpecific\IArrayHandler;
 use SbWereWolf\JsonSerializable\JsonSerializeTrait;
+use SbWereWolf\LanguageSpecific\AdvancedArrayFactory;
+use SbWereWolf\LanguageSpecific\AdvancedArrayInterface;
 use SbWereWolf\XmlNavigator\General\Notation;
 
 /**
@@ -19,19 +19,19 @@ class XmlElement implements IXmlElement, JsonSerializable
 {
     use JsonSerializeTrait;
 
-    /** @var IArrayHandler Массив со свойствами XML элемента */
-    private $handler;
+    /** @var AdvancedArrayInterface Массив со свойствами XML элемента */
+    private  AdvancedArrayInterface $handler;
     /** @var string Индекс имени элемента */
-    private $name;
+    private string $name;
     /** @var string Индекс значения элемента */
-    private $val;
+    private string $val;
     /** @var string Индекс для атрибутов элемента */
-    private $attr;
+    private string $attr;
     /** @var string Индекс для вложенных элементов */
-    private $seq;
+    private string $seq;
 
     /**
-     * @param array $data Массив со свойствами XML элемента
+     * @param array<string,string|array> $data Массив со свойствами XML элемента
      * @param string $name Индекс для имени
      * @param string $val Индекс для значения
      * @param string $attr Индекс для атрибутов
@@ -42,7 +42,7 @@ class XmlElement implements IXmlElement, JsonSerializable
         string $name = Notation::NAME,
         string $val = Notation::VALUE,
         string $attr = Notation::ATTRIBUTES,
-        string $seq = Notation::SEQUENCE
+        string $seq = Notation::SEQUENCE,
     ) {
         $keys = array_flip(array_keys($data));
         $letThrow = !key_exists($name, $keys);
@@ -60,7 +60,8 @@ class XmlElement implements IXmlElement, JsonSerializable
         $this->attr = $attr;
         $this->seq = $seq;
 
-        $this->handler = new ArrayHandler($data);
+        $this->handler = (new AdvancedArrayFactory())
+            ->makeAdvancedArray($data);
     }
 
     /* @inheritdoc */
@@ -78,9 +79,9 @@ class XmlElement implements IXmlElement, JsonSerializable
 
     /** Get content of XmlElement::$handler with given key $index
      * @param string $index
-     * @return null|string|array
+     * @return null|string|array<string,string>
      */
-    private function getIndexContent(string $index)
+    private function getIndexContent(string $index): array|string|null
     {
         $content = null;
         if ($this->handler->has($index)) {
@@ -91,7 +92,7 @@ class XmlElement implements IXmlElement, JsonSerializable
     }
 
     /* @inheritdoc */
-    public function get(string $name = null): string
+    public function get(string|null $name = null): string
     {
         $value = $this->handler->pull($this->attr)->get($name)->str();
 

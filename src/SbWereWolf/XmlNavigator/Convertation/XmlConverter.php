@@ -15,26 +15,28 @@ class XmlConverter implements IXmlConverter, JsonSerializable
 {
     use JsonSerializeTrait;
 
-    /** @var array Структура XML документа в нормализованном виде */
-    private $xmlStructure = [];
-    /** @var array  XML документа в виде удобном для чтения */
-    private $prettyXml = [];
+    /** @var array<string,string|array<string,string>>
+     *      Структура XML документа в нормализованном виде */
+    private array $xmlStructure = [];
+    /** @var array<string,string|array<string,string>>
+     *       XML документа в виде удобном для чтения */
+    private array $prettyXml = [];
     /** @var string Индекс для Имени */
-    private $name;
+    private string $name;
     /** @var string Индекс для Значения */
-    private $val;
+    private string $val;
     /** @var string Индекс для Атрибутов */
-    private $attribs;
+    private string $attribs;
     /** @var string  Индекс для вложенных элементов */
-    private $seq;
+    private string $seq;
     /** @var string|null Кодировка XML Документа */
-    private $encoding;
+    private ?string $encoding;
     /** @var int Битовая маска из констант LIBXML_* */
-    private $flags;
+    private int $flags;
     /** @var string Previous text of XML document */
-    private $previousXmlText = '';
+    private string $previousXmlText = '';
     /** @var string Previous path or link to XML document */
-    private $previousXmlUri = '';
+    private string $previousXmlUri = '';
 
     /**
      * @param string $val Индекс для значения
@@ -49,8 +51,8 @@ class XmlConverter implements IXmlConverter, JsonSerializable
         string $attr = Notation::ATTRIBUTES,
         string $name = Notation::NAME,
         string $seq = Notation::SEQUENCE,
-        string $encoding = null,
-        int $flags = LIBXML_BIGLINES | LIBXML_COMPACT
+        string|null $encoding = null,
+        int $flags = LIBXML_BIGLINES | LIBXML_COMPACT,
     ) {
         $this->name = $name;
         $this->val = $val;
@@ -63,7 +65,7 @@ class XmlConverter implements IXmlConverter, JsonSerializable
     /* @inheritdoc */
     public function toPrettyPrint(
         string $xmlText = '',
-        string $xmlUri = ''
+        string $xmlUri = '',
     ): array {
         $isPrevious = $this->isPrevious($xmlText, $xmlUri);
         if (!$isPrevious || !count($this->prettyXml)) {
@@ -74,7 +76,7 @@ class XmlConverter implements IXmlConverter, JsonSerializable
                     $this->val,
                     $this->attribs,
                     $this->encoding,
-                    $this->flags
+                    $this->flags,
                 );
 
             $this->previousXmlText = $xmlText;
@@ -87,7 +89,7 @@ class XmlConverter implements IXmlConverter, JsonSerializable
     /* @inheritdoc */
     public function toHierarchyOfElements(
         string $xmlText = '',
-        string $xmlUri = ''
+        string $xmlUri = '',
     ): array {
         $isPrevious = $this->isPrevious($xmlText, $xmlUri);
         if (!$isPrevious || !count($this->xmlStructure)) {
@@ -100,7 +102,7 @@ class XmlConverter implements IXmlConverter, JsonSerializable
                     $this->name,
                     $this->seq,
                     $this->encoding,
-                    $this->flags
+                    $this->flags,
                 );
 
             $this->previousXmlText = $xmlText;

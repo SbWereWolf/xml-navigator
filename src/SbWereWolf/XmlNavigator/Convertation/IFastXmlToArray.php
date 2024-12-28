@@ -21,7 +21,7 @@ interface IFastXmlToArray
      * @param string $seq index for child elements collection
      * @param string|null $encoding The document encoding or NULL
      * @param int $flags A bitmask of the LIBXML_* constants.
-     * @return array
+     * @return array<string,string|array<string,string>>
      */
     public static function convert(
         string $xmlText = '',
@@ -30,8 +30,8 @@ interface IFastXmlToArray
         string $attr = Notation::ATTRIBUTES,
         string $name = Notation::NAME,
         string $seq = Notation::SEQUENCE,
-        string $encoding = null,
-        int $flags = LIBXML_BIGLINES | LIBXML_COMPACT
+        string|null $encoding = null,
+        int $flags = LIBXML_BIGLINES | LIBXML_COMPACT,
     ): array;
 
     /** Convert xml document into compact array
@@ -41,14 +41,14 @@ interface IFastXmlToArray
      * @param string $attr index for element attributes collection
      * @param string|null $encoding The document encoding or NULL
      * @param int $flags A bitmask of the LIBXML_* constants.
-     * @return array
+     * @return array<string,string|array<string,string>>
      */
     public static function prettyPrint(
         string $xmlText = '',
         string $xmlUri = '',
         string $val = Notation::VAL,
         string $attr = Notation::ATTR,
-        string $encoding = null,
-        int $flags = LIBXML_BIGLINES | LIBXML_COMPACT
+        string|null $encoding = null,
+        int $flags = LIBXML_BIGLINES | LIBXML_COMPACT,
     ): array;
 }

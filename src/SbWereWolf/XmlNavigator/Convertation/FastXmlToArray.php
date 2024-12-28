@@ -22,10 +22,10 @@ class FastXmlToArray implements IFastXmlToArray
         string $attr = Notation::ATTRIBUTES,
         string $name = Notation::NAME,
         string $seq = Notation::SEQUENCE,
-        string $encoding = null,
-        int $flags = LIBXML_BIGLINES | LIBXML_COMPACT
+        string|null $encoding = null,
+        int $flags = LIBXML_BIGLINES | LIBXML_COMPACT,
     ): array {
-        $reader = static::createXmlReader(
+        $reader = self::createXmlReader(
             $xmlText,
             $xmlUri,
             $encoding,
@@ -41,7 +41,7 @@ class FastXmlToArray implements IFastXmlToArray
             $val,
             $attr,
             $name,
-            $seq
+            $seq,
         );
         $result = $extractor->current();
 
@@ -56,10 +56,10 @@ class FastXmlToArray implements IFastXmlToArray
         string $xmlUri = '',
         string $val = Notation::VAL,
         string $attr = Notation::ATTR,
-        string $encoding = null,
-        int $flags = LIBXML_BIGLINES | LIBXML_COMPACT
+        string|null $encoding = null,
+        int $flags = LIBXML_BIGLINES | LIBXML_COMPACT,
     ): array {
-        $reader = static::createXmlReader(
+        $reader = self::createXmlReader(
             $xmlText,
             $xmlUri,
             $encoding,
@@ -73,7 +73,7 @@ class FastXmlToArray implements IFastXmlToArray
             $reader,
             $detectElement,
             $val,
-            $attr
+            $attr,
         );
         $result = $extractor->current();
 
@@ -92,8 +92,8 @@ class FastXmlToArray implements IFastXmlToArray
     private static function createXmlReader(
         string $xmlText,
         string $xmlUri,
-        $encoding,
-        int $flags
+        string|null $encoding,
+        int $flags,
     ): XMLReader {
         if ($xmlText === '' && $xmlUri === '') {
             throw new InvalidArgumentException(
@@ -105,17 +105,17 @@ class FastXmlToArray implements IFastXmlToArray
 
         $reader = new XMLReader();
         if ($xmlText !== '') {
-            $reader->XML(
+            $reader = XMLReader::XML(
                 $xmlText,
                 $encoding,
-                $flags
+                $flags,
             );
         }
         if ($xmlText === '' && $xmlUri !== '') {
-            $reader->open(
+            $reader = XMLReader::open(
                 $xmlUri,
                 $encoding,
-                $flags
+                $flags,
             );
         }
 

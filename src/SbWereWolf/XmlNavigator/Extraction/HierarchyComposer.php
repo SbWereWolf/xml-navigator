@@ -20,7 +20,7 @@ class HierarchyComposer
      * @param string $attributesIndex index for attributes collection
      * @param string $nameIndex index for element name
      * @param string $elementsIndex index for child elements collection
-     * @return array[]
+     * @return array<string,string|array<int,array<string,string>>>
      */
     public static function compose(
         XMLReader $reader,
@@ -35,7 +35,7 @@ class HierarchyComposer
             $attributesIndex
         );
         /** @noinspection PhpUnnecessaryLocalVariableInspection */
-        $result = static::createTheHierarchyOfElements(
+        $result = self::createTheHierarchyOfElements(
             $elems,
             $elementsIndex,
             $nameIndex,
@@ -47,12 +47,12 @@ class HierarchyComposer
     }
 
     /**
-     * @param array $elems
+     * @param array<int,array<string,array<string,int|string>>> $elems
      * @param string $elementsIndex
      * @param string $nameIndex
      * @param string $valueIndex
      * @param string $attributesIndex
-     * @return array
+     * @return array<string,string|array<int,array<string,string>>>
      */
     private static function createTheHierarchyOfElements(
         array $elems,
