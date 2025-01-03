@@ -18,13 +18,13 @@
   },
   "scripts": {
     "test": "php ./vendor/phpunit/phpunit/phpunit --coverage-html ./build/coverage-report --coverage-filter ./src",
-    "mass-detector": "php vendor/bin/phpstan analyse --level=10 src"
+    "phpstan": "php vendor/bin/phpstan analyse --level=10 src"
   },
   "require-dev": {
     "phpunit/phpunit": "^11",
     "buggregator/trap": "*",
-    "phpstan/phpstan": "*",
-    "phpmd/phpmd": "^2",
+    "phpstan/phpstan": "^2",
+    "phpmd/phpmd": "*",
     "vimeo/psalm": "*",
     "squizlabs/php_codesniffer": "*"
   },
