@@ -26,7 +26,7 @@ class XmlConverter implements IXmlConverter, JsonSerializable
     /** @var string Индекс для Значения */
     private string $val;
     /** @var string Индекс для Атрибутов */
-    private string $attribs;
+    private string $attr;
     /** @var string  Индекс для вложенных элементов */
     private string $seq;
     /** @var string|null Кодировка XML Документа */
@@ -56,7 +56,7 @@ class XmlConverter implements IXmlConverter, JsonSerializable
     ) {
         $this->name = $name;
         $this->val = $val;
-        $this->attribs = $attr;
+        $this->attr = $attr;
         $this->seq = $seq;
         $this->encoding = $encoding;
         $this->flags = $flags;
@@ -68,13 +68,13 @@ class XmlConverter implements IXmlConverter, JsonSerializable
         string $xmlUri = '',
     ): array {
         $isPrevious = $this->isPrevious($xmlText, $xmlUri);
-        if (!$isPrevious || !count($this->prettyXml)) {
+        if (!$isPrevious || count($this->prettyXml) === 0) {
             $this->prettyXml =
                 FastXmlToArray::prettyPrint(
                     $xmlText,
                     $xmlUri,
                     $this->val,
-                    $this->attribs,
+                    $this->attr,
                     $this->encoding,
                     $this->flags,
                 );
@@ -92,13 +92,13 @@ class XmlConverter implements IXmlConverter, JsonSerializable
         string $xmlUri = '',
     ): array {
         $isPrevious = $this->isPrevious($xmlText, $xmlUri);
-        if (!$isPrevious || !count($this->xmlStructure)) {
+        if (!$isPrevious || count($this->xmlStructure) === 0) {
             $this->xmlStructure =
                 FastXmlToArray::convert(
                     $xmlText,
                     $xmlUri,
                     $this->val,
-                    $this->attribs,
+                    $this->attr,
                     $this->name,
                     $this->seq,
                     $this->encoding,
