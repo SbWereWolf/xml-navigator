@@ -49,10 +49,10 @@ interface IXmlElement
     /** Returns true if XML element has nested element with `$name`.
      * If $name omitted, than
      * returns true if XML element has any nested element
-     * @param string $name
+     * @param string|null $name
      * @return bool
      */
-    public function hasElement(string $name = ''): bool;
+    public function hasElement(string|null $name = null): bool;
 
     /** Returns all nested elements
      * @return IXmlElement[]

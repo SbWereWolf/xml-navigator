@@ -390,7 +390,7 @@ XmlElement implements object-oriented approach.
 - `get(string $name = null): string` // Get value of attribute with
   the `$name`, if `$name` is omitted, than returns value of random
   attribute
-- `hasElement(string $name = ''): bool` // Returns `true` if XML
+- `hasElement(?string $name = null): bool` // Returns `true` if XML
   element has nested element with `$name`. If `$name` omitted, than
   returns `true` if XML element has any nested element
 - `elements(): IXmlElement[]` // Returns all nested elements

@@ -67,7 +67,7 @@ class XmlElement implements IXmlElement, JsonSerializable
     /* @inheritdoc */
     public function attributes(): array
     {
-        $attributes = (array)$this->getIndexContent($this->attr);
+        $attributes = (array)$this->handler->get($this->attr)->asIs();
 
         $result = [];
         foreach ($attributes as $name => $value) {
@@ -75,20 +75,6 @@ class XmlElement implements IXmlElement, JsonSerializable
         }
 
         return $result;
-    }
-
-    /** Get content of XmlElement::$handler with given key $index
-     * @param string $index
-     * @return null|string|array<string,string>
-     */
-    private function getIndexContent(string $index): array|string|null
-    {
-        $content = null;
-        if ($this->handler->has($index)) {
-            $content = $this->handler->get($index)->asIs();
-        }
-
-        return $content;
     }
 
     /* @inheritdoc */
@@ -115,12 +101,7 @@ class XmlElement implements IXmlElement, JsonSerializable
     {
         $elems = $this->handler->pull($this->seq)->raw();
         foreach ($elems as $elem) {
-            if ('' === $name) {
-                $result = new static($elem);
-
-                yield $result;
-            }
-            if ($elem[$this->name] === $name) {
+            if ('' === $name || $elem[$this->name] === $name) {
                 $result = new static($elem);
 
                 yield $result;
@@ -131,7 +112,7 @@ class XmlElement implements IXmlElement, JsonSerializable
     /* @inheritdoc */
     public function value(): string
     {
-        $result = (string)$this->getIndexContent($this->val);
+        $result = (string)$this->handler->get($this->val)->asIs();
 
         return $result;
     }
@@ -140,24 +121,6 @@ class XmlElement implements IXmlElement, JsonSerializable
     public function name(): string
     {
         return $this->handler->get($this->name)->str();
-    }
-
-    /** Check existence of element with key $name
-     * inside XmlElement::$handler element with key $index
-     * @param string $index
-     * @param string $name
-     * @return bool
-     */
-    private function checkNameInsideIndex(
-        string $index,
-        string $name
-    ): bool {
-        $result = $this->handler->has($index);
-        if ($result && '' !== $name) {
-            $result =
-                isset($this->handler->get($index)->array()[$name]);
-        }
-        return $result;
     }
 
     /* @inheritdoc */
@@ -169,24 +132,20 @@ class XmlElement implements IXmlElement, JsonSerializable
     /* @inheritdoc */
     public function hasAttribute(string $name = ''): bool
     {
-        $index = $this->attr;
-        $result = $this->checkNameInsideIndex($index, $name);
+        $result = $this->handler->pull($this->attr)->has($name);
 
         return $result;
     }
 
     /* @inheritdoc */
-    public function hasElement(string $name = ''): bool
+    public function hasElement(string|null $name = null): bool
     {
-        $index = $this->seq;
-        $result = $this->handler->has($index);
-        if ($result && '' !== $name) {
-            $elems = $this->handler->get($index)->array();
-            foreach ($elems as $elem) {
-                $result = $elem[$this->name] === $name;
-                if ($result) {
-                    break;
-                }
+        $elems = $this->handler->pull($this->seq)->raw();
+        $result=false;
+        foreach ($elems as $elem) {
+            $result = $elem[$this->name] === $name;
+            if ($result) {
+                break;
             }
         }
 
