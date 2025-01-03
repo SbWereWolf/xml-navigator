@@ -878,6 +878,7 @@ XML;
     <empty/>
 </complex>
 XML;
+        /** @var XMLReader $reader */
         $reader = XMLReader::XML($xml);
 
         $mayRead = true;
@@ -1046,6 +1047,7 @@ XML;
      */
     public function testHierarchyComposerComposeNsQuery(): void
     {
+        /** @var XMLReader $reader */
         $reader = XMLReader::XML(static::NS_QUERY);
 
         $mayRead = true;
@@ -1076,6 +1078,7 @@ XML;
      */
     public function testHierarchyComposerComposeCarplace(): void
     {
+        /** @var XMLReader $reader */
         $reader = XMLReader::XML(static::CARPLACE);
 
         $mayRead = true;
@@ -1105,6 +1108,7 @@ XML;
      */
     public function testPrettyPrintComposerComposeNsQuery(): void
     {
+        /** @var XMLReader $reader */
         $reader = XMLReader::XML(static::NS_QUERY);
 
         $mayRead = true;
@@ -1130,6 +1134,7 @@ XML;
         self::assertEquals(static::NS_QUERY_PRETTY_PRINT, $results);
 
 
+        /** @var XMLReader $reader */
         $reader = XMLReader::XML('<e a="">v</e>');
 
         $mayRead = true;
@@ -1171,6 +1176,7 @@ XML;
      */
     public function testPrettyPrintComposerComposeCarplace(): void
     {
+        /** @var XMLReader $reader */
         $reader = XMLReader::XML(static::CARPLACE);
 
         $mayRead = true;
@@ -1200,6 +1206,7 @@ XML;
      */
     public function testFastXmlParserExtractHierarchyNsQuery(): void
     {
+        /** @var XMLReader $reader */
         $reader = XMLReader::XML(static::NS_QUERY);
 
         $results = [];
@@ -1223,6 +1230,7 @@ XML;
      */
     public function testFastXmlParserExtractPrettyPrintNsQuery(): void
     {
+        /** @var XMLReader $reader */
         $reader = XMLReader::XML(static::NS_QUERY);
 
         $results = [];
@@ -1246,6 +1254,7 @@ XML;
      */
     public function testFastXmlParserExtractHierarchyCarplace(): void
     {
+        /** @var XMLReader $reader */
         $reader = XMLReader::XML(static::CARPLACE);
 
         $results = [];
@@ -1268,6 +1277,7 @@ XML;
      */
     public function testFastXmlParserExtractPrettyPrintCarplace(): void
     {
+        /** @var XMLReader $reader */
         $reader = XMLReader::XML(static::CARPLACE);
 
         $results = [];
@@ -1290,11 +1300,13 @@ XML;
      */
     public function testXmlParserExtractHierarchyNsQuery(): void
     {
+        /** @var XMLReader $reader */
         $reader = XMLReader::XML(static::NS_QUERY);
-        $parser = new XmlParser($reader);
+        $parser = new XmlParser();
 
         $results = [];
         $extractor = $parser->extractHierarchy(
+            $reader,
             function (XMLReader $cursor) {
                 return $cursor->name === 'ns:Query';
             }
@@ -1313,15 +1325,16 @@ XML;
      */
     public function testXmlParserExtractPrettyPrintNsQuery(): void
     {
+        /** @var XMLReader $reader */
         $reader = XMLReader::XML(static::NS_QUERY);
         $parser = new XmlParser(
-            $reader,
             Notation::VAL,
             Notation::ATTR,
         );
 
         $results = [];
         $extractor = $parser->extractPrettyPrint(
+            $reader,
             function (XMLReader $cursor) {
                 return $cursor->name === 'ns:Query';
             }
@@ -1340,11 +1353,13 @@ XML;
      */
     public function testXmlParserExtractHierarchyCarplace(): void
     {
+        /** @var XMLReader $reader */
         $reader = XMLReader::XML(static::CARPLACE);
-        $parser = new XmlParser($reader);
+        $parser = new XmlParser();
 
         $results = [];
         $extractor = $parser->extractHierarchy(
+            $reader,
             function (XMLReader $cursor) {
                 return $cursor->name === 'CARPLACE';
             }
@@ -1362,15 +1377,16 @@ XML;
      */
     public function testXmlParserExtractPrettyPrintCarplace(): void
     {
+        /** @var XMLReader $reader */
         $reader = XMLReader::XML(static::CARPLACE);
         $parser = new XmlParser(
-            $reader,
             Notation::VAL,
             Notation::ATTR,
         );
 
         $results = [];
         $extractor = $parser->extractPrettyPrint(
+            $reader,
             function (XMLReader $cursor) {
                 return $cursor->name === 'CARPLACE';
             }
