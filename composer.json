@@ -29,6 +29,7 @@
     "squizlabs/php_codesniffer": "*"
   },
   "require": {
+    "php": ">=8.4",
     "sbwerewolf/language-specific": "8.4.*",
     "ext-xmlreader": "*",
     "ext-libxml": "*",

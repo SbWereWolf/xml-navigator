@@ -41,27 +41,26 @@ interface IXmlElement
 
     /** Get value of attribute with the $name.
      * If $name is omitted, then returns value of random attribute
-     * @param string|null $name
+     * @param string $name
      * @return string
      */
-    public function get(string|null $name = null): string;
+    public function get(string $name = ''): string;
 
     /** Returns true if XML element has nested element with `$name`.
      * If $name omitted, than
      * returns true if XML element has any nested element
-     * @param string|null $name
+     * @param string $name
      * @return bool
      */
-    public function hasElement(string|null $name = null): bool;
+    public function hasElement(string $name = ''): bool;
 
     /** Returns all nested elements
      * @return IXmlElement[]
      */
     public function elements(string $name = ''): array;
 
-    /** Pull IXmlElement for nested elements,
-     * if $name is defined, than pull elements with the $name,
-     * elements will be type of IXmlElement
+    /** Pull nested elements as IXmlElement,
+     * if $name is defined, than pull elements only with the $name.
      * @param string $name
      * @return Generator<IXmlElement>
      */
