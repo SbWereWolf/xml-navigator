@@ -1,15 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ @package  LanguageSpecific
-  ~ @author   SbWereWolf <ulfnew@gmail.com>
-  ~
-  ~ Copyright © 2024 Volkhin Nikolay
-  ~ 12/26/24, 9:40 PM
-  -->
 
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
-         bootstrap="vendor/autoload.php"
+         xsi:noNamespaceSchemaLocation="../../vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="../../vendor/autoload.php"
          cacheDirectory=".phpunit.cache"
          executionOrder="depends,defects"
          shortenArraysForExportThreshold="10"
@@ -21,7 +14,7 @@
          failOnWarning="true">
     <testsuites>
         <testsuite name="default">
-            <directory>tests/Integration</directory>
+            <directory>../../tests/Integration</directory>
         </testsuite>
     </testsuites>
 

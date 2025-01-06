@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<phpmd-baseline>
+  <violation rule="PHPMD\Rule\CleanCode\StaticAccess" file="src/SbWereWolf/XmlNavigator/Convertation/FastXmlToArray.php"/>
+  <violation rule="PHPMD\Rule\CleanCode\StaticAccess" file="src/SbWereWolf/XmlNavigator/Convertation/XmlConverter.php"/>
+  <violation rule="PHPMD\Rule\CleanCode\StaticAccess" file="src/SbWereWolf/XmlNavigator/Extraction/HierarchyComposer.php"/>
+  <violation rule="PHPMD\Rule\Naming\ShortVariable" file="src/SbWereWolf/XmlNavigator/Extraction/HierarchyComposer.php"/>
+  <violation rule="PHPMD\Rule\CleanCode\StaticAccess" file="src/SbWereWolf/XmlNavigator/Extraction/PrettyPrintComposer.php"/>
+  <violation rule="PHPMD\Rule\CyclomaticComplexity" file="src/SbWereWolf/XmlNavigator/Extraction/PrettyPrintComposer.php" method="composePrettyPrintByXmlElements"/>
+  <violation rule="PHPMD\Rule\Design\NpathComplexity" file="src/SbWereWolf/XmlNavigator/Extraction/PrettyPrintComposer.php" method="composePrettyPrintByXmlElements"/>
+  <violation rule="PHPMD\Rule\CleanCode\StaticAccess" file="src/SbWereWolf/XmlNavigator/Parsing/FastXmlParser.php"/>
+  <violation rule="PHPMD\Rule\CleanCode\StaticAccess" file="src/SbWereWolf/XmlNavigator/Parsing/XmlParser.php"/>
+</phpmd-baseline>
