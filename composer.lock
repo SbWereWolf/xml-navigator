@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fb47e7d00846bc3b5d660e15ed5d9ba8",
+    "content-hash": "5d1ced4d9d7c3e87769340477bea0ced",
     "packages": [
         {
             "name": "sbwerewolf/json-serialize-trait",
@@ -50,7 +50,7 @@
         },
         {
             "name": "sbwerewolf/language-specific",
-            "version": "8.4.4",
+            "version": "8.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/SbWereWolf/language-specific.git",
@@ -95,7 +95,7 @@
             "description": "Library for using PHP specific features",
             "support": {
                 "issues": "https://github.com/SbWereWolf/language-specific/issues",
-                "source": "https://github.com/SbWereWolf/language-specific/tree/8.4.4"
+                "source": "https://github.com/SbWereWolf/language-specific/tree/8.4.0"
             },
             "time": "2025-01-03T03:34:39+00:00"
         }
@@ -1039,16 +1039,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "2.1.0",
+            "version": "2.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "2392d360fdf54ea253aa6c68cad1d4ba2e54e927"
+                "reference": "cd6e973e04b4c2b94c86e8612b5a65f0da0e08e7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/2392d360fdf54ea253aa6c68cad1d4ba2e54e927",
-                "reference": "2392d360fdf54ea253aa6c68cad1d4ba2e54e927",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/cd6e973e04b4c2b94c86e8612b5a65f0da0e08e7",
+                "reference": "cd6e973e04b4c2b94c86e8612b5a65f0da0e08e7",
                 "shasum": ""
             },
             "require": {
@@ -1093,7 +1093,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-12-31T07:30:03+00:00"
+            "time": "2025-01-05T16:43:48+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -3992,6 +3992,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
+        "php": ">=8.4",
         "ext-xmlreader": "*",
         "ext-libxml": "*"
     },
