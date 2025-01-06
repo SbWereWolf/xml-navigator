@@ -44,8 +44,7 @@ class XmlParser
     public function extractHierarchy(
         XMLReader $reader,
         callable $detectElement,
-    ): Generator
-    {
+    ): Generator {
         $extractor = FastXmlParser::extractHierarchy(
             $reader,
             $detectElement,
@@ -68,8 +67,7 @@ class XmlParser
     public function extractPrettyPrint(
         XMLReader $reader,
         callable $detectElement,
-    ): Generator
-    {
+    ): Generator {
         $extractor = FastXmlParser::extractPrettyPrint(
             $reader,
             $detectElement,

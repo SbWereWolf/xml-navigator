@@ -10,9 +10,7 @@ use XMLReader;
 /**
  * Статический конвертор XML элемента в PHP массив
  */
-class HierarchyComposer
-    extends ElementComposer
-    implements Notation
+class HierarchyComposer extends ElementComposer implements Notation
 {
     /**
      * @param XMLReader $reader
@@ -125,5 +123,4 @@ class HierarchyComposer
 
         return $result;
     }
-
 }

@@ -10,9 +10,7 @@ use XMLReader;
 /**
  * Статический конвертор XML элемента в PHP массив
  */
-class PrettyPrintComposer
-    extends ElementComposer
-    implements Notation
+class PrettyPrintComposer extends ElementComposer implements Notation
 {
     /**
      * @param XMLReader $reader
