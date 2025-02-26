@@ -78,6 +78,26 @@ class DebugTest extends TestCase
                 ),
         );
 
+
+
+
+    private const PRETTY_PRINT_FOR_MULTIPLE =
+        array (
+            'offer' =>
+                array (
+                    '@attributes' =>
+                        array (
+                            'id' => '206111',
+                            'available' => 'false',
+                        ),
+                    'picture' =>
+                        array (
+                            0 => 'upload/iblock/2a9/1_6251_22_2.jpg',
+                            1 => 'upload/iblock/5d2/q5kkwmq6zznu/1_6251_22_6.jpg',
+                        ),
+                ),
+        );
+
     private const CONVERTER_PRETTY_PRINT =
         array(
             'complex' =>
@@ -130,6 +150,22 @@ class DebugTest extends TestCase
                                 ),
                             2 =>
                                 array(),
+                        ),
+                ),
+        );
+    private const CONVERTER_PRETTY_PRINT_FOR_MULTIPLE =
+        array(
+            'offer' =>
+                array(
+                    'a' =>
+                        array(
+                            'id' => '206111',
+                            'available' => 'false',
+                        ),
+                    'picture' =>
+                        array(
+                            0 => 'upload/iblock/2a9/1_6251_22_2.jpg',
+                            1 => 'upload/iblock/5d2/q5kkwmq6zznu/1_6251_22_6.jpg',
                         ),
                 ),
         );
@@ -976,6 +1012,29 @@ XML;
     /**
      * @return void
      */
+    public function testXmlConverterToPrettyPrintWithMultipleElements
+    (): void
+    {
+        $xml = <<<XML
+<offer id="206111" available="false">
+    <picture>upload/iblock/2a9/1_6251_22_2.jpg</picture>
+    <picture>upload/iblock/5d2/q5kkwmq6zznu/1_6251_22_6.jpg</picture>
+</offer>
+XML;
+
+        $converter = new XmlConverter();
+        $arrayRepresentationOfXml =
+            $converter->toPrettyPrint($xml);
+
+        self::assertEquals(
+            static::CONVERTER_PRETTY_PRINT_FOR_MULTIPLE,
+            $arrayRepresentationOfXml
+        );
+    }
+
+    /**
+     * @return void
+     */
     public function testFastXmlToArrayConvertWithEmpty(): void
     {
         static::expectExceptionCode(-667);
@@ -1032,6 +1091,27 @@ XML;
 
         self::assertEquals(
             static::PRETTY_PRINT,
+            $arrayRepresentationOfXml
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testFastXmlToArrayPrettyPrintWithMultipleElements
+    (): void
+    {
+        $xml = <<<XML
+<offer id="206111" available="false">
+    <picture>upload/iblock/2a9/1_6251_22_2.jpg</picture>
+    <picture>upload/iblock/5d2/q5kkwmq6zznu/1_6251_22_6.jpg</picture>
+</offer>
+XML;
+
+        $arrayRepresentationOfXml = FastXmlToArray::prettyPrint($xml);
+
+        self::assertEquals(
+            static::PRETTY_PRINT_FOR_MULTIPLE,
             $arrayRepresentationOfXml
         );
     }
