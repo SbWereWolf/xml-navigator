@@ -119,13 +119,7 @@ class PrettyPrintComposer extends ElementComposer implements Notation
             ) {
                 $first = $ptr[$name];
                 $ptr[$name] = [];
-                $isStr = is_string($first);
-                if ($isStr) {
-                    $ptr[$name][] = [$valueIndex => $first];
-                }
-                if (!$isStr) {
-                    $ptr[$name][] = $first;
-                }
+                $ptr[$name][] = $first;
 
                 $ptr[$name][] = $new;
                 $isMulti = true;

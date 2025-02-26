@@ -64,10 +64,7 @@ class DebugTest extends TestCase
                         ),
                     'c' =>
                         array(
-                            0 =>
-                                array(
-                                    '@value' => '0',
-                                ),
+                            0 => '0',
                             1 =>
                                 array(
                                     '@attributes' =>
@@ -123,10 +120,7 @@ class DebugTest extends TestCase
                         ),
                     'c' =>
                         array(
-                            0 =>
-                                array(
-                                    'v' => '0',
-                                ),
+                            0 => '0',
                             1 =>
                                 array(
                                     'a' =>
