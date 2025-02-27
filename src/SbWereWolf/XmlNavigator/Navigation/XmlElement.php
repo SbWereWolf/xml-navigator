@@ -82,7 +82,7 @@ class XmlElement implements IXmlElement, JsonSerializable
     /* @inheritdoc */
     public function attributes(): array
     {
-        $attributes = $this->handler[$this->attr] ?? [];
+        $attributes = $this->handler[$this->attr]->asIs() ?? [];
 
         $result = [];
         foreach ($attributes as $name => $value) {
@@ -117,7 +117,7 @@ class XmlElement implements IXmlElement, JsonSerializable
     /* @inheritdoc */
     public function pull(string $name = ''): Generator
     {
-        $elems = $this->handler[$this->seq] ?? [];
+        $elems = $this->handler[$this->seq]->asIs() ?? [];
         if ('' !== $name) {
             $elems = array_filter(
                 $elems,
@@ -134,7 +134,7 @@ class XmlElement implements IXmlElement, JsonSerializable
     /* @inheritdoc */
     public function value(): string
     {
-        $result = $this->handler[$this->val] ?? '';
+        $result = $this->handler[$this->val]->asIs() ?? '';
 
         return $result;
     }
@@ -142,13 +142,13 @@ class XmlElement implements IXmlElement, JsonSerializable
     /* @inheritdoc */
     public function name(): string
     {
-        return $this->handler[$this->name];
+        return $this->handler[$this->name]->asIs();
     }
 
     /* @inheritdoc */
     public function hasValue(): bool
     {
-        return isset($this->handler[$this->val]);
+        return $this->handler->has($this->val);
     }
 
     /* @inheritdoc */
@@ -169,7 +169,7 @@ class XmlElement implements IXmlElement, JsonSerializable
             $result = $this->handler->has($this->seq);
         }
         if ('' !== $name) {
-            $elems = $this->handler[$this->seq] ?? [];
+            $elems = $this->handler[$this->seq]->asIs() ?? [];
             $result = array_any(
                 $elems,
                 fn($value, $key) => $value[$this->name] === $name
