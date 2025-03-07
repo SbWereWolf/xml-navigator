@@ -178,4 +178,13 @@ class XmlElement implements IXmlElement, JsonSerializable
 
         return $result;
     }
+
+    /* @inheritdoc */
+    public function serialize(): array
+    {
+        /** @noinspection PhpUnnecessaryLocalVariableInspection */
+        $result = $this->handler->jsonSerialize();
+
+        return $result;
+    }
 }

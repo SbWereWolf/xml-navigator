@@ -65,4 +65,10 @@ interface IXmlElement
      * @return Generator<IXmlElement>
      */
     public function pull(string $name = ''): Generator;
+
+    /** Generates a storable representation ($data) of a IXmlElement
+     * use new XmlElement($data) to restore XmlElement object
+     * @return array
+     */
+    public function serialize(): array;
 }
