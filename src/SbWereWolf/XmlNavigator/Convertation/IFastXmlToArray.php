@@ -12,7 +12,6 @@ use SbWereWolf\XmlNavigator\General\Notation;
 interface IFastXmlToArray
 {
     /** Convert xml document into normalized array
-     * with call XMLReader::close() on $reader
      * @param string $xmlText The text of XML document
      * @param string $xmlUri Path or link to XML document
      * @param string $val index for element value
