@@ -772,6 +772,13 @@ XML;
             );
         $navigator = new XmlElement($xmlContent);
 
+        $actual = $navigator->serialize();
+        self::assertEquals(
+            $actual,
+            $xmlContent,
+            'XmlElement serialized to array MUST BE equal to initial'
+        );
+
         /* get element name */
         $actual = $navigator->name();
         $this->assertEquals('complex', $actual);
