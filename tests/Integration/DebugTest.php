@@ -79,19 +79,17 @@ class DebugTest extends TestCase
         );
 
 
-
-
     private const PRETTY_PRINT_FOR_MULTIPLE =
-        array (
+        array(
             'offer' =>
-                array (
+                array(
                     '@attributes' =>
-                        array (
+                        array(
                             'id' => '206111',
                             'available' => 'false',
                         ),
                     'picture' =>
-                        array (
+                        array(
                             0 => 'upload/iblock/2a9/1_6251_22_2.jpg',
                             1 => 'upload/iblock/5d2/q5kkwmq6zznu/1_6251_22_6.jpg',
                         ),
