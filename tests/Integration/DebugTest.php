@@ -785,8 +785,10 @@ XML;
         $this->assertEquals('', $actualValue);
 
         /* check has element attribute */
-        $exported = $navigator->hasAttribute('str');
-        $this->assertEquals(true, $exported);
+        $actual = $navigator->hasAttribute();
+        $this->assertEquals(true, $actual);
+        $actual = $navigator->hasAttribute('str');
+        $this->assertEquals(true, $actual);
 
 
         /* get list of attributes */
@@ -809,13 +811,17 @@ XML;
         }
 
         /* get attribute value */
+        $val = $navigator->get();
+        self::assertEquals('text', $val);
         $val = $navigator->get('str');
         self::assertEquals('text', $val);
         /* text */
 
         /* check has element attribute */
-        $exported = $navigator->hasElement('empty');
-        $this->assertEquals(true, $exported);
+        $actual = $navigator->hasElement();
+        $this->assertEquals(true, $actual);
+        $actual = $navigator->hasElement('empty');
+        $this->assertEquals(true, $actual);
 
         /* get list of nested elements */
         $elements = $navigator->elements();
@@ -839,9 +845,14 @@ XML;
         }
 
         /* get desired nested element */
+        /** @var XmlElement $elem */
         $elem = $navigator->pull()->current();
         $name = $elem->name();
         self::assertEquals('empty', $name);
+        $actual = $elem->hasAttribute();
+        $this->assertEquals(false, $actual);
+        $actual = $elem->hasElement();
+        $this->assertEquals(false, $actual);
 
         $expected = [
             'empty',
