@@ -773,16 +773,16 @@ XML;
         $navigator = new XmlElement($xmlContent);
 
         /* get element name */
-        $exported = $navigator->name();
-        $this->assertEquals('complex', $exported);
+        $actual = $navigator->name();
+        $this->assertEquals('complex', $actual);
 
         /* check has element value */
-        $exported = $navigator->hasValue();
-        $this->assertEquals(false, $exported);
+        $actual = $navigator->hasValue();
+        $this->assertEquals(false, $actual);
 
         /* get element value */
-        $exported = $navigator->value();
-        $this->assertEquals('', $exported);
+        $actualValue = $navigator->value();
+        $this->assertEquals('', $actualValue);
 
         /* check has element attribute */
         $exported = $navigator->hasAttribute('str');
