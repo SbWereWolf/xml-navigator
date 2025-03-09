@@ -891,8 +891,6 @@ XML;
             self::assertEquals($expectedName[$i], $name);
             self::assertEquals($expectedVal[$i], $value);
         }
-
-        $this->assertTrue(true);
     }
 
     /**
