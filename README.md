@@ -291,86 +291,77 @@ XmlConverter can use to convert XML-document to array, example:
 
 ```php
 $xml = <<<XML
-<complex>
-    <a empty=""/>
-    <b val="x"/>
-    <b val="y"/>
-    <b val="z"/>
-    <c>0</c>
-    <c v="o"/>
-    <c/>
-    <different/>
-</complex>
+<elemWithNestedElems>
+    <elemWithVal>val</elemWithVal>
+    <elemWithAttribs one="atrib" other="atrib"/>
+    <elemWithAll attribute_name="attribute_value">element value</elemWithAll>
+</elemWithNestedElems>
 XML;
 
 $converter = new \SbWereWolf\XmlNavigator\Convertation\XmlConverter(
     \SbWereWolf\XmlNavigator\General\Notation::VAL,
     \SbWereWolf\XmlNavigator\General\Notation::ATTR,
 );
-$arrayRepresentationOfXml =
+$xmlAsArray =
     $converter->toPrettyPrint($xml);
-echo var_export($arrayRepresentationOfXml,true);
+
+$prettyPrint = json_encode($xmlAsArray, JSON_PRETTY_PRINT);
+echo 'JSON representation of XML:'
+    . PHP_EOL
+    . $prettyPrint
+    . PHP_EOL;
+
+echo 'Array representation of XML:'
+    . PHP_EOL
+    . var_export($xmlAsArray, true)
+    . PHP_EOL;
 ```
 
 OUTPUT:
 
 ```php
+C:\wamp64\bin\php\php8.4.0\php.exe D:\WORK\xml-browser\tests\README.md\code-example-PrettyPrint.php
+JSON representation of XML:
+{
+    "elemWithNestedElems": {
+        "elemWithVal": "val",
+        "elemWithAttribs": {
+            "@attributes": {
+                "one": "atrib",
+                "other": "atrib"
+            }
+        },
+        "elemWithAll": {
+            "@value": "element value",
+            "@attributes": {
+                "attribute_name": "attribute_value"
+            }
+        }
+    }
+}
+Array representation of XML:
 array (
-    'complex' =>
-        array (
-            'a' =>
-                array (
-                    '@attributes' =>
-                        array (
-                            'empty' => '',
-                        ),
-                ),
-            'b' =>
-                array (
-                    0 =>
-                        array (
-                            '@attributes' =>
-                                array (
-                                    'val' => 'x',
-                                ),
-                        ),
-                    1 =>
-                        array (
-                            '@attributes' =>
-                                array (
-                                    'val' => 'y',
-                                ),
-                        ),
-                    2 =>
-                        array (
-                            '@attributes' =>
-                                array (
-                                    'val' => 'z',
-                                ),
-                        ),
-                ),
-            'c' =>
-                array (
-                    0 =>
-                        array (
-                            '@value' => '0',
-                        ),
-                    1 =>
-                        array (
-                            '@attributes' =>
-                                array (
-                                    'v' => 'o',
-                                ),
-                        ),
-                    2 =>
-                        array (
-                        ),
-                ),
-            'different' =>
-                array (
-                ),
-        ),
-);
+  'elemWithNestedElems' => 
+  array (
+    'elemWithVal' => 'val',
+    'elemWithAttribs' => 
+    array (
+      '@attributes' => 
+      array (
+        'one' => 'atrib',
+        'other' => 'atrib',
+      ),
+    ),
+    'elemWithAll' => 
+    array (
+      '@value' => 'element value',
+      '@attributes' => 
+      array (
+        'attribute_name' => 'attribute_value',
+      ),
+    ),
+  ),
+)
 ```
 
 ### XML-document as object
