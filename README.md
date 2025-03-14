@@ -320,7 +320,6 @@ echo 'Array representation of XML:'
 OUTPUT:
 
 ```php
-C:\wamp64\bin\php\php8.4.0\php.exe D:\WORK\xml-browser\tests\README.md\code-example-PrettyPrint.php
 JSON representation of XML:
 {
     "elemWithNestedElems": {
@@ -376,18 +375,22 @@ XmlElement implements object-oriented approach.
 - `hasAttribute(string $name = ''): bool` // Returns `true` if XML
   element has attribute with `$name`. If `$name` omitted, than returns
   `true` if XML element has any attribute
-- `attributes(): XmlAttribute[]` // Returns all attributes of XML
-  element
 - `get(string $name = null): string` // Get value of attribute with
   the `$name`, if `$name` is omitted, than returns value of random
   attribute
+- `attributes(): XmlAttribute[]` // Returns all attributes of XML
+  element
 - `hasElement(?string $name = null): bool` // Returns `true` if XML
   element has nested element with `$name`. If `$name` omitted, than
   returns `true` if XML element has any nested element
-- `elements(): IXmlElement[]` // Returns all nested elements
-- `pull(string $name = ''): Generator` // Pull `IXmlElement` for
-  nested element, if `$name` is defined, than pull elements with the
+- `pull(string $name = ''): Generator` // Pull nested elements as
+  `IXmlElement`
+  , if `$name` is defined, than pull elements only with the
   `$name`
+- `elements(): IXmlElement[]` // Returns all nested elements
+- `serialize(): array;` Generates a storable representation (`$data`)
+  of a IXmlElement, use `new XmlElement($data)` to restore
+  `XmlElement` object
 
 ### Interact with XML as object
 
@@ -413,6 +416,13 @@ $content = \SbWereWolf\XmlNavigator\Convertation\FastXmlToArray
 ::convert($xml);
 $navigator = 
 new \SbWereWolf\XmlNavigator\Navigation\XmlElement($content);
+
+/* Convert this XmlElement to array,
+ with the array you may restore XmlElement
+ (create same as original one) */
+$gist = $navigator->serialize();
+echo assert($content === $gist) ? 'is same' : 'is different';
+echo PHP_EOL;
 
 /* get name of element */
 echo $navigator->name() . PHP_EOL;
