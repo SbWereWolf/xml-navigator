@@ -471,4 +471,4 @@ Telegram @sbwerewolf
 ```
 
 - [Telegram chat with me](https://t.me/SbWereWolf)
-- [WhatsApp chat with me](https://wa.me/79022726535) 
+- [WhatsApp chat with me](https://wa.me/79022726535)
