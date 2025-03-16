@@ -46,6 +46,62 @@ OUTPUT:
 
 ## Use cases
 
+### Parse XML in stream mode with callback for detect suitable elements
+
+```php
+$xml =
+    '<One attr="val">text</One><Other attr1="" attr2=""/>' . PHP_EOL;
+
+$file = fopen('data-for-stream.xml', 'w');
+fwrite($file, "<Collection>$xml$xml$xml</Collection>");
+fclose($file);
+
+/** @var XMLReader $reader */
+$reader = XMLReader::open('data-for-stream.xml');
+
+$extractor = \SbWereWolf\XmlNavigator\Parsing\FastXmlParser
+    ::extractHierarchy(
+        $reader,
+        /* callback for detect element for parsing */
+        function (XMLReader $cursor) {
+            return $cursor->name === 'One';
+        }
+    );
+/* Extract all elements with name `One` */
+foreach ($extractor as $element) {
+    echo json_encode($element, JSON_PRETTY_PRINT) . PHP_EOL;
+}
+
+$reader->close();
+```
+
+Output to console will be:
+
+```shell
+{
+    "n": "One",
+    "v": "text",
+    "a": {
+        "attr": "val"
+    }
+}
+{
+    "n": "One",
+    "v": "text",
+    "a": {
+        "attr": "val"
+    }
+}
+{
+    "n": "One",
+    "v": "text",
+    "a": {
+        "attr": "val"
+    }
+}
+
+```
+
 ### XML file processing with no worries of file size
 
 Access time to first element do not depend on file size.
@@ -143,144 +199,6 @@ First element parsing duration of temp-465b.xml is 114,400 ns
 First element parsing duration of temp-429Kb.xml is 132,400 ns
 First element parsing duration of temp-429Mb.xml is 119,900 ns
 Benchmark was finished
-```
-
-### Parse XML fast with callback for detect suitable elements
-
-```php
-$xml = <<<XML
-<?xml version="1.0" encoding="utf-8"?>
-<CARPLACES>
-    <CARPLACE
-            ID="11356925"
-            OBJECTID="20318444"
-            OBJECTGUID="6e237b93-09d6-4adf-9567-e9678608543b"
-            CHANGEID="31810106"
-            NUMBER="1"
-            OPERTYPEID="10"
-            PREVID="0"
-            NEXTID="0"
-            UPDATEDATE="2019-07-09"
-            STARTDATE="2019-07-09"
-            ENDDATE="2079-06-06"
-            ISACTUAL="1"
-            ISACTIVE="1"
-    />
-    <CARPLACE
-            ID="11361653"
-            OBJECTID="20326793"
-            OBJECTGUID="11d9f79b-be6f-43dc-bdcc-70bbfc9f86b0"
-            CHANGEID="31822630"
-            NUMBER="1"
-            OPERTYPEID="10"
-            PREVID="0"
-            NEXTID="0"
-            UPDATEDATE="2019-07-30"
-            STARTDATE="2019-07-30"
-            ENDDATE="2079-06-06"
-            ISACTUAL="1"
-            ISACTIVE="1"
-    />
-    <CARPLACE
-            ID="94824"
-            OBJECTID="101032823"
-            OBJECTGUID="4f37e0eb-141f-4c19-b416-0ec85e2e9e76"
-            CHANGEID="192339336"
-            NUMBER="0"
-            OPERTYPEID="10"
-            PREVID="0"
-            NEXTID="0"
-            UPDATEDATE="2021-04-22"
-            STARTDATE="2021-04-22"
-            ENDDATE="2079-06-06"
-            ISACTUAL="1"
-            ISACTIVE="1"
-    />
-</CARPLACES>
-XML;
-
-$reader = XMLReader::XML($xml);
-
-$extractor = \SbWereWolf\XmlNavigator\Parsing\FastXmlParser
-    ::extractPrettyPrint(
-        $reader,
-        /* callback for detect desired elements */
-        function (XMLReader $cursor) {
-            return $cursor->name === 'CARPLACE';
-        }
-    );
-
-$results = [];
-foreach ($extractor as $result) {
-    $results[] = $result;
-}
-$reader->close();
-
-echo json_encode($results, JSON_PRETTY_PRINT) . PHP_EOL;
-```
-
-Output to console will be:
-
-```json
-[
-  {
-    "CARPLACE": {
-      "@attributes": {
-        "ID": "11356925",
-        "OBJECTID": "20318444",
-        "OBJECTGUID": "6e237b93-09d6-4adf-9567-e9678608543b",
-        "CHANGEID": "31810106",
-        "NUMBER": "1",
-        "OPERTYPEID": "10",
-        "PREVID": "0",
-        "NEXTID": "0",
-        "UPDATEDATE": "2019-07-09",
-        "STARTDATE": "2019-07-09",
-        "ENDDATE": "2079-06-06",
-        "ISACTUAL": "1",
-        "ISACTIVE": "1"
-      }
-    }
-  },
-  {
-    "CARPLACE": {
-      "@attributes": {
-        "ID": "11361653",
-        "OBJECTID": "20326793",
-        "OBJECTGUID": "11d9f79b-be6f-43dc-bdcc-70bbfc9f86b0",
-        "CHANGEID": "31822630",
-        "NUMBER": "1",
-        "OPERTYPEID": "10",
-        "PREVID": "0",
-        "NEXTID": "0",
-        "UPDATEDATE": "2019-07-30",
-        "STARTDATE": "2019-07-30",
-        "ENDDATE": "2079-06-06",
-        "ISACTUAL": "1",
-        "ISACTIVE": "1"
-      }
-    }
-  },
-  {
-    "CARPLACE": {
-      "@attributes": {
-        "ID": "94824",
-        "OBJECTID": "101032823",
-        "OBJECTGUID": "4f37e0eb-141f-4c19-b416-0ec85e2e9e76",
-        "CHANGEID": "192339336",
-        "NUMBER": "0",
-        "OPERTYPEID": "10",
-        "PREVID": "0",
-        "NEXTID": "0",
-        "UPDATEDATE": "2021-04-22",
-        "STARTDATE": "2021-04-22",
-        "ENDDATE": "2079-06-06",
-        "ISACTUAL": "1",
-        "ISACTIVE": "1"
-      }
-    }
-  }
-]
 ```
 
 ### XML-document as array
