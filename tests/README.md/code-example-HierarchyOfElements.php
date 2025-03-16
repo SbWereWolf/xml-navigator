@@ -13,19 +13,22 @@ $autoload = join(DIRECTORY_SEPARATOR, $parts);
 require_once $autoload;
 
 $xml = <<<XML
-<elemWithNestedElems>
-    <elemWithVal>val</elemWithVal>
-    <elemWithAttribs one="atrib" other="atrib"/>
-    <elemWithAll attribute_name="attribute_value">element value</elemWithAll>
-</elemWithNestedElems>
+<ElemWithNestedElems>
+    <ElemWithVal>val</ElemWithVal>
+    <ElemWithAttribs one="atrib" other="atrib"/>
+    <ElemWithAll attribute_name="attribute-value">
+        element value
+    </ElemWithAll>
+</ElemWithNestedElems>
 XML;
 
 $converter = new \SbWereWolf\XmlNavigator\Convertation\XmlConverter(
-    \SbWereWolf\XmlNavigator\General\Notation::VAL,
-    \SbWereWolf\XmlNavigator\General\Notation::ATTR,
+    val: 'value',
+    attr: 'attributes',
+    name: 'name',
+    seq: 'sequence',
 );
-$xmlAsArray =
-    $converter->toPrettyPrint($xml);
+$xmlAsArray = $converter->toHierarchyOfElements($xml);
 
 $prettyPrint = json_encode($xmlAsArray, JSON_PRETTY_PRINT);
 echo 'JSON representation of XML:'

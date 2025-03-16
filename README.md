@@ -211,19 +211,22 @@ XmlConverter can use to convert XML-document to array, example:
 
 ```php
 $xml = <<<XML
-<elemWithNestedElems>
-    <elemWithVal>val</elemWithVal>
-    <elemWithAttribs one="atrib" other="atrib"/>
-    <elemWithAll attribute_name="attribute_value">element value</elemWithAll>
-</elemWithNestedElems>
+<ElemWithNestedElems>
+    <ElemWithVal>val</ElemWithVal>
+    <ElemWithAttribs one="atrib" other="atrib"/>
+    <ElemWithAll attribute_name="attribute-value">
+        element value
+    </ElemWithAll>
+</ElemWithNestedElems>
 XML;
 
 $converter = new \SbWereWolf\XmlNavigator\Convertation\XmlConverter(
-    \SbWereWolf\XmlNavigator\General\Notation::VAL,
-    \SbWereWolf\XmlNavigator\General\Notation::ATTR,
+    val: 'value',
+    attr: 'attributes',
+    name: 'name',
+    seq: 'sequence',
 );
-$xmlAsArray =
-    $converter->toPrettyPrint($xml);
+$xmlAsArray = $converter->toHierarchyOfElements($xml);
 
 $prettyPrint = json_encode($xmlAsArray, JSON_PRETTY_PRINT);
 echo 'JSON representation of XML:'
@@ -235,6 +238,7 @@ echo 'Array representation of XML:'
     . PHP_EOL
     . var_export($xmlAsArray, true)
     . PHP_EOL;
+
 ```
 
 OUTPUT:
@@ -242,45 +246,61 @@ OUTPUT:
 ```php
 JSON representation of XML:
 {
-    "elemWithNestedElems": {
-        "elemWithVal": "val",
-        "elemWithAttribs": {
-            "@attributes": {
+    "name": "ElemWithNestedElems",
+    "sequence": [
+        {
+            "name": "ElemWithVal",
+            "value": "val"
+        },
+        {
+            "name": "ElemWithAttribs",
+            "attributes": {
                 "one": "atrib",
                 "other": "atrib"
             }
         },
-        "elemWithAll": {
-            "@value": "element value",
-            "@attributes": {
-                "attribute_name": "attribute_value"
+        {
+            "name": "ElemWithAll",
+            "value": "\n        element value\n    ",
+            "attributes": {
+                "attribute_name": "attribute-value"
             }
         }
-    }
+    ]
 }
 Array representation of XML:
 array (
-  'elemWithNestedElems' => 
+  'name' => 'ElemWithNestedElems',
+  'sequence' => 
   array (
-    'elemWithVal' => 'val',
-    'elemWithAttribs' => 
+    0 => 
     array (
-      '@attributes' => 
+      'name' => 'ElemWithVal',
+      'value' => 'val',
+    ),
+    1 => 
+    array (
+      'name' => 'ElemWithAttribs',
+      'attributes' => 
       array (
         'one' => 'atrib',
         'other' => 'atrib',
       ),
     ),
-    'elemWithAll' => 
+    2 => 
     array (
-      '@value' => 'element value',
-      '@attributes' => 
+      'name' => 'ElemWithAll',
+      'value' => '
+        element value
+    ',
+      'attributes' => 
       array (
-        'attribute_name' => 'attribute_value',
+        'attribute_name' => 'attribute-value',
       ),
     ),
   ),
 )
+
 ```
 
 ### XML-document as object
