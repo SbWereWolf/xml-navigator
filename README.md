@@ -157,24 +157,26 @@ function parseFirstElement(string $filename): void
 
     /** @var XMLReader $reader */
     $reader = XMLReader::open($filename);
+    
     $mayRead = true;
+    /* scroll to first `SomeElement` */
     while ($mayRead && $reader->name !== 'SomeElement') {
         $mayRead = $reader->read();
     }
-    
+    /* Compose array from XML element with name `SomeElement` */    
     $result =
         \SbWereWolf\XmlNavigator\Extraction\PrettyPrintComposer
         ::compose($reader);
+
+    $reader->close();
 
     $finish = hrtime(true);
     $duration = $finish - $start;
     $duration = number_format($duration,);
     echo "First element parsing duration of $filename is $duration ns" .
         PHP_EOL;
-
-    $reader->close();
 }
-
+/* files to metering with benchmark */
 $files = [
     'temp-465b.xml',
     'temp-429Kb.xml',
