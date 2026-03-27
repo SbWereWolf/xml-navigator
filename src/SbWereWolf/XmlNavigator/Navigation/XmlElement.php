@@ -8,8 +8,6 @@ use Generator;
 use InvalidArgumentException;
 use JsonSerializable;
 use SbWereWolf\JsonSerializable\JsonSerializeTrait;
-use SbWereWolf\LanguageSpecific\AdvancedArrayFactory;
-use SbWereWolf\LanguageSpecific\AdvancedArrayInterface;
 use SbWereWolf\XmlNavigator\General\Notation;
 
 /**
@@ -19,8 +17,8 @@ class XmlElement implements IXmlElement, JsonSerializable
 {
     use JsonSerializeTrait;
 
-    /** @var AdvancedArrayInterface Массив со свойствами XML элемента */
-    private AdvancedArrayInterface $handler;
+    /** @var array<string,mixed> Сериализуемое представление XML элемента */
+    private array $data;
     /** @var string Индекс имени элемента */
     private string $name;
     /** @var string Индекс значения элемента */
@@ -29,6 +27,14 @@ class XmlElement implements IXmlElement, JsonSerializable
     private string $attr;
     /** @var string Индекс для вложенных элементов */
     private string $seq;
+    /** @var string Имя XML элемента */
+    private string $elementName;
+    /** @var string Значение XML элемента */
+    private string $elementValue;
+    /** @var array<string,string> Атрибуты XML элемента */
+    private array $attributesData;
+    /** @var array<int,array<string,mixed>> Дочерние элементы */
+    private array $sequenceData;
 
     /**
      * @param array<string,string|array> $initial Массив со свойствами
@@ -75,17 +81,18 @@ class XmlElement implements IXmlElement, JsonSerializable
         $this->val = $val;
         $this->attr = $attr;
         $this->seq = $seq;
-        $this->handler = (new AdvancedArrayFactory())
-            ->makeAdvancedArray($data);
+        $this->data = $data;
+        $this->elementName = $initial[$name];
+        $this->elementValue = (string)($initial[$val] ?? '');
+        $this->attributesData = $initial[$attr] ?? [];
+        $this->sequenceData = $initial[$seq] ?? [];
     }
 
     /* @inheritdoc */
     public function attributes(): array
     {
-        $attributes = $this->handler[$this->attr]->asIs() ?? [];
-
         $result = [];
-        foreach ($attributes as $name => $value) {
+        foreach ($this->attributesData as $name => $value) {
             $result[] = new XmlAttribute($name, $value);
         }
 
@@ -95,12 +102,16 @@ class XmlElement implements IXmlElement, JsonSerializable
     /* @inheritdoc */
     public function get(string $name = ''): string
     {
-        if ('' === $name) {
-            $name = null;
+        if ('' !== $name) {
+            return $this->attributesData[$name] ?? '';
         }
-        $value = $this->handler->pull($this->attr)->get($name)->str();
 
-        return $value;
+        $first = reset($this->attributesData);
+        if ($first === false) {
+            return '';
+        }
+
+        return $first;
     }
 
     /* @inheritdoc */
@@ -117,14 +128,14 @@ class XmlElement implements IXmlElement, JsonSerializable
     /* @inheritdoc */
     public function pull(string $name = ''): Generator
     {
-        $elems = $this->handler[$this->seq]->asIs() ?? [];
-        if ('' !== $name) {
-            $elems = array_filter(
-                $elems,
-                fn($val) => $val[$this->name] === $name
-            );
-        }
-        foreach ($elems as $elem) {
+        foreach ($this->sequenceData as $elem) {
+            if (
+                '' !== $name
+                && (($elem[$this->name] ?? null) !== $name)
+            ) {
+                continue;
+            }
+
             $result = new static(
                 $elem,
                 $this->name,
@@ -140,57 +151,50 @@ class XmlElement implements IXmlElement, JsonSerializable
     /* @inheritdoc */
     public function value(): string
     {
-        $result = $this->handler[$this->val]->asIs() ?? '';
-
-        return $result;
+        return $this->elementValue;
     }
 
     /* @inheritdoc */
     public function name(): string
     {
-        return $this->handler[$this->name]->asIs();
+        return $this->elementName;
     }
 
     /* @inheritdoc */
     public function hasValue(): bool
     {
-        return $this->handler->has($this->val);
+        return array_key_exists($this->val, $this->data);
     }
 
     /* @inheritdoc */
     public function hasAttribute(string $name = ''): bool
     {
         if ('' === $name) {
-            $name = null;
+            return $this->attributesData !== [];
         }
-        $result = $this->handler->pull($this->attr)->has($name);
 
-        return $result;
+        return array_key_exists($name, $this->attributesData);
     }
 
     /* @inheritdoc */
     public function hasElement(string $name = ''): bool
     {
         if ('' === $name) {
-            $result = $this->handler->has($this->seq);
-        }
-        if ('' !== $name) {
-            $elems = $this->handler[$this->seq]->asIs() ?? [];
-            $result = array_any(
-                $elems,
-                fn($value, $key) => $value[$this->name] === $name
-            );
+            return $this->sequenceData !== [];
         }
 
-        return $result;
+        foreach ($this->sequenceData as $elem) {
+            if (($elem[$this->name] ?? null) === $name) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /* @inheritdoc */
     public function serialize(): array
     {
-        /** @noinspection PhpUnnecessaryLocalVariableInspection */
-        $result = $this->handler->jsonSerialize();
-
-        return $result;
+        return $this->data;
     }
 }

@@ -34,10 +34,10 @@
   },
   "require": {
     "php": ">=8.4",
-    "sbwerewolf/language-specific": "8.4.*",
     "ext-xmlreader": "*",
     "ext-libxml": "*",
-    "sbwerewolf/json-serialize-trait": "^1"
+    "sbwerewolf/json-serialize-trait": "^1",
+    "sbwerewolf/language-specific": "8.4.*"
   },
   "config": {
     "allow-plugins": {
