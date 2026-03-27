@@ -23,114 +23,181 @@ class PrettyPrintComposer extends ElementComposer implements Notation
         string $valueIndex = Notation::VAL,
         string $attributesIndex = Notation::ATTR
     ): array {
-        $elems = ElementExtractor::extractElements(
+        while ($reader->nodeType !== XMLReader::ELEMENT && $reader->read()) {
+        }
+
+        if ($reader->nodeType !== XMLReader::ELEMENT) {
+            return [];
+        }
+
+        $isEmpty = $reader->isEmptyElement;
+        $result = self::composeElement(
             $reader,
             $valueIndex,
             $attributesIndex
         );
-
-        /** @noinspection PhpUnnecessaryLocalVariableInspection */
-        $result = self::composePrettyPrintByXmlElements(
-            $elems,
-            $valueIndex,
-            $attributesIndex
-        );
+        if ($isEmpty) {
+            $reader->read();
+        }
 
         return $result;
     }
 
     /**
-     * @param array<int,array<string,array<string,int|string>>> $elems
      * @param string $valueIndex
      * @param string $attributesIndex
      * @return array<string,array>
      */
-    private static function composePrettyPrintByXmlElements(
-        array $elems,
+    private static function composeElement(
+        XMLReader $reader,
         string $valueIndex,
         string $attributesIndex
     ): array {
-        $base = static::extractBaseDepth($elems);
-        $prev = $base;
-        $result = [];
-        $ptr = &$result;
-        $isMulti = false;
-        foreach ($elems as $elem) {
-            $data = current($elem);
+        $name = $reader->name;
+        $startDepth = $reader->depth;
+        $attributes = self::collectAttributes($reader);
 
-            $curr = $data[ElementExtractor::DEPTH];
-            $name = key($elem);
-
-            $letDoSearch = $prev !== $curr;
-            if ($letDoSearch) {
-                $ptr = &$result;
-                for ($d = $base; $d < $curr; $d++) {
-                    $end = 0;
-                    if (count($ptr)) {
-                        end($ptr);
-                        $end = key($ptr);
-                    }
-                    if ($isMulti && ($d + 1) === $curr) {
-                        $ptr = &$ptr[$end];
-                        end($ptr);
-                        $end = key($ptr);
-                    }
-
-                    $ptr = &$ptr[$end];
-                }
-            }
-
-            $new = [];
-            if (
-                isset($data[$valueIndex]) &&
-                !isset($data[$attributesIndex])
-            ) {
-                $new = $data[$valueIndex];
-            }
-            if (
-                isset($data[$valueIndex]) &&
-                isset(
-                    $data[$attributesIndex]
-                )
-            ) {
-                $new[$valueIndex] = $data[$valueIndex];
-            }
-            if (isset($data[$attributesIndex])) {
-                $new[$attributesIndex] = $data[$attributesIndex];
-            }
-
-            /* Order of IF operators is most important */
-            $isMulti = false;
-            if (
-                key_exists($name, $ptr) &&
-                is_array($ptr[$name]) &&
-                key_exists(0, $ptr[$name])
-            ) {
-                $ptr[$name][] = $new;
-                $isMulti = true;
-            }
-
-            if (
-                key_exists($name, $ptr) &&
-                (
-                    !is_array($ptr[$name]) ||
-                    !key_exists(0, $ptr[$name])
-                )
-            ) {
-                $first = $ptr[$name];
-                $ptr[$name] = [];
-                $ptr[$name][] = $first;
-
-                $ptr[$name][] = $new;
-                $isMulti = true;
-            }
-
-            if (!key_exists($name, $ptr)) {
-                $ptr[$name] = $new;
-            }
-
-            $prev = $curr;
+        if ($reader->isEmptyElement) {
+            return [$name => self::normalizeValue([], '', false, $attributes, $valueIndex, $attributesIndex)];
         }
+
+        $children = [];
+        $value = '';
+        $hasValue = false;
+        while ($reader->read()) {
+            if ($reader->nodeType === XMLReader::ELEMENT) {
+                $child = self::composeElement(
+                    $reader,
+                    $valueIndex,
+                    $attributesIndex
+                );
+                $childName = key($child);
+                $childValue = current($child);
+                self::appendChild($children, $childName, $childValue);
+                continue;
+            }
+
+            if (
+                (
+                    $reader->nodeType === XMLReader::TEXT
+                    || $reader->nodeType === XMLReader::CDATA
+                )
+                && $reader->depth === ($startDepth + 1)
+            ) {
+                $value .= $reader->value;
+                $hasValue = true;
+                continue;
+            }
+
+            if (
+                $reader->nodeType === XMLReader::END_ELEMENT
+                && $reader->depth === $startDepth
+            ) {
+                break;
+            }
+        }
+
+        return [
+            $name => self::normalizeValue(
+                $children,
+                $value,
+                $hasValue,
+                $attributes,
+                $valueIndex,
+                $attributesIndex
+            ),
+        ];
+    }
+
+    /**
+     * @param array<string,mixed> $target
+     * @param mixed $childValue
+     */
+    private static function appendChild(
+        array &$target,
+        string $childName,
+        mixed $childValue
+    ): void {
+        if (!array_key_exists($childName, $target)) {
+            $target[$childName] = $childValue;
+            return;
+        }
+
+        if (
+            is_array($target[$childName])
+            && array_key_exists(0, $target[$childName])
+        ) {
+            $target[$childName][] = $childValue;
+            return;
+        }
+
+        $target[$childName] = [
+            $target[$childName],
+            $childValue,
+        ];
+    }
+
+    /**
+     * @param array<string,mixed> $children
+     * @param array<string,string> $attributes
+     */
+    private static function normalizeValue(
+        array $children,
+        string $value,
+        bool $hasValue,
+        array $attributes,
+        string $valueIndex,
+        string $attributesIndex
+    ): mixed {
+        if ($children === [] && $attributes === [] && !$hasValue) {
+            return [];
+        }
+
+        if ($children === [] && $attributes === [] && $hasValue) {
+            return $value;
+        }
+
+        if ($children === [] && $attributes !== [] && !$hasValue) {
+            return [
+                $attributesIndex => $attributes,
+            ];
+        }
+
+        if ($children === [] && $attributes !== [] && $hasValue) {
+            return [
+                $valueIndex => $value,
+                $attributesIndex => $attributes,
+            ];
+        }
+
+        $result = [];
+        if ($attributes !== []) {
+            $result[$attributesIndex] = $attributes;
+        }
+        if ($hasValue) {
+            $result[$valueIndex] = $value;
+        }
+        foreach ($children as $name => $childValue) {
+            $result[$name] = $childValue;
+        }
+
         return $result;
+    }
+
+    /**
+     * @return array<string,string>
+     */
+    private static function collectAttributes(XMLReader $reader): array
+    {
+        $attributes = [];
+        while ($reader->moveToNextAttribute()) {
+            $attributes[$reader->name] = $reader->value;
+        }
+
+        if ($attributes !== []) {
+            $reader->moveToElement();
+        }
+
+        return $attributes;
     }
 }

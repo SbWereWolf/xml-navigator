@@ -239,6 +239,49 @@ echo 'Array representation of XML:'
     . var_export($xmlAsArray, true)
     . PHP_EOL;
 
+## Benchmarking
+
+Repository now contains benchmark tooling under `tests/Performance/`.
+
+What is stored where:
+
+- benchmark scripts and Docker files: `tests/Performance/`
+- temporary fixtures and reports: `task/performance-refactor-benchmark/`
+
+Generate a smoke fixture pack:
+
+```bash
+php tests/Performance/generate_fixture_pack.php \
+  --profile=smoke \
+  --force=1 \
+  --fixtures-dir=task/performance-refactor-benchmark/fixtures-smoke
+```
+
+Run a local smoke benchmark:
+
+```bash
+php tests/Performance/acceptance_benchmark.php \
+  --fixtures-dir=task/performance-refactor-benchmark/fixtures-smoke \
+  --output=task/performance-refactor-benchmark/reports/acceptance-benchmark-smoke.json
+```
+
+Run a Docker benchmark:
+
+```bash
+bash tests/Performance/run-docker-benchmark.sh \
+  task/performance-refactor-benchmark/fixtures \
+  task/performance-refactor-benchmark/reports/acceptance-benchmark.json \
+  xml-browser-bench:local
+```
+
+Benchmark runner writes JSON with:
+
+- environment metadata;
+- fixture manifest references and checksums;
+- correctness hashes;
+- timing results for stream extraction, first-element access,
+  full conversion, pretty-print conversion and `XmlElement` API.
+
 ```
 
 OUTPUT:

@@ -27,100 +27,118 @@ class HierarchyComposer extends ElementComposer implements Notation
         string $nameIndex = Notation::NAME,
         string $elementsIndex = Notation::SEQUENCE
     ): array {
-        $elems = ElementExtractor::extractElements(
+        while ($reader->nodeType !== XMLReader::ELEMENT && $reader->read()) {
+        }
+
+        if ($reader->nodeType !== XMLReader::ELEMENT) {
+            return [];
+        }
+
+        $isEmpty = $reader->isEmptyElement;
+        $result = self::composeElement(
             $reader,
-            $valueIndex,
-            $attributesIndex
-        );
-        /** @noinspection PhpUnnecessaryLocalVariableInspection */
-        $result = self::createTheHierarchyOfElements(
-            $elems,
             $elementsIndex,
             $nameIndex,
             $valueIndex,
             $attributesIndex
         );
+        if ($isEmpty) {
+            $reader->read();
+        }
 
         return $result;
     }
 
     /**
-     * @param array<int,array<string,array<string,int|string>>> $elems
      * @param string $elementsIndex
      * @param string $nameIndex
      * @param string $valueIndex
      * @param string $attributesIndex
      * @return array<string,string|array<int,array<string,string>>>
      */
-    private static function createTheHierarchyOfElements(
-        array $elems,
+    private static function composeElement(
+        XMLReader $reader,
         string $elementsIndex,
         string $nameIndex,
         string $valueIndex,
         string $attributesIndex
     ): array {
-        $base = static::extractBaseDepth($elems);
-        $prev = $base;
+        $startDepth = $reader->depth;
+        $result = [
+            $nameIndex => $reader->name,
+        ];
 
-        $hierarchy = [$elementsIndex => []];
-        $ptr = &$hierarchy[$elementsIndex];
-        foreach ($elems as $i => $elem) {
-            $data = current($elem);
-            /*$logger->debug('будем добавлять элемент' . json_encode($data, JSON_PRETTY_PRINT));*/
+        $attributes = self::collectAttributes($reader);
 
-            $curr = $data[ElementExtractor::DEPTH];
-            /*$logger->debug("уровень элемента `$curr`");*/
-            $name = key($elem);
-            /*$logger->debug("имя элемента `$name`");*/
-
-            $letDoSearch = $prev !== $curr;
-            /*$logger->debug('надо ли искать последовательность элементов' . json_encode($letDoSearch, JSON_PRETTY_PRINT));*/
-            if ($letDoSearch) {
-                $ptr = &$hierarchy[$elementsIndex];
-                /*$logger->debug('перевели указатель на корень=>' . json_encode($ptr, JSON_PRETTY_PRINT));*/
-                for ($d = $base; $d < $curr; $d++) {
-                    /*$logger->debug("текущий уровень=>`$d`");*/
-
-                    $end = 0;
-                    if (count($ptr)) {
-                        end($ptr);
-                        $end = key($ptr);
-                    }
-                    /*$logger->debug("последний индекс на текущем уровне=>`$end`");*/
-
-                    $ptr = &$ptr[$end][$elementsIndex];
-                    /*$logger->debug('переместили указатель на следующую последовательность=>' . json_encode($ptr, JSON_PRETTY_PRINT));*/
-                }
-                /*$logger->debug('указатель на последовательности=>' . json_encode($ptr, JSON_PRETTY_PRINT));*/
+        if ($reader->isEmptyElement) {
+            if ($attributes !== []) {
+                $result[$attributesIndex] = $attributes;
             }
-
-            $new = [];
-            $new[$nameIndex] = $name;
-            if (isset($data[$valueIndex])) {
-                $new[$valueIndex] = $data[$valueIndex];
-            }
-            if (isset($data[$attributesIndex])) {
-                $new[$attributesIndex] = $data[$attributesIndex];
-            }
-
-            $ii = $i + 1;
-            if (
-                isset($elems[$ii])
-                && current($elems[$ii])[ElementExtractor::DEPTH] > $curr
-            ) {
-                $new[$elementsIndex] = [];
-            }
-
-            /*$logger->debug('новый элемент=>' . json_encode($new, JSON_PRETTY_PRINT));*/
-            $ptr[] = $new;
-            /*$logger->debug('последовательность после добавления элемента=>' . json_encode($ptr, JSON_PRETTY_PRINT));*/
-
-            $prev = $curr;
-            /*$logger->debug("предыдущий уровень вложенности `$prev`");*/
+            return $result;
         }
 
-        $result = &$hierarchy[$elementsIndex][0];
+        $children = [];
+        $value = '';
+        $hasValue = false;
+        while ($reader->read()) {
+            if ($reader->nodeType === XMLReader::ELEMENT) {
+                $children[] = self::composeElement(
+                    $reader,
+                    $elementsIndex,
+                    $nameIndex,
+                    $valueIndex,
+                    $attributesIndex
+                );
+                continue;
+            }
+
+            if (
+                (
+                    $reader->nodeType === XMLReader::TEXT
+                    || $reader->nodeType === XMLReader::CDATA
+                )
+                && $reader->depth === ($startDepth + 1)
+            ) {
+                $value .= $reader->value;
+                $hasValue = true;
+                continue;
+            }
+
+            if (
+                $reader->nodeType === XMLReader::END_ELEMENT
+                && $reader->depth === $startDepth
+            ) {
+                break;
+            }
+        }
+
+        if ($hasValue) {
+            $result[$valueIndex] = $value;
+        }
+        if ($attributes !== []) {
+            $result[$attributesIndex] = $attributes;
+        }
+        if ($children !== []) {
+            $result[$elementsIndex] = $children;
+        }
 
         return $result;
+    }
+
+    /**
+     * @return array<string,string>
+     */
+    private static function collectAttributes(XMLReader $reader): array
+    {
+        $attributes = [];
+        while ($reader->moveToNextAttribute()) {
+            $attributes[$reader->name] = $reader->value;
+        }
+
+        if ($attributes !== []) {
+            $reader->moveToElement();
+        }
+
+        return $attributes;
     }
 }

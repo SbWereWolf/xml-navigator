@@ -32,26 +32,14 @@ class FastXmlParser
         string $name = Notation::NAME,
         string $seq = Notation::SEQUENCE
     ): Generator {
-        $isSuitable = (bool)$detectElement($reader);
-        if (!$isSuitable) {
-            $isSuitable =
-                self::skipNotSuitable($reader, $detectElement);
-        }
-
-        while ($isSuitable) {
-            /** @noinspection PhpUnnecessaryLocalVariableInspection */
-            $result = HierarchyComposer::compose(
+        while (self::seekSuitable($reader, $detectElement)) {
+            yield HierarchyComposer::compose(
                 $reader,
                 $val,
                 $attr,
                 $name,
                 $seq
             );
-
-            yield $result;
-
-            $isSuitable =
-                self::skipNotSuitable($reader, $detectElement);
         }
     }
 
@@ -68,24 +56,12 @@ class FastXmlParser
         string $val = Notation::VAL,
         string $attr = Notation::ATTR
     ): Generator {
-        $isSuitable = (bool)$detectElement($reader);
-        if (!$isSuitable) {
-            $isSuitable =
-                self::skipNotSuitable($reader, $detectElement);
-        }
-
-        while ($isSuitable) {
-            /** @noinspection PhpUnnecessaryLocalVariableInspection */
-            $result = PrettyPrintComposer::compose(
+        while (self::seekSuitable($reader, $detectElement)) {
+            yield PrettyPrintComposer::compose(
                 $reader,
                 $val,
                 $attr
             );
-
-            yield $result;
-
-            $isSuitable =
-                self::skipNotSuitable($reader, $detectElement);
         }
     }
 
@@ -95,15 +71,19 @@ class FastXmlParser
      *
      * @return bool
      */
-    private static function skipNotSuitable(
+    private static function seekSuitable(
         XMLReader $reader,
         callable $detectElement
     ): bool {
         do {
-            $mayRead = $reader->read();
-            $isSuitable = (bool)$detectElement($reader);
-        } while ($mayRead && !$isSuitable);
+            if (
+                $reader->nodeType === XMLReader::ELEMENT
+                && (bool) $detectElement($reader)
+            ) {
+                return true;
+            }
+        } while ($reader->read());
 
-        return $isSuitable;
-    }
+        return false;
+   }
 }
