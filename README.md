@@ -358,7 +358,7 @@ $navigator =
 new \SbWereWolf\XmlNavigator\Navigation\XmlElement($content);
 
 /* Convert this XmlElement to array,
- with the array you may restore XmlElement
+ with the array you may restore the XmlElement
  (create same as original one) */
 $gist = $navigator->serialize();
 echo assert($content === $gist) ? 'is same' : 'is different';
