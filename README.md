@@ -464,7 +464,7 @@ composer test
 ## Contacts
 
 ```
-Volkhin Nikolay
+Nicholas Volkhin
 e-mail ulfnew@gmail.com
 phone +7-902-272-65-35
 Telegram @sbwerewolf
