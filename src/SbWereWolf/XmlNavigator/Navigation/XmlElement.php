@@ -125,7 +125,13 @@ class XmlElement implements IXmlElement, JsonSerializable
             );
         }
         foreach ($elems as $elem) {
-            $result = new static($elem);
+            $result = new static(
+                $elem,
+                $this->name,
+                $this->val,
+                $this->attr,
+                $this->seq,
+            );
 
             yield $result;
         }
