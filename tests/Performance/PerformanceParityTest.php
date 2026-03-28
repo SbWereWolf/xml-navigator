@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Performance;
 
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use SbWereWolf\XmlNavigator\Convertation\FastXmlToArray;
 use SbWereWolf\XmlNavigator\Convertation\XmlConverter;
@@ -18,6 +19,7 @@ use function SbWereWolf\XmlNavigator\Bench\runAcceptanceBenchmark;
 
 require_once __DIR__ . '/BenchmarkSupport.php';
 
+#[CoversNothing]
 final class PerformanceParityTest extends TestCase
 {
     private const STRUCTURED_XML = <<<'XML'

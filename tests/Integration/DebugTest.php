@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Integration;
 
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use SbWereWolf\XmlNavigator\Convertation\FastXmlToArray;
 use SbWereWolf\XmlNavigator\Convertation\XmlConverter;
@@ -20,6 +21,7 @@ use XMLReader;
 /**
  * Testing library classes
  */
+#[CoversNothing]
 class DebugTest extends TestCase
 {
     private const PRETTY_PRINT =
