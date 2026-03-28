@@ -18,7 +18,7 @@
   },
   "scripts": {
     "test": "php ./vendor/phpunit/phpunit/phpunit --configuration ./continuous-integration/phpunit/phpunit.xml --testdox  --colors=always",
-    "test-with-coverage": "php ./vendor/phpunit/phpunit/phpunit --configuration ./continuous-integration/phpunit/phpunit.xml --testdox  --colors=always  --coverage-html ./continuous-integration/autotests-coverage-report --coverage-filter ./src",
+    "test-with-coverage": "bash ./continuous-integration/phpunit/run-with-coverage.sh",
     "phpstan-check": "php ./vendor/bin/phpstan analyse -vvv --configuration continuous-integration/phpstan/phpstan.neon",
     "phpstan-suppress": "php ./vendor/bin/phpstan analyse -vvv --configuration continuous-integration/phpstan/phpstan.neon --generate-baseline continuous-integration/phpstan/ignore-errors/baseline.neon",
     "check-style": "php ./vendor/bin/phpcs --standard=continuous-integration/phpcs/phpcs.xml -v",

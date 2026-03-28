@@ -767,3 +767,20 @@ The package also exposes interfaces that mirror the concrete APIs:
   name-only nodes in hierarchy output.
 - The examples in this README are covered by tests in 
   `tests/Integration/ReadmeExamplesTest.php`.
+
+## Development verification
+
+Primary local checks:
+
+- `composer test`
+- `composer test-with-coverage`
+- `composer phpstan-check`
+- `composer check-style`
+
+`composer test-with-coverage` is the canonical coverage entrypoint. It
+uses a local coverage driver when one is available and falls back to a
+Docker-based PHPUnit runtime otherwise. The HTML report is written to
+`continuous-integration/autotests-coverage-report`.
+
+For the high-level conversion API, exactly one XML source must be
+provided: use either `$xmlText` or `$xmlUri`, but not both.
