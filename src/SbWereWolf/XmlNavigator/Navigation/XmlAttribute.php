@@ -14,8 +14,8 @@ class XmlAttribute implements IXmlAttribute, JsonSerializable
 {
     use JsonSerializeTrait;
 
-    private $name;
-    private $value;
+    private string $name;
+    private string $value;
 
     /**
      * @param string $name Имя атрибута

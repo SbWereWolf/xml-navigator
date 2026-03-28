@@ -12,12 +12,16 @@ use SbWereWolf\XmlNavigator\General\Notation;
 
 /**
  * Объект для XML элемента
+ *
+ * @phpstan-import-type HierarchyNode from \SbWereWolf\XmlNavigator\Convertation\IFastXmlToArray
+ * @phpstan-import-type XmlAttributes from \SbWereWolf\XmlNavigator\Convertation\IFastXmlToArray
+ * @phpstan-consistent-constructor
  */
 class XmlElement implements IXmlElement, JsonSerializable
 {
     use JsonSerializeTrait;
 
-    /** @var array<string,mixed> Сериализуемое представление XML элемента */
+    /** @var HierarchyNode Сериализуемое представление XML элемента */
     private array $data;
     /** @var string Индекс имени элемента */
     private string $name;
@@ -31,13 +35,13 @@ class XmlElement implements IXmlElement, JsonSerializable
     private string $elementName;
     /** @var string Значение XML элемента */
     private string $elementValue;
-    /** @var array<string,string> Атрибуты XML элемента */
+    /** @var XmlAttributes Атрибуты XML элемента */
     private array $attributesData;
-    /** @var array<int,array<string,mixed>> Дочерние элементы */
+    /** @var list<HierarchyNode> Дочерние элементы */
     private array $sequenceData;
 
     /**
-     * @param array<string,string|array> $initial Массив со свойствами
+     * @param HierarchyNode $initial Массив со свойствами
      *                                              XML элемента
      * @param string $name Индекс для имени
      * @param string $val Индекс для значения
@@ -51,16 +55,17 @@ class XmlElement implements IXmlElement, JsonSerializable
         string $attr = Notation::ATTRIBUTES,
         string $seq = Notation::SEQUENCE,
     ) {
-        $letThrow = !key_exists($name, $initial);
-        $letThrow =
-            $letThrow || gettype($initial[$name]) !== 'string';
-        $letThrow =
-            $letThrow || gettype($initial[$val] ?? '') !== 'string';
-        $letThrow =
-            $letThrow || gettype($initial[$attr] ?? []) !== 'array';
-        $letThrow =
-            $letThrow || gettype($initial[$seq] ?? []) !== 'array';
-        if ($letThrow) {
+        $elementName = $initial[$name] ?? null;
+        $elementValue = $initial[$val] ?? '';
+        $attributesData = $initial[$attr] ?? [];
+        $sequenceData = $initial[$seq] ?? [];
+
+        if (
+            !is_string($elementName)
+            || !is_string($elementValue)
+            || !self::isXmlAttributes($attributesData)
+            || !self::isHierarchySequence($sequenceData)
+        ) {
             throw new InvalidArgumentException(
                 '$initial array MUST BE like' .
                 " [ `$name`=>string, `$val`=>string," .
@@ -70,9 +75,10 @@ class XmlElement implements IXmlElement, JsonSerializable
         }
 
         $keys = [$name, $val, $attr, $seq];
+        /** @var HierarchyNode $data */
         $data = [];
         foreach ($keys as $key) {
-            if (isset($initial[$key])) {
+            if (array_key_exists($key, $initial)) {
                 $data[$key] = $initial[$key];
             }
         }
@@ -82,13 +88,15 @@ class XmlElement implements IXmlElement, JsonSerializable
         $this->attr = $attr;
         $this->seq = $seq;
         $this->data = $data;
-        $this->elementName = $initial[$name];
-        $this->elementValue = (string)($initial[$val] ?? '');
-        $this->attributesData = $initial[$attr] ?? [];
-        $this->sequenceData = $initial[$seq] ?? [];
+        $this->elementName = $elementName;
+        $this->elementValue = $elementValue;
+        $this->attributesData = $attributesData;
+        $this->sequenceData = $sequenceData;
     }
 
-    /* @inheritdoc */
+    /**
+     * @return list<IXmlAttribute>
+     */
     public function attributes(): array
     {
         $result = [];
@@ -114,7 +122,9 @@ class XmlElement implements IXmlElement, JsonSerializable
         return $first;
     }
 
-    /* @inheritdoc */
+    /**
+     * @return list<IXmlElement>
+     */
     public function elements(string $name = ''): array
     {
         $result = [];
@@ -125,7 +135,9 @@ class XmlElement implements IXmlElement, JsonSerializable
         return $result;
     }
 
-    /* @inheritdoc */
+    /**
+     * @return Generator<int, static>
+     */
     public function pull(string $name = ''): Generator
     {
         foreach ($this->sequenceData as $elem) {
@@ -136,6 +148,8 @@ class XmlElement implements IXmlElement, JsonSerializable
                 continue;
             }
 
+            /** @var HierarchyNode $elem */
+            $elem = $elem;
             $result = new static(
                 $elem,
                 $this->name,
@@ -196,5 +210,43 @@ class XmlElement implements IXmlElement, JsonSerializable
     public function serialize(): array
     {
         return $this->data;
+    }
+
+    /**
+     * @param mixed $value
+     * @phpstan-assert-if-true XmlAttributes $value
+     */
+    private static function isXmlAttributes(mixed $value): bool
+    {
+        if (!is_array($value)) {
+            return false;
+        }
+
+        foreach ($value as $key => $item) {
+            if (!is_string($key) || !is_string($item)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param mixed $value
+     * @phpstan-assert-if-true list<array<string, mixed>> $value
+     */
+    private static function isHierarchySequence(mixed $value): bool
+    {
+        if (!is_array($value) || !array_is_list($value)) {
+            return false;
+        }
+
+        foreach ($value as $item) {
+            if (!is_array($item)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

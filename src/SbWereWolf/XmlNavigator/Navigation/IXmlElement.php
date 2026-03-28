@@ -8,6 +8,8 @@ use Generator;
 
 /**
  * Интерфейс для объекта XML элемента
+ *
+ * @phpstan-import-type HierarchyNode from \SbWereWolf\XmlNavigator\Convertation\IFastXmlToArray
  */
 interface IXmlElement
 {
@@ -62,13 +64,13 @@ interface IXmlElement
     /** Pull nested elements as IXmlElement,
      * if $name is defined, than pull elements only with the $name.
      * @param string $name
-     * @return Generator<IXmlElement>
+     * @return Generator<int, IXmlElement>
      */
     public function pull(string $name = ''): Generator;
 
     /** Generates a storable representation ($data) of a IXmlElement
      * use new XmlElement($data) to restore XmlElement object
-     * @return array
+     * @return HierarchyNode
      */
     public function serialize(): array;
 }

@@ -8,6 +8,12 @@ use XMLReader;
 
 /**
  * Extract whole element
+ *
+ * @phpstan-type ExtractedAttributes array<string, string>
+ * @phpstan-type ExtractedProps array<string, array{0: int, 1?: string|ExtractedAttributes}>
+ * @phpstan-type ExtractedElementData array<string, int|string|ExtractedAttributes>
+ * @phpstan-type ExtractedElementFragment array<string, ExtractedElementData>
+ * @phpstan-type ExtractedElementList list<ExtractedElementFragment>
  */
 class ElementExtractor
 {
@@ -23,7 +29,7 @@ class ElementExtractor
      * @param XMLReader $reader
      * @param string $valueIndex index for element value
      * @param string $attributesIndex index for element attributes collection
-     * @return array<int,array<string,array<string,int|string>>>
+     * @return ExtractedElementList
      */
     public static function extractElements(
         XMLReader $reader,
@@ -72,7 +78,7 @@ class ElementExtractor
     /**
      * @param XMLReader $reader
      * @param array<int,string> $path
-     * @return array<string,array<string,int|string>>
+     * @return ExtractedProps
      */
     private static function props(
         XMLReader $reader,
@@ -117,8 +123,8 @@ class ElementExtractor
     }
 
     /**
-     * @param array<string,array<string,int|string>> $props
-     * @param array<int,array<string,array<string,int|string>>> $elems
+     * @param ExtractedProps $props
+     * @param ExtractedElementList $elems
      * @param string $attributesIndex
      * @param string $valueIndex
      * @return void
@@ -131,22 +137,29 @@ class ElementExtractor
     ): void {
         $name = key($props);
         $data = current($props);
-        $isSet = isset($data[1]);
-        if (!$isSet) {
-            $elems[] = [$name => [static::DEPTH => $data[0]]];
+        if (!is_string($name) || !is_array($data)) {
+            return;
         }
 
-        $isArray = $isSet && is_array($data[1]);
-        if ($isSet && $isArray) {
-            $elems[] = [$name => [static::DEPTH => $data[0]]];
+        $element = [
+            $name => [
+                static::DEPTH => $data[0],
+            ],
+        ];
 
-            end($elems);
-            $elems[key($elems)][$name][$attributesIndex] =
-                $data[1];
+        if (!array_key_exists(1, $data)) {
+            $elems[] = $element;
+            return;
         }
-        if ($isSet && !$isArray) {
-            end($elems);
-            $elems[key($elems)][$name][$valueIndex] = $data[1];
+
+        $payload = $data[1];
+        if (is_array($payload)) {
+            $element[$name][$attributesIndex] = $payload;
+            $elems[] = $element;
+            return;
         }
+
+        $element[$name][$valueIndex] = $payload;
+        $elems[] = $element;
     }
 }

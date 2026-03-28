@@ -6,13 +6,16 @@ namespace SbWereWolf\XmlNavigator\Convertation;
 
 /**
  * Интерфейс для конвертеров XML документов в PHP массивы
+ *
+ * @phpstan-import-type HierarchyNode from IFastXmlToArray
+ * @phpstan-import-type PrettyNode from IFastXmlToArray
  */
 interface IXmlConverter
 {
     /** Convert xml document into compact array
      * @param string $xmlText The text of XML document
      * @param string $xmlUri Path or link to XML document
-     * @return array<string,string|array<string,string>>
+     * @return PrettyNode
      */
     public function toPrettyPrint(
         string $xmlText = '',
@@ -22,7 +25,7 @@ interface IXmlConverter
     /** Convert xml document into normalized array
      * @param string $xmlText The text of XML document
      * @param string $xmlUri Path or link to XML document
-     * @return array<string,string|array<string,string>>
+     * @return HierarchyNode
      */
     public function toHierarchyOfElements(
         string $xmlText = '',

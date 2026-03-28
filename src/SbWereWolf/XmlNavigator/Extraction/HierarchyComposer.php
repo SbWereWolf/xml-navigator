@@ -9,8 +9,10 @@ use XMLReader;
 
 /**
  * Статический конвертор XML элемента в PHP массив
+ *
+ * @phpstan-import-type HierarchyNode from \SbWereWolf\XmlNavigator\Convertation\IFastXmlToArray
  */
-class HierarchyComposer extends ElementComposer implements Notation
+class HierarchyComposer implements Notation
 {
     /**
      * @param XMLReader $reader
@@ -18,7 +20,7 @@ class HierarchyComposer extends ElementComposer implements Notation
      * @param string $attributesIndex index for attributes collection
      * @param string $nameIndex index for element name
      * @param string $elementsIndex index for child elements collection
-     * @return array<string,string|array<int,array<string,string>>>
+     * @return HierarchyNode
      */
     public static function compose(
         XMLReader $reader,
@@ -54,7 +56,7 @@ class HierarchyComposer extends ElementComposer implements Notation
      * @param string $nameIndex
      * @param string $valueIndex
      * @param string $attributesIndex
-     * @return array<string,string|array<int,array<string,string>>>
+     * @return HierarchyNode
      */
     private static function composeElement(
         XMLReader $reader,
@@ -77,6 +79,7 @@ class HierarchyComposer extends ElementComposer implements Notation
             return $result;
         }
 
+        /** @var list<HierarchyNode> $children */
         $children = [];
         $value = '';
         $hasValue = false;

@@ -11,10 +11,15 @@ use XMLReader;
 
 /**
  * Статический конвертер XML документа в PHP массив
+ *
+ * @phpstan-import-type HierarchyNode from IFastXmlToArray
+ * @phpstan-import-type PrettyNode from IFastXmlToArray
  */
 class FastXmlToArray implements IFastXmlToArray
 {
-    /* @inheritdoc */
+    /**
+     * @return HierarchyNode
+     */
     public static function convert(
         string $xmlText = '',
         string $xmlUri = '',
@@ -25,32 +30,47 @@ class FastXmlToArray implements IFastXmlToArray
         string|null $encoding = null,
         int $flags = LIBXML_BIGLINES | LIBXML_COMPACT,
     ): array {
-        $reader = self::createXmlReader(
+        /** @var \Closure(XMLReader):array<mixed, mixed> $parse */
+        $parse = static function (
+            XMLReader $reader,
+        ) use (
             $xmlText,
             $xmlUri,
-            $encoding,
-            $flags
-        );
-
-        $detectElement = function (XMLReader $cursor) {
-            return $cursor->nodeType === XMLReader::ELEMENT;
-        };
-        $extractor = FastXmlParser::extractHierarchy(
-            $reader,
-            $detectElement,
             $val,
             $attr,
             $name,
             $seq,
-        );
-        $result = $extractor->current();
+        ): array {
+            return self::requireArrayResult(
+                FastXmlParser::extractHierarchy(
+                    $reader,
+                    static fn (XMLReader $cursor): bool =>
+                        $cursor->nodeType === XMLReader::ELEMENT,
+                    $val,
+                    $attr,
+                    $name,
+                    $seq,
+                )->current(),
+                $xmlText,
+                $xmlUri
+            );
+        };
 
-        $reader->close();
+        /** @var HierarchyNode $result */
+        $result = self::parseRootElement(
+            $xmlText,
+            $xmlUri,
+            $encoding,
+            $flags,
+            $parse
+        );
 
         return $result;
     }
 
-    /* @inheritdoc */
+    /**
+     * @return PrettyNode
+     */
     public static function prettyPrint(
         string $xmlText = '',
         string $xmlUri = '',
@@ -59,27 +79,76 @@ class FastXmlToArray implements IFastXmlToArray
         string|null $encoding = null,
         int $flags = LIBXML_BIGLINES | LIBXML_COMPACT,
     ): array {
-        $reader = self::createXmlReader(
+        /** @var \Closure(XMLReader):array<mixed, mixed> $parse */
+        $parse = static function (
+            XMLReader $reader,
+        ) use (
+            $xmlText,
+            $xmlUri,
+            $val,
+            $attr,
+        ): array {
+            return self::requireArrayResult(
+                FastXmlParser::extractPrettyPrint(
+                    $reader,
+                    static fn (XMLReader $cursor): bool =>
+                        $cursor->nodeType === XMLReader::ELEMENT,
+                    $val,
+                    $attr,
+                )->current(),
+                $xmlText,
+                $xmlUri
+            );
+        };
+
+        /** @var PrettyNode $result */
+        $result = self::parseRootElement(
             $xmlText,
             $xmlUri,
             $encoding,
-            $flags
+            $flags,
+            $parse
         );
-
-        $detectElement = function (XMLReader $cursor) {
-            return $cursor->nodeType === XMLReader::ELEMENT;
-        };
-        $extractor = FastXmlParser::extractPrettyPrint(
-            $reader,
-            $detectElement,
-            $val,
-            $attr,
-        );
-        $result = $extractor->current();
-
-        $reader->close();
 
         return $result;
+    }
+
+    /**
+     * @param \Closure(XMLReader):array<mixed, mixed> $parse
+     * @return array<mixed, mixed>
+     */
+    private static function parseRootElement(
+        string $xmlText,
+        string $xmlUri,
+        ?string $encoding,
+        int $flags,
+        \Closure $parse,
+    ): array {
+        $reader = null;
+        $hadInternalErrors = libxml_use_internal_errors(true);
+        libxml_clear_errors();
+
+        try {
+            $reader = self::createXmlReader(
+                $xmlText,
+                $xmlUri,
+                $encoding,
+                $flags
+            );
+            $result = $parse($reader);
+            if (libxml_get_errors() !== []) {
+                throw self::buildParsingException($xmlText, $xmlUri);
+            }
+
+            return $result;
+        } finally {
+            if ($reader instanceof XMLReader) {
+                $reader->close();
+            }
+
+            libxml_clear_errors();
+            libxml_use_internal_errors($hadInternalErrors);
+        }
     }
 
     /**
@@ -97,28 +166,94 @@ class FastXmlToArray implements IFastXmlToArray
     ): XMLReader {
         if ($xmlText === '' && $xmlUri === '') {
             throw new InvalidArgumentException(
-                'One of $xmlText or $xmlUri MUST BE defined,' .
-                ' please assign only one of them, other MUST BE empty',
+                'Exactly one XML source must be provided: set either ' .
+                '$xmlText or $xmlUri.',
                 -667
             );
         }
+        if ($xmlText !== '' && $xmlUri !== '') {
+            throw new InvalidArgumentException(
+                'XML source selection is ambiguous: use either ' .
+                '$xmlText or $xmlUri, not both.',
+                -668
+            );
+        }
 
-        $reader = new XMLReader();
         if ($xmlText !== '') {
-            $reader = XMLReader::XML(
+            $reader = @XMLReader::XML(
                 $xmlText,
                 $encoding,
                 $flags,
             );
+            if (!$reader instanceof XMLReader) {
+                throw self::buildParsingException($xmlText, '');
+            }
+
+            return $reader;
         }
-        if ($xmlText === '' && $xmlUri !== '') {
-            $reader = XMLReader::open(
-                $xmlUri,
-                $encoding,
-                $flags,
+
+        $reader = @XMLReader::open(
+            $xmlUri,
+            $encoding,
+            $flags,
+        );
+        if (!$reader instanceof XMLReader) {
+            throw new InvalidArgumentException(
+                'Unable to open XML source from URI `' . $xmlUri . '`.',
+                -670
             );
         }
 
         return $reader;
+    }
+
+    private static function buildParsingException(
+        string $xmlText,
+        string $xmlUri
+    ): InvalidArgumentException {
+        $details = self::formatLibxmlErrors();
+        if ($xmlText !== '') {
+            return new InvalidArgumentException(
+                'Unable to parse XML from $xmlText.' . $details,
+                -669
+            );
+        }
+
+        return new InvalidArgumentException(
+            'Unable to parse XML from URI `' . $xmlUri . '`.' . $details,
+            -670
+        );
+    }
+
+    /**
+     * @param mixed $result
+     * @return array<mixed, mixed>
+     */
+    private static function requireArrayResult(
+        mixed $result,
+        string $xmlText,
+        string $xmlUri
+    ): array {
+        if (!is_array($result) || $result === []) {
+            throw self::buildParsingException($xmlText, $xmlUri);
+        }
+
+        return $result;
+    }
+
+    private static function formatLibxmlErrors(): string
+    {
+        $errors = libxml_get_errors();
+        if ($errors === []) {
+            return '';
+        }
+
+        $messages = array_map(
+            static fn (\LibXMLError $error): string =>
+                trim($error->message),
+            $errors
+        );
+
+        return ' ' . implode(' | ', $messages);
     }
 }

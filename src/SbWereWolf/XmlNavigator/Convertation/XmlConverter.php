@@ -10,15 +10,18 @@ use SbWereWolf\XmlNavigator\General\Notation;
 
 /**
  * Конвертер XML документа в PHP массив
+ *
+ * @phpstan-import-type HierarchyNode from IFastXmlToArray
+ * @phpstan-import-type PrettyNode from IFastXmlToArray
  */
 class XmlConverter implements IXmlConverter, JsonSerializable
 {
     use JsonSerializeTrait;
 
-    /** @var array<string,string|array<string,string>>
+    /** @var HierarchyNode
      *      Структура XML документа в нормализованном виде */
     private array $xmlStructure = [];
-    /** @var array<string,string|array<string,string>>
+    /** @var PrettyNode
      *       XML документа в виде удобном для чтения */
     private array $prettyXml = [];
     /** @var string Индекс для Имени */
@@ -62,7 +65,9 @@ class XmlConverter implements IXmlConverter, JsonSerializable
         $this->flags = $flags;
     }
 
-    /* @inheritdoc */
+    /**
+     * @return PrettyNode
+     */
     public function toPrettyPrint(
         string $xmlText = '',
         string $xmlUri = '',
@@ -86,7 +91,9 @@ class XmlConverter implements IXmlConverter, JsonSerializable
         return $this->prettyXml;
     }
 
-    /* @inheritdoc */
+    /**
+     * @return HierarchyNode
+     */
     public function toHierarchyOfElements(
         string $xmlText = '',
         string $xmlUri = '',

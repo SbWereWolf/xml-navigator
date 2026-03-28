@@ -8,6 +8,11 @@ use SbWereWolf\XmlNavigator\General\Notation;
 
 /**
  * Интерфейс для статического преобразователя XML документа в PHP массив
+ *
+ * @phpstan-type XmlAttributes array<string, string>
+ * @phpstan-type HierarchyNode array<string, string|XmlAttributes|list<array<string, mixed>>>
+ * @phpstan-type PrettyNodeValue string|XmlAttributes|array<string, mixed>|list<array<string, mixed>|string>
+ * @phpstan-type PrettyNode array<string, PrettyNodeValue>
  */
 interface IFastXmlToArray
 {
@@ -20,7 +25,7 @@ interface IFastXmlToArray
      * @param string $seq index for child elements collection
      * @param string|null $encoding The document encoding or NULL
      * @param int $flags A bitmask of the LIBXML_* constants.
-     * @return array<string,string|array<string,string>>
+     * @return HierarchyNode
      */
     public static function convert(
         string $xmlText = '',
@@ -40,7 +45,7 @@ interface IFastXmlToArray
      * @param string $attr index for element attributes collection
      * @param string|null $encoding The document encoding or NULL
      * @param int $flags A bitmask of the LIBXML_* constants.
-     * @return array<string,string|array<string,string>>
+     * @return PrettyNode
      */
     public static function prettyPrint(
         string $xmlText = '',

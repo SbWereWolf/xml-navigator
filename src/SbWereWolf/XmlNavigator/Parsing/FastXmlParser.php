@@ -12,17 +12,20 @@ use XMLReader;
 
 /**
  * Static XML parser with callable to filter elements
+ *
+ * @phpstan-import-type HierarchyNode from \SbWereWolf\XmlNavigator\Convertation\IFastXmlToArray
+ * @phpstan-import-type PrettyNode from \SbWereWolf\XmlNavigator\Convertation\IFastXmlToArray
  */
 class FastXmlParser
 {
     /**
      * @param XMLReader $reader
-     * @param callable $detectElement
+     * @param callable(XMLReader):bool $detectElement
      * @param string $val
      * @param string $attr
      * @param string $name
      * @param string $seq
-     * @return Generator
+     * @return Generator<int, HierarchyNode>
      */
     public static function extractHierarchy(
         XMLReader $reader,
@@ -45,10 +48,10 @@ class FastXmlParser
 
     /**
      * @param XMLReader $reader
-     * @param callable $detectElement
+     * @param callable(XMLReader):bool $detectElement
      * @param string $val
      * @param string $attr
-     * @return Generator
+     * @return Generator<int, PrettyNode>
      */
     public static function extractPrettyPrint(
         XMLReader $reader,
@@ -67,7 +70,7 @@ class FastXmlParser
 
     /**
      * @param XMLReader $reader
-     * @param callable $detectElement
+     * @param callable(XMLReader):bool $detectElement
      *
      * @return bool
      */
@@ -78,7 +81,7 @@ class FastXmlParser
         do {
             if (
                 $reader->nodeType === XMLReader::ELEMENT
-                && (bool) $detectElement($reader)
+                && $detectElement($reader)
             ) {
                 return true;
             }
