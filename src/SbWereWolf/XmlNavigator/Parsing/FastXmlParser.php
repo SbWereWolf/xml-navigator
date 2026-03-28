@@ -85,5 +85,5 @@ class FastXmlParser
         } while ($reader->read());
 
         return false;
-   }
+    }
 }

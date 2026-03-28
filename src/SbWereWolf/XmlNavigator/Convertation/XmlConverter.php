@@ -9,7 +9,7 @@ use SbWereWolf\JsonSerializable\JsonSerializeTrait;
 use SbWereWolf\XmlNavigator\General\Notation;
 
 /**
- * Конвертор XML документа в PHP массив
+ * Конвертер XML документа в PHP массив
  */
 class XmlConverter implements IXmlConverter, JsonSerializable
 {

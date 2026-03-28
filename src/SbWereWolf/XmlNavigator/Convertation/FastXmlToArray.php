@@ -10,7 +10,7 @@ use SbWereWolf\XmlNavigator\Parsing\FastXmlParser;
 use XMLReader;
 
 /**
- * Статический конвертор XML документа в PHP массив
+ * Статический конвертер XML документа в PHP массив
  */
 class FastXmlToArray implements IFastXmlToArray
 {

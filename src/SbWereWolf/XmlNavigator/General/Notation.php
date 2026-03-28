@@ -10,18 +10,18 @@ namespace SbWereWolf\XmlNavigator\General;
 interface Notation
 {
     /** @var string Индекс Имени в нормализованном виде */
-    const NAME = 'n';
+    public const NAME = 'n';
     /** @var string Индекс Значения в нормализованном виде */
-    const VALUE = 'v';
+    public const VALUE = 'v';
     /** @var string Индекс Атрибутов в нормализованном виде */
-    const ATTRIBUTES = 'a';
+    public const ATTRIBUTES = 'a';
     /** @var string Индекс Последовательности вложенных элементов
      * в нормализованном виде
      */
-    const SEQUENCE = 's';
+    public const SEQUENCE = 's';
 
     /** @var string Индекс для Значения в формате pretty print */
-    const VAL = '@value';
+    public const VAL = '@value';
     /** @var string Индекс для Атрибутов в формате pretty print */
-    const ATTR = '@attributes';
+    public const ATTR = '@attributes';
 }
