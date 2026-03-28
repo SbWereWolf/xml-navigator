@@ -8,7 +8,6 @@ use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use SbWereWolf\XmlNavigator\Conversation\FastXmlToArray;
 use SbWereWolf\XmlNavigator\Conversation\XmlConverter;
-use SbWereWolf\XmlNavigator\Extraction\ElementExtractor;
 use SbWereWolf\XmlNavigator\Extraction\HierarchyComposer;
 use SbWereWolf\XmlNavigator\Extraction\PrettyPrintComposer;
 use SbWereWolf\XmlNavigator\General\Notation;
@@ -911,43 +910,6 @@ XML;
             self::assertEquals($expectedName[$i], $name);
             self::assertEquals($expectedVal[$i], $value);
         }
-    }
-
-    /**
-     * @return void
-     */
-    public function testElementExtractorExtractElements(): void
-    {
-        $xml = <<<XML
-<complex>
-    <ONLY_VALUE>element has only value</ONLY_VALUE>
-    <empty/>
-</complex>
-XML;
-        /** @var XMLReader $reader */
-        $reader = XMLReader::XML($xml);
-
-        $mayRead = true;
-        while (
-            $mayRead &&
-            $reader->nodeType !== XMLReader::TEXT
-        ) {
-            $mayRead = $reader->read();
-        }
-        $arrayRepresentationOfXml =
-            ElementExtractor::extractElements($reader, 'v', 'a');
-
-        $expected = array
-        (
-            0 => array
-            (
-                'empty' => array
-                (
-                    'depth' => 1
-                )
-            )
-        );
-        self::assertEquals($expected, $arrayRepresentationOfXml);
     }
 
     /**

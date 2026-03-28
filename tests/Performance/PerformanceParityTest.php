@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Performance;
 
-use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use SbWereWolf\XmlNavigator\Conversation\FastXmlToArray;
 use SbWereWolf\XmlNavigator\Conversation\XmlConverter;
@@ -14,12 +13,12 @@ use SbWereWolf\XmlNavigator\Navigation\XmlAttribute;
 use SbWereWolf\XmlNavigator\Navigation\XmlElement;
 use SbWereWolf\XmlNavigator\Parsing\FastXmlParser;
 use XMLReader;
+
 use function SbWereWolf\XmlNavigator\Bench\generateFixturePack;
 use function SbWereWolf\XmlNavigator\Bench\runAcceptanceBenchmark;
 
 require_once __DIR__ . '/BenchmarkSupport.php';
 
-#[CoversNothing]
 final class PerformanceParityTest extends TestCase
 {
     private const STRUCTURED_XML = <<<'XML'
@@ -197,7 +196,11 @@ XML;
 
     public function testXmlElementScalarParity(): void
     {
-        $xmlElement = new XmlElement(FastXmlToArray::convert(self::STRUCTURED_XML));
+        $xmlElement = new XmlElement(
+            FastXmlToArray::convert(
+                self::STRUCTURED_XML
+            )
+        );
 
         self::assertSame('doc', $xmlElement->name());
         self::assertSame('', $xmlElement->value());
@@ -206,7 +209,10 @@ XML;
 
         $attributes = $xmlElement->attributes();
         self::assertCount(2, $attributes);
-        self::assertContainsOnlyInstancesOf(XmlAttribute::class, $attributes);
+        self::assertContainsOnlyInstancesOf(
+            XmlAttribute::class,
+            $attributes
+        );
         self::assertSame('attrib', $attributes[0]->name());
         self::assertSame('a', $attributes[0]->value());
         self::assertSame('option', $attributes[1]->name());
@@ -216,7 +222,11 @@ XML;
 
     public function testXmlElementTraversalParity(): void
     {
-        $xmlElement = new XmlElement(FastXmlToArray::convert(self::STRUCTURED_XML));
+        $xmlElement = new XmlElement(
+            FastXmlToArray::convert(
+                self::STRUCTURED_XML
+            )
+        );
 
         self::assertTrue($xmlElement->hasElement('complex'));
 

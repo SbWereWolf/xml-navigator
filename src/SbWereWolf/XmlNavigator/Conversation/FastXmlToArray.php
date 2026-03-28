@@ -180,15 +180,12 @@ class FastXmlToArray implements IFastXmlToArray
         }
 
         if ($xmlText !== '') {
+            /** @var XMLReader $reader */
             $reader = @XMLReader::XML(
                 $xmlText,
                 $encoding,
                 $flags,
             );
-            if (!$reader instanceof XMLReader) {
-                throw self::buildParsingException($xmlText, '');
-            }
-
             return $reader;
         }
 
@@ -200,7 +197,7 @@ class FastXmlToArray implements IFastXmlToArray
         if (!$reader instanceof XMLReader) {
             throw new InvalidArgumentException(
                 'Unable to open XML source from URI `' . $xmlUri . '`.',
-                -670
+                -671
             );
         }
 

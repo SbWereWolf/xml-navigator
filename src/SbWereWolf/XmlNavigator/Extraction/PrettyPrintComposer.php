@@ -28,8 +28,10 @@ class PrettyPrintComposer implements Notation
         string $valueIndex = Notation::VAL,
         string $attributesIndex = Notation::ATTR
     ): array {
-        while ($reader->nodeType !==
-            XMLReader::ELEMENT && $reader->read()) {
+        while (
+            $reader->nodeType !== XMLReader::ELEMENT
+            && $reader->read()
+        ) {
         }
 
         if ($reader->nodeType !== XMLReader::ELEMENT) {
@@ -87,15 +89,10 @@ class PrettyPrintComposer implements Notation
                     $valueIndex,
                     $attributesIndex
                 );
-                $childName = key($child);
-                $childValue = current($child);
-                if (!is_string($childName)) {
-                    continue;
-                }
-                if (!is_string($childValue) && !is_array($childValue)) {
-                    continue;
-                }
-
+                /** @var string $childName */
+                $childName = array_key_first($child);
+                /** @var PrettyNodeValue $childValue */
+                $childValue = $child[$childName];
                 self::appendChild($children, $childName, $childValue);
                 continue;
             }
@@ -135,6 +132,7 @@ class PrettyPrintComposer implements Notation
     /**
      * @param PrettyChildren $target
      * @param PrettyNodeValue $childValue
+     * @param-out PrettyChildren $target
      */
     private static function appendChild(
         array &$target,

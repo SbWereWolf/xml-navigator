@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Integration;
 
-use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use SbWereWolf\XmlNavigator\Conversation\FastXmlToArray;
 use SbWereWolf\XmlNavigator\Conversation\XmlConverter;
@@ -20,7 +19,6 @@ use XMLReader;
 /**
  * Validates the executable examples shown in README.md.
  */
-#[CoversNothing]
 class ReadmeExamplesTest extends TestCase
 {
     private const FEED_XML =

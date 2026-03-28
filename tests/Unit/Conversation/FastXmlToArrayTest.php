@@ -2,21 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Unit\Convertation;
+namespace Unit\Conversation;
 
 use InvalidArgumentException;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 use SbWereWolf\XmlNavigator\Conversation\FastXmlToArray;
-use SbWereWolf\XmlNavigator\Extraction\HierarchyComposer;
-use SbWereWolf\XmlNavigator\Extraction\PrettyPrintComposer;
-use SbWereWolf\XmlNavigator\Parsing\FastXmlParser;
 
-#[CoversClass(FastXmlToArray::class)]
-#[UsesClass(FastXmlParser::class)]
-#[UsesClass(HierarchyComposer::class)]
-#[UsesClass(PrettyPrintComposer::class)]
 final class FastXmlToArrayTest extends TestCase
 {
     public function testConvertParsesXmlText(): void
@@ -31,13 +23,17 @@ final class FastXmlToArrayTest extends TestCase
                     ],
                 ],
             ],
-            FastXmlToArray::convert('<root><value>alpha</value></root>')
+            FastXmlToArray::convert(
+                '<root><value>alpha</value></root>'
+            )
         );
     }
 
     public function testPrettyPrintParsesXmlUri(): void
     {
-        $path = $this->createTempXmlFile('<root attr="x"><value>alpha</value></root>');
+        $path = $this->createTempXmlFile(
+            '<root attr="x"><value>alpha</value></root>'
+        );
 
         try {
             static::assertSame(
@@ -70,6 +66,14 @@ final class FastXmlToArrayTest extends TestCase
         }
     }
 
+    public function testConvertRejectsMissingXmlSource(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionCode(-667);
+
+        FastXmlToArray::convert();
+    }
+
     public function testPrettyPrintRejectsBothXmlTextAndXmlUri(): void
     {
         $path = $this->createTempXmlFile('<from-uri/>');
@@ -95,9 +99,36 @@ final class FastXmlToArrayTest extends TestCase
     public function testConvertRejectsUnreadableXmlUri(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionCode(-670);
+        $this->expectExceptionCode(-671);
 
         FastXmlToArray::convert('', '/definitely/missing.xml');
+    }
+
+    public function testPrettyPrintRejectsMalformedXmlUri(): void
+    {
+        $path = $this->createTempXmlFile('<broken>');
+
+        try {
+            $this->expectException(InvalidArgumentException::class);
+            $this->expectExceptionCode(-670);
+
+            FastXmlToArray::prettyPrint('', $path);
+        } finally {
+            @unlink($path);
+        }
+    }
+
+    public function testFormatLibxmlErrorsReturnsEmptyStringWhenNoErrorsExist(): void
+    {
+        libxml_clear_errors();
+
+        $method = new ReflectionMethod(
+            FastXmlToArray::class,
+            'formatLibxmlErrors'
+        );
+        $method->setAccessible(true);
+
+        static::assertSame('', $method->invoke(null));
     }
 
     private function createTempXmlFile(string $xml): string
