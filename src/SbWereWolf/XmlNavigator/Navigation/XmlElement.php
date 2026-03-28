@@ -8,13 +8,14 @@ use Generator;
 use InvalidArgumentException;
 use JsonSerializable;
 use SbWereWolf\JsonSerializable\JsonSerializeTrait;
+use SbWereWolf\XmlNavigator\Conversation\IFastXmlToArray;
 use SbWereWolf\XmlNavigator\General\Notation;
 
 /**
  * Объект для XML элемента
  *
- * @phpstan-import-type HierarchyNode from \SbWereWolf\XmlNavigator\Convertation\IFastXmlToArray
- * @phpstan-import-type XmlAttributes from \SbWereWolf\XmlNavigator\Convertation\IFastXmlToArray
+ * @phpstan-import-type HierarchyNode from IFastXmlToArray
+ * @phpstan-import-type XmlAttributes from IFastXmlToArray
  * @phpstan-consistent-constructor
  */
 class XmlElement implements IXmlElement, JsonSerializable

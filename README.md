@@ -75,7 +75,7 @@ Use this when you want to:
 
 ```php
 <?php
-use SbWereWolf\XmlNavigator\Convertation\FastXmlToArray;
+use SbWereWolf\XmlNavigator\Conversation\FastXmlToArray;
 
 $xml = '
 <feed generated_at="2026-03-28T09:00:00Z">
@@ -136,7 +136,7 @@ Use this when you want to:
 ```php
 <?php
 
-use SbWereWolf\XmlNavigator\Convertation\FastXmlToArray;
+use SbWereWolf\XmlNavigator\Conversation\FastXmlToArray;
 
 $xml = '
 <feed generated_at="2026-03-28T09:00:00Z">
@@ -265,7 +265,7 @@ a more convenient traversal API.
 ```php
 <?php
 
-use SbWereWolf\XmlNavigator\Convertation\FastXmlToArray;
+use SbWereWolf\XmlNavigator\Conversation\FastXmlToArray;
 use SbWereWolf\XmlNavigator\Navigation\IXmlAttribute;
 use SbWereWolf\XmlNavigator\Navigation\IXmlElement;
 use SbWereWolf\XmlNavigator\Navigation\XmlElement;
@@ -338,7 +338,7 @@ do not want library defaults leaking into the rest of the codebase.
 ```php
 <?php
 
-use SbWereWolf\XmlNavigator\Convertation\XmlConverter;
+use SbWereWolf\XmlNavigator\Conversation\XmlConverter;
 
 $converter = new XmlConverter(
     val: 'value',

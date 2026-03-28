@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SbWereWolf\XmlNavigator\Convertation;
+namespace SbWereWolf\XmlNavigator\Conversation;
 
 use JsonSerializable;
 use SbWereWolf\JsonSerializable\JsonSerializeTrait;

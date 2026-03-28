@@ -6,8 +6,8 @@ namespace SbWereWolf\XmlNavigator\Bench;
 
 use InvalidArgumentException;
 use RuntimeException;
-use SbWereWolf\XmlNavigator\Convertation\FastXmlToArray;
-use SbWereWolf\XmlNavigator\Convertation\XmlConverter;
+use SbWereWolf\XmlNavigator\Conversation\FastXmlToArray;
+use SbWereWolf\XmlNavigator\Conversation\XmlConverter;
 use SbWereWolf\XmlNavigator\Extraction\PrettyPrintComposer;
 use SbWereWolf\XmlNavigator\Navigation\XmlElement;
 use SbWereWolf\XmlNavigator\Parsing\FastXmlParser;

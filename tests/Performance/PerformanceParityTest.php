@@ -6,8 +6,8 @@ namespace Performance;
 
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
-use SbWereWolf\XmlNavigator\Convertation\FastXmlToArray;
-use SbWereWolf\XmlNavigator\Convertation\XmlConverter;
+use SbWereWolf\XmlNavigator\Conversation\FastXmlToArray;
+use SbWereWolf\XmlNavigator\Conversation\XmlConverter;
 use SbWereWolf\XmlNavigator\Extraction\HierarchyComposer;
 use SbWereWolf\XmlNavigator\Extraction\PrettyPrintComposer;
 use SbWereWolf\XmlNavigator\Navigation\XmlAttribute;

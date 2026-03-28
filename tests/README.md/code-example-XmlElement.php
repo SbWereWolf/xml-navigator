@@ -29,7 +29,7 @@ $xml = <<<XML
 </doc>
 XML;
 
-$content = \SbWereWolf\XmlNavigator\Convertation\FastXmlToArray
+$content = \SbWereWolf\XmlNavigator\Conversation\FastXmlToArray
     ::convert($xml);
 $navigator =
     new \SbWereWolf\XmlNavigator\Navigation\XmlElement($content);

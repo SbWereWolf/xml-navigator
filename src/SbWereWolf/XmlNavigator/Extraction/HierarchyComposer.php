@@ -8,9 +8,9 @@ use SbWereWolf\XmlNavigator\General\Notation;
 use XMLReader;
 
 /**
- * Статический конвертор XML элемента в PHP массив
+ * Статический конвертер XML элемента в PHP массив
  *
- * @phpstan-import-type HierarchyNode from \SbWereWolf\XmlNavigator\Convertation\IFastXmlToArray
+ * @phpstan-import-type HierarchyNode from \SbWereWolf\XmlNavigator\Conversation\IFastXmlToArray
  */
 class HierarchyComposer implements Notation
 {

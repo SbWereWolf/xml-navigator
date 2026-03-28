@@ -8,11 +8,11 @@ use SbWereWolf\XmlNavigator\General\Notation;
 use XMLReader;
 
 /**
- * Статический конвертор XML элемента в PHP массив
+ * Статический конвертер XML элемента в PHP массив
  *
- * @phpstan-import-type PrettyNode from \SbWereWolf\XmlNavigator\Convertation\IFastXmlToArray
- * @phpstan-import-type PrettyNodeValue from \SbWereWolf\XmlNavigator\Convertation\IFastXmlToArray
- * @phpstan-import-type XmlAttributes from \SbWereWolf\XmlNavigator\Convertation\IFastXmlToArray
+ * @phpstan-import-type PrettyNode from \SbWereWolf\XmlNavigator\Conversation\IFastXmlToArray
+ * @phpstan-import-type PrettyNodeValue from \SbWereWolf\XmlNavigator\Conversation\IFastXmlToArray
+ * @phpstan-import-type XmlAttributes from \SbWereWolf\XmlNavigator\Conversation\IFastXmlToArray
  * @phpstan-type PrettyChildren array<string, PrettyNodeValue>
  */
 class PrettyPrintComposer implements Notation
@@ -28,7 +28,8 @@ class PrettyPrintComposer implements Notation
         string $valueIndex = Notation::VAL,
         string $attributesIndex = Notation::ATTR
     ): array {
-        while ($reader->nodeType !== XMLReader::ELEMENT && $reader->read()) {
+        while ($reader->nodeType !==
+            XMLReader::ELEMENT && $reader->read()) {
         }
 
         if ($reader->nodeType !== XMLReader::ELEMENT) {

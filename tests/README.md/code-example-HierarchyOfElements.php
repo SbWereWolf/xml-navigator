@@ -22,7 +22,7 @@ $xml = <<<XML
 </ElemWithNestedElems>
 XML;
 
-$converter = new \SbWereWolf\XmlNavigator\Convertation\XmlConverter(
+$converter = new \SbWereWolf\XmlNavigator\Conversation\XmlConverter(
     val: 'value',
     attr: 'attributes',
     name: 'name',

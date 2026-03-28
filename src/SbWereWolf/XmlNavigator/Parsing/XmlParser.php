@@ -11,8 +11,8 @@ use XMLReader;
 /**
  * XML parser with callable to filter elements
  *
- * @phpstan-import-type HierarchyNode from \SbWereWolf\XmlNavigator\Convertation\IFastXmlToArray
- * @phpstan-import-type PrettyNode from \SbWereWolf\XmlNavigator\Convertation\IFastXmlToArray
+ * @phpstan-import-type HierarchyNode from \SbWereWolf\XmlNavigator\Conversation\IFastXmlToArray
+ * @phpstan-import-type PrettyNode from \SbWereWolf\XmlNavigator\Conversation\IFastXmlToArray
  */
 class XmlParser
 {

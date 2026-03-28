@@ -8,7 +8,7 @@ use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
-use SbWereWolf\XmlNavigator\Convertation\FastXmlToArray;
+use SbWereWolf\XmlNavigator\Conversation\FastXmlToArray;
 use SbWereWolf\XmlNavigator\Extraction\HierarchyComposer;
 use SbWereWolf\XmlNavigator\Extraction\PrettyPrintComposer;
 use SbWereWolf\XmlNavigator\Parsing\FastXmlParser;

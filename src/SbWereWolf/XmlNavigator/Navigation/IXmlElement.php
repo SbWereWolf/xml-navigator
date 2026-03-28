@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace SbWereWolf\XmlNavigator\Navigation;
 
 use Generator;
+use SbWereWolf\XmlNavigator\Conversation\IFastXmlToArray;
 
 /**
  * Интерфейс для объекта XML элемента
  *
- * @phpstan-import-type HierarchyNode from \SbWereWolf\XmlNavigator\Convertation\IFastXmlToArray
+ * @phpstan-import-type HierarchyNode from IFastXmlToArray
  */
 interface IXmlElement
 {

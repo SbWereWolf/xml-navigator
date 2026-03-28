@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SbWereWolf\XmlNavigator\Convertation;
+namespace SbWereWolf\XmlNavigator\Conversation;
 
 use InvalidArgumentException;
 use SbWereWolf\XmlNavigator\General\Notation;
