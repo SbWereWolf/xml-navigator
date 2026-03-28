@@ -21,6 +21,8 @@ class XmlElement implements IXmlElement, JsonSerializable
 {
     use JsonSerializeTrait;
 
+    private static bool $trustChildData = false;
+
     /** @var HierarchyNode Сериализуемое представление XML элемента */
     private array $data;
     /** @var string Индекс имени элемента */
@@ -37,7 +39,7 @@ class XmlElement implements IXmlElement, JsonSerializable
     private string $elementValue;
     /** @var XmlAttributes Атрибуты XML элемента */
     private array $attributesData;
-    /** @var list<HierarchyNode> Дочерние элементы */
+    /** @var list<array<string, mixed>> Дочерние элементы */
     private array $sequenceData;
 
     /**
@@ -59,12 +61,19 @@ class XmlElement implements IXmlElement, JsonSerializable
         $elementValue = $initial[$val] ?? '';
         $attributesData = $initial[$attr] ?? [];
         $sequenceData = $initial[$seq] ?? [];
+        $hasValidElementName = is_string($elementName);
+        $hasValidElementValue = is_string($elementValue);
+        $hasValidAttributes = self::isXmlAttributes($attributesData);
+        $hasValidSequence = self::isHierarchySequence($sequenceData);
 
         if (
-            !is_string($elementName)
-            || !is_string($elementValue)
-            || !self::isXmlAttributes($attributesData)
-            || !self::isHierarchySequence($sequenceData)
+            !self::$trustChildData
+            && (
+            !$hasValidElementName
+            || !$hasValidElementValue
+            || !$hasValidAttributes
+            || !$hasValidSequence
+            )
         ) {
             throw new InvalidArgumentException(
                 '$initial array MUST BE like' .
@@ -88,10 +97,10 @@ class XmlElement implements IXmlElement, JsonSerializable
         $this->attr = $attr;
         $this->seq = $seq;
         $this->data = $data;
-        $this->elementName = $elementName;
-        $this->elementValue = $elementValue;
-        $this->attributesData = $attributesData;
-        $this->sequenceData = $sequenceData;
+        $this->elementName = $hasValidElementName ? $elementName : '';
+        $this->elementValue = $hasValidElementValue ? $elementValue : '';
+        $this->attributesData = $hasValidAttributes ? $attributesData : [];
+        $this->sequenceData = $hasValidSequence ? $sequenceData : [];
     }
 
     /**
@@ -150,13 +159,19 @@ class XmlElement implements IXmlElement, JsonSerializable
 
             /** @var HierarchyNode $elem */
             $elem = $elem;
-            $result = new static(
-                $elem,
-                $this->name,
-                $this->val,
-                $this->attr,
-                $this->seq,
-            );
+
+            self::$trustChildData = true;
+            try {
+                $result = new static(
+                    $elem,
+                    $this->name,
+                    $this->val,
+                    $this->attr,
+                    $this->seq,
+                );
+            } finally {
+                self::$trustChildData = false;
+            }
 
             yield $result;
         }
