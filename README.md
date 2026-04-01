@@ -784,3 +784,14 @@ Docker-based PHPUnit runtime otherwise. The HTML report is written to
 
 For the high-level conversion API, exactly one XML source must be
 provided: use either `$xmlText` or `$xmlUri`, but not both.
+
+```
+Nicholas Volkhin
+e-mail ulfnew@gmail.com
+phone +7-902-272-65-35
+Telegram @sbwerewolf
+```
+
+- [Telegram chat with me](https://t.me/SbWereWolf)
+- [WhatsApp chat with me](https://wa.me/79022726535)
+- 
