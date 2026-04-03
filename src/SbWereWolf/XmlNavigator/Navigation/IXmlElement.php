@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace SbWereWolf\XmlNavigator\Navigation;
 
 use Generator;
-use SbWereWolf\XmlNavigator\Conversation\IFastXmlToArray;
+use SbWereWolf\XmlNavigator\Conversion\IFastXmlToArray;
 
 /**
  * Интерфейс для объекта XML элемента

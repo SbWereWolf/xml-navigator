@@ -10,7 +10,7 @@ use XMLReader;
 /**
  * Статический конвертер XML элемента в PHP массив
  *
- * @phpstan-import-type HierarchyNode from \SbWereWolf\XmlNavigator\Conversation\IFastXmlToArray
+ * @phpstan-import-type HierarchyNode from \SbWereWolf\XmlNavigator\Conversion\IFastXmlToArray
  */
 class HierarchyComposer implements Notation
 {

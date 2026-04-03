@@ -75,7 +75,7 @@ Use this when you want to:
 
 ```php
 <?php
-use SbWereWolf\XmlNavigator\Conversation\FastXmlToArray;
+use SbWereWolf\XmlNavigator\Conversion\FastXmlToArray;
 
 $xml = '
 <feed generated_at="2026-03-28T09:00:00Z">
@@ -136,7 +136,7 @@ Use this when you want to:
 ```php
 <?php
 
-use SbWereWolf\XmlNavigator\Conversation\FastXmlToArray;
+use SbWereWolf\XmlNavigator\Conversion\FastXmlToArray;
 
 $xml = '
 <feed generated_at="2026-03-28T09:00:00Z">
@@ -265,7 +265,7 @@ a more convenient traversal API.
 ```php
 <?php
 
-use SbWereWolf\XmlNavigator\Conversation\FastXmlToArray;
+use SbWereWolf\XmlNavigator\Conversion\FastXmlToArray;
 use SbWereWolf\XmlNavigator\Navigation\IXmlAttribute;
 use SbWereWolf\XmlNavigator\Navigation\IXmlElement;
 use SbWereWolf\XmlNavigator\Navigation\XmlElement;
@@ -338,7 +338,7 @@ do not want library defaults leaking into the rest of the codebase.
 ```php
 <?php
 
-use SbWereWolf\XmlNavigator\Conversation\XmlConverter;
+use SbWereWolf\XmlNavigator\Conversion\XmlConverter;
 
 $converter = new XmlConverter(
     val: 'value',
@@ -573,7 +573,7 @@ drop lower only when you actually need more control.
 
 ### Everyday API
 
-#### `SbWereWolf\XmlNavigator\Convertation\FastXmlToArray`
+#### `SbWereWolf\XmlNavigator\Conversion\FastXmlToArray`
 
 Static helpers for one-shot conversion.
 
@@ -588,7 +588,7 @@ Notes:
 - Pass XML either as `$xmlText` or as `$xmlUri`.
 - If both inputs are empty, the method throws `InvalidArgumentException`.
 
-#### `SbWereWolf\XmlNavigator\Convertation\XmlConverter`
+#### `SbWereWolf\XmlNavigator\Conversion\XmlConverter`
 
 Stateful converter with configurable key names.
 

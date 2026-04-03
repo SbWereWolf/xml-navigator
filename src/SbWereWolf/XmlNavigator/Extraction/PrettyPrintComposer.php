@@ -10,9 +10,9 @@ use XMLReader;
 /**
  * Статический конвертер XML элемента в PHP массив
  *
- * @phpstan-import-type PrettyNode from \SbWereWolf\XmlNavigator\Conversation\IFastXmlToArray
- * @phpstan-import-type PrettyNodeValue from \SbWereWolf\XmlNavigator\Conversation\IFastXmlToArray
- * @phpstan-import-type XmlAttributes from \SbWereWolf\XmlNavigator\Conversation\IFastXmlToArray
+ * @phpstan-import-type PrettyNode from \SbWereWolf\XmlNavigator\Conversion\IFastXmlToArray
+ * @phpstan-import-type PrettyNodeValue from \SbWereWolf\XmlNavigator\Conversion\IFastXmlToArray
+ * @phpstan-import-type XmlAttributes from \SbWereWolf\XmlNavigator\Conversion\IFastXmlToArray
  * @phpstan-type PrettyChildren array<string, PrettyNodeValue>
  */
 class PrettyPrintComposer implements Notation

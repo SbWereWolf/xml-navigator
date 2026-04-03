@@ -8,7 +8,7 @@ use Generator;
 use InvalidArgumentException;
 use JsonSerializable;
 use SbWereWolf\JsonSerializable\JsonSerializeTrait;
-use SbWereWolf\XmlNavigator\Conversation\IFastXmlToArray;
+use SbWereWolf\XmlNavigator\Conversion\IFastXmlToArray;
 use SbWereWolf\XmlNavigator\General\Notation;
 
 /**

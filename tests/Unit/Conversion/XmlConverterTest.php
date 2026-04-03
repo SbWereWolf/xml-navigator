@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Unit\Conversation;
+namespace Unit\Conversion;
 
 use PHPUnit\Framework\TestCase;
-use SbWereWolf\XmlNavigator\Conversation\XmlConverter;
+use SbWereWolf\XmlNavigator\Conversion\XmlConverter;
 
 final class XmlConverterTest extends TestCase
 {

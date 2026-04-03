@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Unit\Conversation;
+namespace Unit\Conversion;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
-use SbWereWolf\XmlNavigator\Conversation\FastXmlToArray;
+use SbWereWolf\XmlNavigator\Conversion\FastXmlToArray;
 
 final class FastXmlToArrayTest extends TestCase
 {

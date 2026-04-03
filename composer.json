@@ -1,6 +1,6 @@
 {
   "name": "sbwerewolf/xml-navigator",
-  "description": "Easy XML to PHP array conversion and fast XML streaming conversion",
+  "description": "Streaming-first PHP toolkit for extracting data from XML into plain arrays.",
   "type": "library",
   "license": "Apache-2.0",
   "authors": [
