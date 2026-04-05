@@ -1,71 +1,63 @@
 {
-    "name": "sbwerewolf/xml-navigator",
-    "description": "XmlExtractKit for PHP: stream large XML, extract selected nodes, and convert XML into plain arrays.",
-    "type": "library",
-    "license": "Apache-2.0",
-    "keywords": [
-        "php",
-        "xml",
-        "xmlreader",
-        "xml parser",
-        "xml to array",
-        "streaming parser",
-        "large xml",
-        "data extraction",
-        "etl",
-        "feed parser",
-        "soap",
-        "integration"
-    ],
-    "homepage": "https://github.com/SbWereWolf/xml-navigator",
-    "support": {
-        "issues": "https://github.com/SbWereWolf/xml-navigator/issues",
-        "source": "https://github.com/SbWereWolf/xml-navigator",
-        "docs": "https://github.com/SbWereWolf/xml-navigator/tree/main/docs"
-    },
-    "authors": [
-        {
-            "name": "Nicholas Volkhin",
-            "email": "ulfnew@gmail.com"
-        }
-    ],
-    "autoload": {
-        "psr-4": {
-            "SbWereWolf\\XmlNavigator\\": [
-                "src/SbWereWolf/XmlNavigator"
-            ]
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "SbWereWolf\\XmlNavigator\\Tests\\": "tests/"
-        }
-    },
-    "scripts": {
-        "test": "php ./vendor/phpunit/phpunit/phpunit --configuration ./continuous-integration/phpunit/phpunit.xml --testdox --colors=always",
-        "test-with-coverage": "bash ./continuous-integration/phpunit/run-with-coverage.sh",
-        "phpstan-check": "php ./vendor/bin/phpstan analyse -vvv --configuration continuous-integration/phpstan/phpstan.neon",
-        "phpstan-suppress": "php ./vendor/bin/phpstan analyse -vvv --configuration continuous-integration/phpstan/phpstan.neon --generate-baseline continuous-integration/phpstan/ignore-errors/baseline.neon",
-        "check-style": "php ./vendor/bin/phpcs --standard=continuous-integration/phpcs/phpcs.xml -v",
-        "fix-style": "php ./vendor/bin/phpcbf --standard=continuous-integration/phpcs/phpcs.xml -v"
-    },
-    "require-dev": {
-        "buggregator/trap": "^1.15",
-        "phpstan/extension-installer": "^1.4",
-        "phpstan/phpstan": "^2.1",
-        "phpstan/phpstan-strict-rules": "^2.0",
-        "phpunit/phpunit": "^13",
-        "squizlabs/php_codesniffer": "^4.0"
-    },
-    "require": {
-        "php": ">=8.4",
-        "ext-xmlreader": "*",
-        "ext-libxml": "*",
-        "sbwerewolf/json-serialize-trait": "^1"
-    },
-    "config": {
-        "allow-plugins": {
-            "phpstan/extension-installer": true
-        }
+  "name": "sbwerewolf/xml-navigator",
+  "description": "XmlExtractKit for PHP: Stream large XML, extract only what matters, and get plain PHP arrays.",
+  "type": "library",
+  "license": "Apache-2.0",
+  "keywords": [
+    "xml",
+    "xmlreader",
+    "xml-to-array",
+    "streaming",
+    "xml-extraction",
+    "etl",
+    "feed-parser",
+    "integration"
+  ],
+  "authors": [
+    {
+      "name": "Nicholas Volkhin",
+      "email": "ulfnew@gmail.com"
     }
+  ],
+  "autoload": {
+    "psr-4": {
+      "SbWereWolf\\XmlNavigator\\": [
+        "src/SbWereWolf/XmlNavigator"
+      ]
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "SbWereWolf\\XmlNavigator\\Test\\": [
+        "tests/"
+      ]
+    }
+  },
+  "scripts": {
+    "test": "php ./vendor/phpunit/phpunit/phpunit --configuration ./continuous-integration/phpunit/phpunit.xml --testdox --colors=always",
+    "test-coverage": "php -d xdebug.mode=coverage ./vendor/phpunit/phpunit/phpunit --configuration ./continuous-integration/phpunit/phpunit.xml --testdox --colors=always --coverage-html ./continuous-integration/autotests-coverage-report --coverage-filter ./src",
+    "phpstan-check": "php ./vendor/bin/phpstan analyse -vvv --configuration continuous-integration/phpstan/phpstan.neon",
+    "phpstan-suppress": "php ./vendor/bin/phpstan analyse -vvv --configuration continuous-integration/phpstan/phpstan.neon --generate-baseline continuous-integration/phpstan/ignore-errors/baseline.neon",
+    "check-style": "php ./vendor/bin/phpcs --standard=continuous-integration/phpcs/phpcs.xml -v",
+    "fix-style": "php ./vendor/bin/phpcbf --standard=continuous-integration/phpcs/phpcs.xml -v"
+  },
+  "require-dev": {
+    "buggregator/trap": "^1.15",
+    "phpstan/extension-installer": "^1.4",
+    "phpstan/phpstan": "^2.1",
+    "phpstan/phpstan-strict-rules": "^2.0",
+    "phpunit/phpunit": "^13",
+    "squizlabs/php_codesniffer": "^4.0"
+  },
+  "require": {
+    "php": ">=8.4",
+    "ext-xmlreader": "*",
+    "ext-libxml": "*",
+    "sbwerewolf/json-serialize-trait": "^1"
+  },
+  "config": {
+    "allow-plugins": {
+      "phpstan/extension-installer": true
+    }
+  }
 }

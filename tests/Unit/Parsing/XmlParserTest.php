@@ -6,15 +6,14 @@ namespace Unit\Parsing;
 
 use PHPUnit\Framework\TestCase;
 use SbWereWolf\XmlNavigator\Parsing\XmlParser;
+use SbWereWolf\XmlNavigator\Test\Support\XmlFixture;
+use XMLReader;
 
 final class XmlParserTest extends TestCase
 {
-    public function testExtractHierarchySupportsCustomNotationKeys(): void
+    public function testExtractHierarchyUsesConfiguredNotation(): void
     {
-        $reader = \XMLReader::XML(
-            '<dataset><row id="1"><value>alpha</value></row></dataset>'
-        );
-        static::assertInstanceOf(\XMLReader::class, $reader);
+        $reader = XmlFixture::readerFromFixture('stream-catalog.xml');
         $parser = new XmlParser(
             val: 'value',
             attr: 'attributes',
@@ -25,37 +24,131 @@ final class XmlParserTest extends TestCase
         $actual = iterator_to_array(
             $parser->extractHierarchy(
                 $reader,
-                static fn(\XMLReader $cursor): bool => $cursor->name === 'row'
+                static fn (XMLReader $cursor): bool => $cursor->name === 'offer'
             ),
             false
         );
 
-        static::assertSame(
+        $reader->close();
+
+        self::assertSame(
             [
                 [
-                    'name' => 'row',
+                    'name' => 'offer',
                     'attributes' => [
-                        'id' => '1',
+                        'id' => '1001',
+                        'available' => 'true',
                     ],
                     'children' => [
                         [
-                            'name' => 'value',
-                            'value' => 'alpha',
+                            'name' => 'name',
+                            'value' => 'Keyboard',
+                        ],
+                        [
+                            'name' => 'price',
+                            'value' => '49.90',
+                            'attributes' => [
+                                'currency' => 'USD',
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'name' => 'offer',
+                    'attributes' => [
+                        'id' => '1002',
+                        'available' => 'false',
+                    ],
+                    'children' => [
+                        [
+                            'name' => 'name',
+                            'value' => 'Mouse',
+                        ],
+                        [
+                            'name' => 'price',
+                            'value' => '19.90',
+                            'attributes' => [
+                                'currency' => 'USD',
+                            ],
                         ],
                     ],
                 ],
             ],
             $actual
         );
-        $reader->close();
     }
 
-    public function testExtractPrettyPrintSupportsCustomNotationKeys(): void
+    public function testExtractHierarchyReusesConfiguredParserAcrossReaders(): void
     {
-        $reader = \XMLReader::XML(
-            '<dataset><row id="1"><value>alpha</value></row></dataset>'
+        $parser = new XmlParser(
+            val: 'value',
+            attr: 'attributes',
+            name: 'name',
+            seq: 'children',
         );
-        static::assertInstanceOf(\XMLReader::class, $reader);
+
+        $firstReader = XmlFixture::readerFromFixture('stream-catalog.xml');
+        $secondReader = XmlFixture::readerFromFixture('stream-catalog.xml');
+
+        $first = iterator_to_array(
+            $parser->extractHierarchy(
+                $firstReader,
+                static fn (XMLReader $cursor): bool => $cursor->name === 'offer'
+            ),
+            false
+        );
+        $second = iterator_to_array(
+            $parser->extractHierarchy(
+                $secondReader,
+                static fn (XMLReader $cursor): bool => $cursor->name === 'service'
+            ),
+            false
+        );
+
+        $firstReader->close();
+        $secondReader->close();
+
+        self::assertCount(2, $first);
+        self::assertSame(
+            [
+                [
+                    'name' => 'service',
+                    'attributes' => [
+                        'id' => 's-1',
+                    ],
+                    'children' => [
+                        [
+                            'name' => 'name',
+                            'value' => 'Warranty',
+                        ],
+                    ],
+                ],
+            ],
+            $second
+        );
+    }
+
+    public function testExtractHierarchyReturnsEmptyWhenNoElementMatches(): void
+    {
+        $reader = XmlFixture::readerFromFixture('stream-catalog.xml');
+        $parser = new XmlParser();
+
+        $actual = iterator_to_array(
+            $parser->extractHierarchy(
+                $reader,
+                static fn (XMLReader $cursor): bool => $cursor->name === 'missing'
+            ),
+            false
+        );
+
+        $reader->close();
+
+        self::assertSame([], $actual);
+    }
+
+    public function testExtractPrettyPrintUsesConfiguredNotation(): void
+    {
+        $reader = XmlFixture::readerFromFixture('stream-catalog.xml');
         $parser = new XmlParser(
             val: 'value',
             attr: 'attributes',
@@ -64,25 +157,47 @@ final class XmlParserTest extends TestCase
         $actual = iterator_to_array(
             $parser->extractPrettyPrint(
                 $reader,
-                static fn(\XMLReader $cursor): bool =>
-                    $cursor->name === 'row'
+                static fn (XMLReader $cursor): bool => $cursor->name === 'offer'
             ),
             false
         );
 
-        static::assertSame(
+        $reader->close();
+
+        self::assertSame(
             [
                 [
-                    'row' => [
+                    'offer' => [
                         'attributes' => [
-                            'id' => '1',
+                            'id' => '1001',
+                            'available' => 'true',
                         ],
-                        'value' => 'alpha',
+                        'name' => 'Keyboard',
+                        'price' => [
+                            'value' => '49.90',
+                            'attributes' => [
+                                'currency' => 'USD',
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'offer' => [
+                        'attributes' => [
+                            'id' => '1002',
+                            'available' => 'false',
+                        ],
+                        'name' => 'Mouse',
+                        'price' => [
+                            'value' => '19.90',
+                            'attributes' => [
+                                'currency' => 'USD',
+                            ],
+                        ],
                     ],
                 ],
             ],
             $actual
         );
-        $reader->close();
     }
 }

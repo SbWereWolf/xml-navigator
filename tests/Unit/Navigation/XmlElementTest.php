@@ -4,11 +4,76 @@ declare(strict_types=1);
 
 namespace Unit\Navigation;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use SbWereWolf\XmlNavigator\Conversion\FastXmlToArray;
+use SbWereWolf\XmlNavigator\Navigation\XmlAttribute;
 use SbWereWolf\XmlNavigator\Navigation\XmlElement;
+use SbWereWolf\XmlNavigator\Test\Support\XmlFixture;
 
 final class XmlElementTest extends TestCase
 {
+    public function testHierarchyRoundtripProvidesStableAccessors(): void
+    {
+        $payload = FastXmlToArray::convert(
+            '',
+            XmlFixture::path('hierarchy-catalog.xml')
+        );
+        $element = new XmlElement($payload);
+
+        self::assertSame('catalog', $element->name());
+        self::assertSame('', $element->value());
+        self::assertFalse($element->hasValue());
+        self::assertTrue($element->hasAttribute());
+        self::assertTrue($element->hasAttribute('region'));
+        self::assertSame('eu', $element->get('region'));
+        self::assertSame('eu', $element->get());
+        self::assertTrue($element->hasElement());
+        self::assertTrue($element->hasElement('offer'));
+        self::assertCount(2, $element->elements('offer'));
+        self::assertSame($payload, $element->serialize());
+
+        $attributes = $element->attributes();
+        self::assertContainsOnlyInstancesOf(XmlAttribute::class, $attributes);
+        self::assertSame('region', $attributes[0]->name());
+        self::assertSame('eu', $attributes[0]->value());
+    }
+
+    public function testNestedElementsCanBePulledAndInspected(): void
+    {
+        $root = new XmlElement(
+            FastXmlToArray::convert(
+                '',
+                XmlFixture::path('hierarchy-catalog.xml')
+            )
+        );
+
+        $offer = $root->pull('offer')->current();
+
+        self::assertInstanceOf(XmlElement::class, $offer);
+        self::assertSame('offer', $offer->name());
+        self::assertSame('', $offer->value());
+        self::assertFalse($offer->hasValue());
+        self::assertTrue($offer->hasAttribute('id'));
+        self::assertSame('1001', $offer->get('id'));
+        self::assertTrue($offer->hasElement('name'));
+        self::assertTrue($offer->hasElement('price'));
+
+        $names = array_map(
+            static fn (XmlElement $element): string => $element->name(),
+            $offer->elements()
+        );
+
+        self::assertSame(['name', 'price', 'tag', 'tag'], $names);
+        self::assertSame(
+            ['office', 'usb'],
+            array_map(
+                static fn (XmlElement $tag): string => $tag->value(),
+                $offer->elements('tag')
+            )
+        );
+    }
+
     public function testMissingLookupsReturnStableNegativeResults(): void
     {
         $element = new XmlElement(
@@ -25,69 +90,11 @@ final class XmlElementTest extends TestCase
             ]
         );
 
-        static::assertFalse($element->hasAttribute('missing'));
-        static::assertSame('value', $element->get());
-        static::assertSame('', $element->get('missing'));
-        static::assertFalse($element->hasElement('missing'));
-        static::assertSame([], $element->elements('missing'));
-        static::assertSame(
-            [],
-            iterator_to_array($element->pull('missing'), false)
-        );
-    }
-
-    public function testSerializeRoundtripRemainsStable(): void
-    {
-        $payload = [
-            'n' => 'root',
-            'v' => 'value',
-            'a' => [
-                'id' => '42',
-            ],
-            's' => [
-                [
-                    'n' => 'child',
-                ],
-            ],
-        ];
-
-        $element = new XmlElement($payload);
-
-        static::assertSame($payload, $element->serialize());
-        static::assertSame('id', $element->attributes()[0]->name());
-        static::assertSame('42', $element->attributes()[0]->value());
-    }
-
-    public function testAccessorsWithoutExplicitNamesUseStoredData(): void
-    {
-        $element = new XmlElement(
-            [
-                'n' => 'root',
-                'v' => 'payload',
-                'a' => [
-                    'id' => '42',
-                    'lang' => 'ru',
-                ],
-                's' => [
-                    [
-                        'n' => 'first',
-                    ],
-                    [
-                        'n' => 'second',
-                        'v' => 'value',
-                    ],
-                ],
-            ]
-        );
-
-        static::assertSame('root', $element->name());
-        static::assertSame('payload', $element->value());
-        static::assertTrue($element->hasValue());
-        static::assertTrue($element->hasAttribute());
-        static::assertTrue($element->hasElement());
-        static::assertSame('42', $element->get());
-        static::assertCount(2, $element->elements());
-        static::assertCount(2, iterator_to_array($element->pull(), false));
+        self::assertFalse($element->hasAttribute('missing'));
+        self::assertSame('', $element->get('missing'));
+        self::assertFalse($element->hasElement('missing'));
+        self::assertSame([], $element->elements('missing'));
+        self::assertSame([], iterator_to_array($element->pull('missing'), false));
     }
 
     public function testGetWithoutNameReturnsEmptyStringWhenAttributesAreAbsent(): void
@@ -98,7 +105,9 @@ final class XmlElementTest extends TestCase
             ]
         );
 
-        static::assertSame('', $element->get());
+        self::assertSame('', $element->get());
+        self::assertFalse($element->hasAttribute());
+        self::assertFalse($element->hasElement());
     }
 
     public function testConstructorRejectsInvalidPayloadShapes(): void
@@ -140,11 +149,9 @@ final class XmlElementTest extends TestCase
         foreach ($invalidPayloads as $payload) {
             try {
                 new XmlElement($payload);
-                static::fail(
-                    'Expected InvalidArgumentException was not thrown.'
-                );
-            } catch (\InvalidArgumentException $exception) {
-                static::assertSame(-666, $exception->getCode());
+                self::fail('Expected InvalidArgumentException was not thrown.');
+            } catch (InvalidArgumentException $exception) {
+                self::assertSame(-666, $exception->getCode());
             }
         }
     }

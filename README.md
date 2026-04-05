@@ -1,344 +1,164 @@
 # XmlExtractKit
 
+[![Packagist Version](https://img.shields.io/packagist/v/sbwerewolf/xml-navigator?label=packagist)](https://packagist.org/packages/sbwerewolf/xml-navigator)
+[![Packagist Downloads](https://img.shields.io/packagist/dt/sbwerewolf/xml-navigator)](https://packagist.org/packages/sbwerewolf/xml-navigator)
+[![PHP 8.4+](https://img.shields.io/badge/PHP-8.4%2B-777BB4)](https://www.php.net/)
+[![Static Analysis](https://github.com/SbWereWolf/xml-navigator/actions/workflows/static-analysis.yml/badge.svg)](https://github.com/SbWereWolf/xml-navigator/actions/workflows/static-analysis.yml)
+[![Test Coverage](https://codecov.io/github/SbWereWolf/xml-navigator/graph/badge.svg)](https://codecov.io/github/SbWereWolf/xml-navigator)
+
+**XmlExtractKit for PHP: Stream large XML, extract only what matters,
+and get plain PHP arrays.**
+
+```text
+large XML → selected nodes → plain PHP arrays
+```
+
 ## Installation
 
 ```bash
 composer require sbwerewolf/xml-navigator
 ```
 
-## What is this?
+For local test and coverage dependencies on a standard PHP 8.4 setup,
+see [`tests/ENVIRONMENT.md`](tests/ENVIRONMENT.md).
 
-A small PHP library for three boring but common XML jobs:
+## Why this package?
+
+XmlExtractKit is built for the boring XML jobs that show up in real
+systems:
 
 - convert XML into native PHP arrays;
 - stream huge XML files and extract only the elements you need;
-- emit JSON-friendly structures without hand-written normalization.
+- keep application code working with plain arrays instead of
+  cursor-level `XMLReader` logic.
 
-If you are integrating feeds, imports, partner exports, SOAP-ish 
-payloads, or other legacy XML, this package is meant to remove glue 
-code rather than introduce a new abstraction layer.
+Use it for feeds, partner exports, imports, SOAP-ish payloads,
+marketplace catalogs, ETL pipelines, and other legacy XML integrations.
 
-It is built on top of `XMLReader`, so it can work with very large 
-documents without loading the whole file into memory.
+## Core workflow
 
-## What it is good at
-
-### 1) Turn arbitrary XML into PHP arrays
-
-Use it when you need a plain array now, not an object tree, DOM 
-traversal, or custom recursive code.
-
-### 2) Stream large XML files
-
-Use it when the file is too large to load comfortably and you only 
-care about specific nodes such as `<offer>`, `<item>`, or `<row>`.
-
-### 3) Produce JSON-friendly output
-
-Use `prettyPrint()` when the result is going to logs, APIs, debug 
-dumps, or a queue payload.
-
-## What it is not trying to be
-
-This package is not a full XML query language, schema validator, 
-or XML editor.
-It is focused on **read, extract, and convert**.
-
-Requirements:
-
-- PHP `>= 8.4`
-- `ext-xmlreader`
-- `ext-libxml`
-
-## Start with the highest-level API
-
-Most projects only need one of these entry points:
-
-- `FastXmlToArray::prettyPrint()` — readable, JSON-friendly output
-- `FastXmlToArray::convert()` — normalized hierarchy for traversal
-- `FastXmlParser::extractPrettyPrint()` — stream matching elements as readable arrays
-- `FastXmlParser::extractHierarchy()` — stream matching elements as normalized arrays
-
-Everything else in the package exists to support more custom or 
-lower-level workflows.
-
-## Choose your output format
-
-### `prettyPrint()`: readable output for application code and JSON
-
-Use this when you want to:
-
-- inspect the result easily;
-- serialize it to JSON;
-- keep repeated child tags grouped as arrays;
-- move XML data into regular PHP or HTTP code quickly.
+Open large XML with `XMLReader`, select matching nodes, receive plain
+PHP arrays.
 
 ```php
-<?php
-use SbWereWolf\XmlNavigator\Conversion\FastXmlToArray;
+use SbWereWolf\XmlNavigator\Parsing\FastXmlParser;
 
-$xml = '
-<feed generated_at="2026-03-28T09:00:00Z">
-  <offer id="206111" available="true">
-    <name>USB-C Dock</name>
-    <price currency="USD">129.90</price>
-    <picture>https://cdn.example.test/1.jpg</picture>
-    <picture>https://cdn.example.test/2.jpg</picture>
+require_once __DIR__ . '/vendor/autoload.php';
+
+$uri = tempnam(sys_get_temp_dir(), 'xml-extract-kit-');
+file_put_contents(
+    $uri,
+    <<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog generated_at="2026-04-05T10:00:00Z">
+  <offer id="1001" available="true">
+    <name>Keyboard</name>
+    <price currency="USD">49.90</price>
   </offer>
-</feed>
-';
-
-$result = FastXmlToArray::prettyPrint($xml);
-
-echo json_encode(
-    $result,
-    JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+  <service id="s-1">
+    <name>Warranty</name>
+  </service>
+  <offer id="1002" available="false">
+    <name>Mouse</name>
+    <price currency="USD">19.90</price>
+  </offer>
+</catalog>
+XML
 );
-```
 
-Output:
-
-```json
-{
-  "feed": {
-    "@attributes": {
-      "generated_at": "2026-03-28T09:00:00Z"
-    },
-    "offer": {
-      "@attributes": {
-        "id": "206111",
-        "available": "true"
-      },
-      "name": "USB-C Dock",
-      "price": {
-        "@value": "129.90",
-        "@attributes": {
-          "currency": "USD"
-        }
-      },
-      "picture": [
-        "https://cdn.example.test/1.jpg",
-        "https://cdn.example.test/2.jpg"
-      ]
-    }
-  }
+$reader = XMLReader::open($uri);
+foreach (
+    FastXmlParser::extractHierarchy(
+        $reader,
+        static fn(XMLReader $cursor): bool =>
+            $cursor->nodeType === XMLReader::ELEMENT
+            && $cursor->name === 'offer'
+    ) as $offer
+) {
+    var_export($offer);
+    echo PHP_EOL;
 }
-```
+$reader->close();
 
-### `convert()`: normalized hierarchy for traversal and wrappers
-
-Use this when you want to:
-
-- traverse XML in a predictable structure;
-- keep name, value, attributes, and children explicit;
-- wrap the result in `XmlElement` later.
-
-```php
-<?php
-
-use SbWereWolf\XmlNavigator\Conversion\FastXmlToArray;
-
-$xml = '
-<feed generated_at="2026-03-28T09:00:00Z">
-  <offer id="206111" available="true">
-    <name>USB-C Dock</name>
-    <price currency="USD">129.90</price>
-    <picture>https://cdn.example.test/1.jpg</picture>
-    <picture>https://cdn.example.test/2.jpg</picture>
-  </offer>
-</feed>
-';
-
-$result = FastXmlToArray::convert($xml);
-
-var_export($result);
+unlink($uri);
 ```
 
 Output:
 
 ```php
 array (
-  'n' => 'feed',
+  'n' => 'offer',
   'a' =>
   array (
-    'generated_at' => '2026-03-28T09:00:00Z',
+    'id' => '1001',
+    'available' => 'true',
   ),
   's' =>
   array (
     0 =>
     array (
-      'n' => 'offer',
+      'n' => 'name',
+      'v' => 'Keyboard',
+    ),
+    1 =>
+    array (
+      'n' => 'price',
+      'v' => '49.90',
       'a' =>
       array (
-        'id' => '206111',
-        'available' => 'true',
+        'currency' => 'USD',
       ),
-      's' =>
+    ),
+  ),
+)
+array (
+  'n' => 'offer',
+  'a' =>
+  array (
+    'id' => '1002',
+    'available' => 'false',
+  ),
+  's' =>
+  array (
+    0 =>
+    array (
+      'n' => 'name',
+      'v' => 'Mouse',
+    ),
+    1 =>
+    array (
+      'n' => 'price',
+      'v' => '19.90',
+      'a' =>
       array (
-        0 =>
-        array (
-          'n' => 'name',
-          'v' => 'USB-C Dock',
-        ),
-        1 =>
-        array (
-          'n' => 'price',
-          'v' => '129.90',
-          'a' =>
-          array (
-            'currency' => 'USD',
-          ),
-        ),
-        2 =>
-        array (
-          'n' => 'picture',
-          'v' => 'https://cdn.example.test/1.jpg',
-        ),
-        3 =>
-        array (
-          'n' => 'picture',
-          'v' => 'https://cdn.example.test/2.jpg',
-        ),
+        'currency' => 'USD',
       ),
     ),
   ),
 )
 ```
 
-## Stream large XML files
+## Index
+- [Turn XML into arrays with custom keys](#turn-xml-into-arrays-with-custom-keys)
+- [Extract only the needed elements from large XML without loading the whole document](#extract-only-the-needed-elements-from-large-xml-without-loading-the-whole-document)
+- [Convert XML to a traversable array and walk it with `XmlElement`](#convert-xml-to-a-traversable-array-and-walk-it-with-xmlelement)
+- [Practical notes](#practical-notes)
+- [Detailed documentation](#detailed-documentation)
+- [Common use cases](#common-use-cases)
+- [Pick your entry point](#pick-your-entry-point)
+- [Contacts](#contacts)
 
-This is the performance-oriented part of the package.
+## Working examples
 
-When you already have an `XMLReader`, you can extract only the
-nodes you care about and process them one by one.
-That keeps memory use stable even when the source file is large.
+### Turn XML into arrays with custom keys
 
-```php
-<?php
-
-use SbWereWolf\XmlNavigator\Parsing\FastXmlParser;
-
-$file = fopen('catalog.xml', 'w');
-fwrite(
-    $file,
-'
-<catalog>
-    <offer id="1001" available="true">
-      <name>Keyboard</name>
-      <price currency="USD">49.90</price>
-    </offer>
-    <service id="x1">
-        <name>Warranty</name>
-    </service>
-    <offer id="1002" available="false">
-      <name>Mouse</name>
-      <price currency="USD">19.90</price>
-    </offer>
-</catalog>
-'
-);
-fclose($file);
-
-$reader = XMLReader::open('catalog.xml');
-
-$offers = FastXmlParser::extractPrettyPrint(
-    $reader,
-    static fn (XMLReader $cursor): bool => $cursor->name === 'offer'
-);
-
-foreach ($offers as $offer) {
-    echo json_encode($offer, JSON_PRETTY_PRINT) . PHP_EOL;
-}
-
-$reader->close();
-```
-
-`FastXmlParser::extractHierarchy()` works the same way, but yields 
-normalized arrays instead of pretty-print arrays.
-
-## Navigate normalized XML with `XmlElement`
-
-`XmlElement` is a thin wrapper over the normalized hierarchy.
-Use it when arrays are still the right storage format, but you want 
-a more convenient traversal API.
+Use `XmlConverter` when your project already has its own internal
+array contract and you want hierarchy output with your own key names.
 
 ```php
-<?php
-
-use SbWereWolf\XmlNavigator\Conversion\FastXmlToArray;
-use SbWereWolf\XmlNavigator\Navigation\IXmlAttribute;
-use SbWereWolf\XmlNavigator\Navigation\IXmlElement;
-use SbWereWolf\XmlNavigator\Navigation\XmlElement;
-
-$xml = '
-<catalog region="eu">
-  <offer id="1001" available="true">
-    <name>Keyboard</name>
-    <tag>office</tag>
-    <tag>usb</tag>
-  </offer>
-  <offer id="1002" available="false" />
-</catalog>';
-
-$root = new XmlElement(FastXmlToArray::convert($xml));
-$offer = $root->pull('offer')->current();
-
-echo $root->name() . PHP_EOL; // catalog
-echo $root->get('region') . PHP_EOL; // eu
-echo ($root->hasElement('offer') ? 'yes' : 'no') . PHP_EOL; // yes
-
-foreach ($offer->attributes() as $attribute) {
-    /** @var IXmlAttribute $attribute */
-    echo $attribute->name() . '=' . $attribute->value() . PHP_EOL;
-}
-// id=1001
-// available=true
-
-$tagValues = array_map(
-    static fn (IXmlElement $tag): string => $tag->value(),
-    $offer->elements('tag')
-);
-
-var_export($tagValues);
-/*
- array (
-  0 => 'office',
-  1 => 'usb',
-)
-*/
-
-$snapshot = $offer->serialize();
-$restored = new XmlElement($snapshot);
-
-echo $restored->get('id') . PHP_EOL; // 1001
-```
-
-Output:
-
-```text
-catalog
-eu
-yes
-id=1001
-available=true
-array (
-  0 => 'office',
-  1 => 'usb',
-)
-1001
-```
-
-## Customize key names with `XmlConverter`
-
-Use `XmlConverter` when you want the same conversion logic but need 
-your own notation.
-This is useful when you already have an internal array contract and 
-do not want library defaults leaking into the rest of the codebase.
-
-```php
-<?php
-
 use SbWereWolf\XmlNavigator\Conversion\XmlConverter;
+
+require_once __DIR__ . '/vendor/autoload.php';
 
 $converter = new XmlConverter(
     val: 'value',
@@ -347,32 +167,16 @@ $converter = new XmlConverter(
     seq: 'children',
 );
 
-$pretty = $converter->toPrettyPrint(
-    '<price currency="USD">129.90</price>'
-);
-
 $hierarchy = $converter->toHierarchyOfElements(
     '<price currency="USD">129.90</price>'
 );
 
-var_export($pretty);
-echo PHP_EOL;
 var_export($hierarchy);
 ```
 
 Output:
 
 ```php
-array (
-  'price' =>
-  array (
-    'value' => '129.90',
-    'attributes' =>
-    array (
-      'currency' => 'USD',
-    ),
-  ),
-)
 array (
   'name' => 'price',
   'value' => '129.90',
@@ -383,407 +187,176 @@ array (
 )
 ```
 
-## Reuse your notation in a stream with `XmlParser`
+### Extract only the needed elements from large XML without loading the whole document
 
-`XmlParser` is the object-oriented wrapper around `FastXmlParser`.
-Use it when you want to configure notation once and then reuse the 
-parser in several places.
-
-```php
-<?php
-
-use SbWereWolf\XmlNavigator\Parsing\XmlParser;
-
-$reader = XMLReader::XML(
-'
-<dataset>
-  <row id="1">
-    <value>alpha</value>
-  </row>
-  <row id="2" />
-</dataset>'
-);
-
-$parser = new XmlParser(
-    val: 'value',
-    attr: 'attributes',
-    name: 'name',
-    seq: 'children',
-);
-
-$rows = iterator_to_array(
-    $parser->extractHierarchy(
-        $reader,
-        static fn (XMLReader $cursor): bool => $cursor->name === 'row'
-    ),
-    false
-);
-
-var_export($rows);
-```
-
-Output:
+Use `FastXmlParser` on top of `XMLReader` when the file is large and
+only some nodes matter.
 
 ```php
-array (
-  0 =>
-  array (
-    'name' => 'row',
-    'attributes' =>
-    array (
-      'id' => '1',
-    ),
-    'children' =>
-    array (
-      0 =>
-      array (
-        'name' => 'value',
-        'value' => 'alpha',
-      ),
-    ),
-  ),
-  1 =>
-  array (
-    'name' => 'row',
-    'attributes' =>
-    array (
-      'id' => '2',
-    ),
-  ),
-)
-```
+use SbWereWolf\XmlNavigator\Parsing\FastXmlParser;
 
-## Compose the current XML node with low-level composers
+require_once __DIR__ . '/vendor/autoload.php';
 
-If you already control the `XMLReader` cursor, 
-you can compose just the current node.
-This is the lower-level API for custom streaming workflows.
-
-```php
-<?php
-
-use SbWereWolf\XmlNavigator\Extraction\HierarchyComposer;
-use SbWereWolf\XmlNavigator\Extraction\PrettyPrintComposer;
-
-$xml = '
-<root>
-  <offer id="1">
+$uri = tempnam(sys_get_temp_dir(), 'xml-extract-kit-');
+file_put_contents(
+    $uri,
+    <<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog>
+  <offer id="1001">
     <name>Keyboard</name>
+    <price>49.90</price>
   </offer>
-  <offer id="2">
+  <service id="s-1">
+    <name>Warranty</name>
+  </service>
+  <offer id="1002">
     <name>Mouse</name>
+    <price>19.90</price>
   </offer>
-</root>
-';
+</catalog>
+XML
+);
 
-$prettyReader = XMLReader::XML($xml);
-while (
-    $prettyReader->read()
-    && !(
-        $prettyReader->nodeType === XMLReader::ELEMENT
-        && $prettyReader->name === 'offer'
-        && $prettyReader->getAttribute('id') === '2'
-    )
-) {
+$reader = XMLReader::open($uri);
+
+$offers = FastXmlParser::extractHierarchy(
+    $reader,
+    static fn(XMLReader $cursor):
+    bool => $cursor->nodeType === XMLReader::ELEMENT
+        && $cursor->name === 'offer'
+);
+
+$reader->close();
+unlink($uri);
+
+foreach ($offers as $offer) {
+    var_export($offer);
+    echo PHP_EOL;
 }
+```
 
-$pretty = PrettyPrintComposer::compose($prettyReader);
-var_export($pretty);
-/*
-array (
-  'offer' =>
-  array (
-    '@attributes' =>
-    array (
-      'id' => '2',
-    ),
-    'name' => 'Mouse',
-  ),
-)
- */
+### Convert XML to a traversable array and walk it with `XmlElement`
+
+Use `FastXmlToArray::convert()` when you want a stable normalized
+structure, then wrap it with `XmlElement` for convenient traversal.
+
+```php
+use SbWereWolf\XmlNavigator\Conversion\FastXmlToArray;
+use SbWereWolf\XmlNavigator\Navigation\XmlElement;
+
+require_once __DIR__ . '/vendor/autoload.php';
+
+$xml = <<<'XML'
+<catalog region="eu">
+  <offer id="1001" available="true">
+    <name>Keyboard</name>
+    <tag>office</tag>
+    <tag>usb</tag>
+  </offer>
+</catalog>
+XML;
+
+$root = new XmlElement(FastXmlToArray::convert($xml));
+$offer = $root->pull('offer')->current();
+
+echo $root->name() . PHP_EOL;                // catalog
+echo $root->get('region') . PHP_EOL;         // eu
+echo ($root->hasElement('offer') ? 'yes' : 'no') . PHP_EOL; // yes
+
 echo PHP_EOL;
-
-$hierarchyReader = XMLReader::XML($xml);
-while (
-    $hierarchyReader->read()
-    && !(
-        $hierarchyReader->nodeType === XMLReader::ELEMENT
-        && $hierarchyReader->name === 'offer'
-        && $hierarchyReader->getAttribute('id') === '2'
-    )
-) {
+echo 'offer attributes:' . PHP_EOL;
+foreach ($offer->attributes() as $attribute) {
+    echo $attribute->name() . '=' . $attribute->value() . PHP_EOL;
 }
 
-$hierarchy = HierarchyComposer::compose($hierarchyReader);
-var_export($hierarchy);
-/*
-array (
-  'n' => 'offer',
-  'a' =>
-  array (
-    'id' => '2',
-  ),
-  's' =>
-  array (
-    0 =>
-    array (
-      'n' => 'name',
-      'v' => 'Mouse',
-    ),
-  ),
-)
-*/
+echo PHP_EOL;
+echo 'offer elements with name `tag`:' . PHP_EOL;
+$tagValues = array_map(
+    static fn (XmlElement $tag): string => $tag->value(),
+    $offer->elements('tag')
+);
+
+var_export($tagValues);
 ```
 
 Output:
 
-```php
+```text
+catalog
+eu
+yes
+
+offer attributes:
+id=1001
+available=true
+
+value of offer elements with name `tag`:
 array (
-  'offer' =>
-  array (
-    '@attributes' =>
-    array (
-      'id' => '2',
-    ),
-    'name' => 'Mouse',
-  ),
-)
-array (
-  'n' => 'offer',
-  'a' =>
-  array (
-    'id' => '2',
-  ),
-  's' =>
-  array (
-    0 =>
-    array (
-      'n' => 'name',
-      'v' => 'Mouse',
-    ),
-  ),
+  0 => 'office',
+  1 => 'usb',
 )
 ```
-
-## Public API reference
-
-This section lists the full public surface of the package.
-The order is intentional: start from the top, 
-drop lower only when you actually need more control.
-
-### Everyday API
-
-#### `SbWereWolf\XmlNavigator\Conversion\FastXmlToArray`
-
-Static helpers for one-shot conversion.
-
-- `convert(string $xmlText = '', string $xmlUri = '', string $val = 'v', string $attr = 'a', string $name = 'n', string $seq = 's', ?string $encoding = null, int $flags = LIBXML_BIGLINES | LIBXML_COMPACT): array`  
-  Convert XML into the normalized hierarchy format.
-
-- `prettyPrint(string $xmlText = '', string $xmlUri = '', string $val = '@value', string $attr = '@attributes', ?string $encoding = null, int $flags = LIBXML_BIGLINES | LIBXML_COMPACT): array`  
-  Convert XML into the readable, JSON-friendly format.
-
-Notes:
-
-- Pass XML either as `$xmlText` or as `$xmlUri`.
-- If both inputs are empty, the method throws `InvalidArgumentException`.
-
-#### `SbWereWolf\XmlNavigator\Conversion\XmlConverter`
-
-Stateful converter with configurable key names.
-
-- `__construct(string $val = 'v', string $attr = 'a', string $name = 'n', string $seq = 's', ?string $encoding = null, int $flags = LIBXML_BIGLINES | LIBXML_COMPACT)`  
-  Configure the key names and parser options used by the instance.
-
-- `toPrettyPrint(string $xmlText = '', string $xmlUri = ''): array`  
-  Convert XML into the readable format using the instance notation.
-
-- `toHierarchyOfElements(string $xmlText = '', string $xmlUri = ''): array`  
-  Convert XML into the normalized format using the instance notation.
-
-- `jsonSerialize(): mixed`  
-  Available because the class implements `JsonSerializable` 
-  through the external package `sbwerewolf/json-serialize-trait`.
-
-Behavior note: the instance caches the last processed XML input and 
-reuses the cached result when the next call uses the same source.
-
-#### `SbWereWolf\XmlNavigator\Parsing\FastXmlParser`
-
-Static streaming parser for `XMLReader`.
-
-- `extractHierarchy(XMLReader $reader, callable $detectElement, string $val = 'v', string $attr = 'a', string $name = 'n', string $seq = 's'): Generator`  
-  Yield matching elements in normalized hierarchy format.
-
-- `extractPrettyPrint(XMLReader $reader, callable $detectElement, string $val = '@value', string $attr = '@attributes'): Generator`  
-  Yield matching elements in readable format.
-
-The callback receives the current `XMLReader` cursor and
-should return `true` for nodes that should be extracted.
-
-#### `SbWereWolf\XmlNavigator\Parsing\XmlParser`
-
-Object-oriented wrapper around `FastXmlParser`.
-
-- `__construct(string $val = 'v', string $attr = 'a', string $name = 'n', string $seq = 's')`  
-  Configure the notation once.
-
-- `extractHierarchy(XMLReader $reader, callable $detectElement): Generator`  
-  Yield matching elements in normalized hierarchy format.
-
-- `extractPrettyPrint(XMLReader $reader, callable $detectElement): Generator`  
-  Yield matching elements in readable format.
-
-#### `SbWereWolf\XmlNavigator\Navigation\XmlElement`
-
-Navigation helper for normalized XML arrays.
-
-- `__construct(array $initial, string $name = 'n', string $val = 'v', string $attr = 'a', string $seq = 's')`  
-  Wrap a normalized XML element array. 
-  Throws `InvalidArgumentException` if the array does not follow 
-  the expected shape.
-
-- `name(): string`  
-  Return the element name.
-
-- `hasValue(): bool`  
-  Return `true` when the element has direct text content.
-
-- `value(): string`  
-  Return the direct text content, or an empty string.
-
-- `hasAttribute(string $name = ''): bool`  
-  Check whether the element has any attribute, or a specific attribute.
-
-- `attributes(): array`  
-  Return all attributes as `XmlAttribute[]`.
-
-- `get(string $name = ''): string`  
-  Return the value of a named attribute. If no name is passed, return 
-  the first attribute value or an empty string.
-
-- `hasElement(string $name = ''): bool`  
-  Check whether the element has any child element, or a child element 
-  with a specific name.
-
-- `elements(string $name = ''): array`  
-  Return child elements as `XmlElement[]`. When a name is provided, 
-  return only matching children.
-
-- `pull(string $name = ''): Generator`  
-  Lazily yield child elements as `XmlElement` objects. When a name is 
-  provided, yield only matching children.
-
-- `serialize(): array`  
-  Return the normalized array snapshot used to restore the same 
-  `XmlElement` later.
-
-- `jsonSerialize(): mixed`  
-  Available because the class implements `JsonSerializable` through 
-  the external package `sbwerewolf/json-serialize-trait`.
-
-#### `SbWereWolf\XmlNavigator\Navigation\XmlAttribute`
-
-Value object for one attribute.
-
-- `__construct(string $name, string $value)`  
-  Create an attribute object.
-
-- `name(): string`  
-  Return the attribute name.
-
-- `value(): string`  
-  Return the attribute value.
-
-- `jsonSerialize(): mixed`  
-  Available because the class implements `JsonSerializable` through 
-  the external package `sbwerewolf/json-serialize-trait`.
-
-### Advanced building blocks
-
-#### `SbWereWolf\XmlNavigator\Extraction\PrettyPrintComposer`
-
-- `compose(XMLReader $reader, string $valueIndex = '@value', string $attributesIndex = '@attributes'): array`  
-  Compose the current element under the reader into the readable format. 
-  If the reader is not currently on an element node, 
-  it advances until it finds one. If no element is found, 
-  it returns an empty array.
-
-#### `SbWereWolf\XmlNavigator\Extraction\HierarchyComposer`
-
-- `compose(XMLReader $reader, string $valueIndex = 'v', string $attributesIndex = 'a', string $nameIndex = 'n', string $elementsIndex = 's'): array`  
-  Compose the current element under the reader into the normalized 
-  hierarchy format. If the reader is not currently on an element node,
-  it advances until it finds one. If no element is found, 
-  it returns an empty array.
-
-#### `SbWereWolf\XmlNavigator\Extraction\ElementExtractor`
-
-Low-level internal-style helper used to extract XML element events 
-with depth metadata.
-
-- `extractElements(XMLReader $reader, string $valueIndex, string $attributesIndex): array`  
-  Return a flat list of extracted element fragments that still contain 
-  depth information. Useful when you need to build your own composer 
-  or inspect parsing internals.
-
-Public constant:
-
-- `DEPTH`  
-  The array key used to store node depth inside extractor output.
-
-### Constants and internal base classes
-
-#### `SbWereWolf\XmlNavigator\General\Notation`
-
-Public constants used by the library defaults:
-
-- `NAME` = `'n'`
-- `VALUE` = `'v'`
-- `ATTRIBUTES` = `'a'`
-- `SEQUENCE` = `'s'`
-- `VAL` = `'@value'`
-- `ATTR` = `'@attributes'`
-
-#### `SbWereWolf\XmlNavigator\Extraction\ElementComposer`
-
-Base class for composers. It does not expose public methods and is 
-not intended for day-to-day use.
-
-### Contracts
-
-The package also exposes interfaces that mirror the concrete APIs:
-
-- `IFastXmlToArray`
-- `IXmlConverter`
-- `IXmlElement`
-- `IXmlAttribute`
 
 ## Practical notes
 
-- Attributes are always returned as strings.
-- Repeated child tags become indexed arrays in pretty-print output.
-- Empty elements become empty arrays in pretty-print output and 
-  name-only nodes in hierarchy output.
-- The examples in this README are covered by tests in 
-  `tests/Integration/ReadmeExamplesTest.php`.
+- attributes are always strings;
+- repeated child tags become indexed arrays in readable output;
+- empty elements become empty arrays in readable output and name-only
+  nodes in normalized output;
+- for one-shot conversion, provide either `$xmlText` or `$xmlUri`,
+  but not both;
+- if you already have an `XMLReader`, use the streaming API first
+  instead of loading the entire document.
 
-## Development verification
+## Detailed documentation
 
-Primary local checks:
+The detailed method-by-method documentation stays available in 
+dedicated files:
 
-- `composer test`
-- `composer test-with-coverage`
-- `composer phpstan-check`
-- `composer check-style`
+- [Examples by workflow and API](docs/examples.md)
+- [Output formats: readable vs normalized](docs/output-formats.md)
+- [Public API reference](docs/reference.md)
 
-`composer test-with-coverage` is the canonical coverage entrypoint. It
-uses a local coverage driver when one is available and falls back to a
-Docker-based PHPUnit runtime otherwise. The HTML report is written to
-`continuous-integration/autotests-coverage-report`.
+Standalone runnable snippets are also included in
+[`examples/`](examples).
 
-For the high-level conversion API, exactly one XML source must be
-provided: use either `$xmlText` or `$xmlUri`, but not both.
+## Common use cases
+
+- supplier and marketplace feeds;
+- partner imports and exports;
+- ETL jobs that consume XML in batches;
+- SOAP-ish or legacy integration payloads;
+- queue payload preparation and JSON serialization;
+- large catalogs where only selected nodes are relevant.
+
+## What it is not
+
+XmlExtractKit is not trying to be:
+
+- a full XML query language;
+- an XML schema validator;
+- an XML editor;
+- an object mapper that hides XML structure behind a large 
+  abstraction layer.
+
+The value proposition is much simpler:
+
+> stream XML, extract only what matters, and keep working with plain 
+> arrays.
+
+## Pick your entry point
+
+| Need                                                   | Start here                                   |
+|--------------------------------------------------------|----------------------------------------------|
+| I need plain arrays from XML now                       | `FastXmlToArray::prettyPrint()`              |
+| I need a stable normalized structure for traversal     | `FastXmlToArray::convert()`                  |
+| I need to stream only matching elements from large XML | `FastXmlParser::extractPrettyPrint()`        |
+| I need streaming plus normalized output                | `FastXmlParser::extractHierarchy()`          |
+| I need custom key names                                | `XmlConverter` or `XmlParser`                |
+| I need low-level composition around an existing cursor | `PrettyPrintComposer` or `HierarchyComposer` |
+
+## Contacts
 
 ```
 Nicholas Volkhin
@@ -794,4 +367,3 @@ Telegram @sbwerewolf
 
 - [Telegram chat with me](https://t.me/SbWereWolf)
 - [WhatsApp chat with me](https://wa.me/79022726535)
-- 

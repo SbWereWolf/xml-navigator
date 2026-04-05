@@ -9,19 +9,17 @@ namespace SbWereWolf\XmlNavigator\General;
  */
 interface Notation
 {
-    /** @var string Индекс Имени в нормализованном виде */
+    /** @var string Name index in normalized form */
     public const NAME = 'n';
-    /** @var string Индекс Значения в нормализованном виде */
+    /** @var string Value index in normalized form */
     public const VALUE = 'v';
-    /** @var string Индекс Атрибутов в нормализованном виде */
+    /** @var string Attributes index in normalized form */
     public const ATTRIBUTES = 'a';
-    /** @var string Индекс Последовательности вложенных элементов
-     * в нормализованном виде
-     */
+    /** @var string Nested elements sequence index in normalized form */
     public const SEQUENCE = 's';
 
-    /** @var string Индекс для Значения в формате pretty print */
+    /** @var string Value index in pretty-print format */
     public const VAL = '@value';
-    /** @var string Индекс для Атрибутов в формате pretty print */
+    /** @var string Attributes index in pretty-print format */
     public const ATTR = '@attributes';
 }

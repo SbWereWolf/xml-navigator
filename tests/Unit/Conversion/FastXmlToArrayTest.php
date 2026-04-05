@@ -5,87 +5,163 @@ declare(strict_types=1);
 namespace Unit\Conversion;
 
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 use SbWereWolf\XmlNavigator\Conversion\FastXmlToArray;
+use SbWereWolf\XmlNavigator\Test\Support\XmlFixture;
 
 final class FastXmlToArrayTest extends TestCase
 {
-    public function testConvertParsesXmlText(): void
+    public function testConvertSupportsXmlTextAndXmlFile(): void
     {
-        static::assertSame(
-            [
-                'n' => 'root',
-                's' => [
-                    [
-                        'n' => 'value',
-                        'v' => 'alpha',
+        $xmlText = XmlFixture::read('hierarchy-catalog.xml');
+        $xmlFile = XmlFixture::path('hierarchy-catalog.xml');
+
+        $expected = [
+            'n' => 'catalog',
+            'a' => [
+                'region' => 'eu',
+                'generated_at' => '2026-04-05T10:00:00Z',
+            ],
+            's' => [
+                [
+                    'n' => 'offer',
+                    'a' => [
+                        'id' => '1001',
+                        'available' => 'true',
+                    ],
+                    's' => [
+                        [
+                            'n' => 'name',
+                            'v' => 'Keyboard',
+                        ],
+                        [
+                            'n' => 'price',
+                            'v' => '49.90',
+                            'a' => [
+                                'currency' => 'USD',
+                            ],
+                        ],
+                        [
+                            'n' => 'tag',
+                            'v' => 'office',
+                        ],
+                        [
+                            'n' => 'tag',
+                            'v' => 'usb',
+                        ],
+                    ],
+                ],
+                [
+                    'n' => 'offer',
+                    'a' => [
+                        'id' => '1002',
+                        'available' => 'false',
+                    ],
+                    's' => [
+                        [
+                            'n' => 'name',
+                            'v' => 'Mouse',
+                        ],
+                        [
+                            'n' => 'price',
+                            'v' => '19.90',
+                            'a' => [
+                                'currency' => 'USD',
+                            ],
+                        ],
+                        [
+                            'n' => 'tag',
+                            'v' => 'gaming',
+                        ],
                     ],
                 ],
             ],
-            FastXmlToArray::convert(
-                '<root><value>alpha</value></root>'
-            )
-        );
+        ];
+
+        self::assertSame($expected, FastXmlToArray::convert($xmlText));
+        self::assertSame($expected, FastXmlToArray::convert('', $xmlFile));
     }
 
-    public function testPrettyPrintParsesXmlUri(): void
+    public function testPrettyPrintSupportsXmlTextAndXmlFile(): void
     {
-        $path = $this->createTempXmlFile(
-            '<root attr="x"><value>alpha</value></root>'
-        );
+        $xmlText = XmlFixture::read('repeated-pretty-print.xml');
+        $xmlFile = XmlFixture::path('repeated-pretty-print.xml');
 
-        try {
-            static::assertSame(
-                [
-                    'root' => [
+        $expected = [
+            'root' => [
+                'item' => [
+                    'value-only',
+                    [
                         '@attributes' => [
-                            'attr' => 'x',
+                            'code' => 'A',
                         ],
-                        'value' => 'alpha',
                     ],
+                    [
+                        '@value' => 'value-and-attributes',
+                        '@attributes' => [
+                            'code' => 'B',
+                        ],
+                    ],
+                    [],
                 ],
-                FastXmlToArray::prettyPrint('', $path)
-            );
-        } finally {
-            @unlink($path);
-        }
+            ],
+        ];
+
+        self::assertSame($expected, FastXmlToArray::prettyPrint($xmlText));
+        self::assertSame($expected, FastXmlToArray::prettyPrint('', $xmlFile));
     }
 
-    public function testConvertRejectsBothXmlTextAndXmlUri(): void
-    {
-        $path = $this->createTempXmlFile('<from-uri/>');
-
-        try {
-            $this->expectException(InvalidArgumentException::class);
-            $this->expectExceptionCode(-668);
-
-            FastXmlToArray::convert('<from-text/>', $path);
-        } finally {
-            @unlink($path);
-        }
-    }
-
-    public function testConvertRejectsMissingXmlSource(): void
+    #[DataProvider('missingSourceProvider')]
+    public function testMethodsRejectMissingXmlSource(string $method): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionCode(-667);
 
-        FastXmlToArray::convert();
+        FastXmlToArray::{$method}();
     }
 
-    public function testPrettyPrintRejectsBothXmlTextAndXmlUri(): void
+    /**
+     * @return list<array{string}>
+     */
+    public static function missingSourceProvider(): array
     {
-        $path = $this->createTempXmlFile('<from-uri/>');
+        return [
+            ['convert'],
+            ['prettyPrint'],
+        ];
+    }
 
-        try {
-            $this->expectException(InvalidArgumentException::class);
-            $this->expectExceptionCode(-668);
+    #[DataProvider('ambiguousSourceProvider')]
+    public function testMethodsRejectAmbiguousXmlSource(
+        string $method,
+        string $xmlText,
+        string $xmlUri
+    ): void {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionCode(-668);
 
-            FastXmlToArray::prettyPrint('<from-text/>', $path);
-        } finally {
-            @unlink($path);
-        }
+        FastXmlToArray::{$method}($xmlText, $xmlUri);
+    }
+
+    /**
+     * @return list<array{string,string,string}>
+     */
+    public static function ambiguousSourceProvider(): array
+    {
+        return [
+            [
+                'convert',
+                '<from-text/>',
+                XmlFixture::path('hierarchy-catalog.xml'),
+            ],
+            [
+                'prettyPrint',
+                '<from-text/>',
+                XmlFixture::path('hierarchy-catalog.xml'),
+            ],
+        ];
     }
 
     public function testConvertRejectsMalformedXmlText(): void
@@ -96,26 +172,48 @@ final class FastXmlToArrayTest extends TestCase
         FastXmlToArray::convert('<broken>');
     }
 
+    public function testConvertRejectsXmlTextWithTrailingGarbage(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionCode(-669);
+
+        FastXmlToArray::convert('<root/>junk');
+    }
+
+    public function testPrettyPrintRejectsMalformedXmlText(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionCode(-669);
+
+        FastXmlToArray::prettyPrint('<broken>');
+    }
+
+    #[DataProvider('malformedUriProvider')]
+    public function testMethodsRejectMalformedXmlFile(string $method): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionCode(-670);
+
+        FastXmlToArray::{$method}('', XmlFixture::path('malformed.xml'));
+    }
+
+    /**
+     * @return list<array{string}>
+     */
+    public static function malformedUriProvider(): array
+    {
+        return [
+            ['convert'],
+            ['prettyPrint'],
+        ];
+    }
+
     public function testConvertRejectsUnreadableXmlUri(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionCode(-671);
 
         FastXmlToArray::convert('', '/definitely/missing.xml');
-    }
-
-    public function testPrettyPrintRejectsMalformedXmlUri(): void
-    {
-        $path = $this->createTempXmlFile('<broken>');
-
-        try {
-            $this->expectException(InvalidArgumentException::class);
-            $this->expectExceptionCode(-670);
-
-            FastXmlToArray::prettyPrint('', $path);
-        } finally {
-            @unlink($path);
-        }
     }
 
     public function testFormatLibxmlErrorsReturnsEmptyStringWhenNoErrorsExist(): void
@@ -128,16 +226,34 @@ final class FastXmlToArrayTest extends TestCase
         );
         $method->setAccessible(true);
 
-        static::assertSame('', $method->invoke(null));
+        self::assertSame('', $method->invoke(null));
     }
 
-    private function createTempXmlFile(string $xml): string
+    public function testParseRootElementRejectsBufferedLibxmlErrorsAfterParse(): void
     {
-        $path = tempnam(sys_get_temp_dir(), 'xml-nav-');
-        static::assertIsString($path);
-        $written = file_put_contents($path, $xml);
-        static::assertNotFalse($written);
+        $method = new ReflectionMethod(
+            FastXmlToArray::class,
+            'parseRootElement'
+        );
+        $method->setAccessible(true);
 
-        return $path;
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionCode(-669);
+
+        $method->invoke(
+            null,
+            '<root/>',
+            '',
+            null,
+            LIBXML_BIGLINES | LIBXML_COMPACT,
+            static function (\XMLReader $reader): array {
+                $dom = new \DOMDocument();
+                @$dom->loadXML('<broken>');
+
+                return [
+                    'n' => $reader->name,
+                ];
+            }
+        );
     }
 }

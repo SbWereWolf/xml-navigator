@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <item>value-only</item>
+  <item code="A" />
+  <item code="B">value-and-attributes</item>
+  <item />
+</root>

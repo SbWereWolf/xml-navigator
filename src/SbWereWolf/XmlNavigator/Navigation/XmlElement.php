@@ -151,15 +151,13 @@ class XmlElement implements IXmlElement, JsonSerializable
     public function pull(string $name = ''): Generator
     {
         foreach ($this->sequenceData as $elem) {
+            /** @var HierarchyNode $elem */
             if (
                 '' !== $name
                 && (($elem[$this->name] ?? null) !== $name)
             ) {
                 continue;
             }
-
-            /** @var HierarchyNode $elem */
-            $elem = $elem;
 
             self::$trustChildData = true;
             try {
