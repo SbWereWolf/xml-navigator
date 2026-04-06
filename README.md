@@ -149,6 +149,11 @@ array (
 - [Pick your entry point](#pick-your-entry-point)
 - [Contacts](#contacts)
 
+## Code test coverage
+
+![Codecov graph](https://codecov.io/github/SbWereWolf/xml-navigator/graphs/tree.svg?token=Q0BQ2COFTC)
+
+
 ## Working examples
 
 ### Turn XML into arrays with custom keys
