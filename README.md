@@ -4,7 +4,8 @@
 [![Packagist Downloads](https://img.shields.io/packagist/dt/sbwerewolf/xml-navigator)](https://packagist.org/packages/sbwerewolf/xml-navigator)
 [![PHP 8.4+](https://img.shields.io/badge/PHP-8.4%2B-777BB4)](https://www.php.net/)
 [![Static Analysis](https://github.com/SbWereWolf/xml-navigator/actions/workflows/static-analysis.yml/badge.svg)](https://github.com/SbWereWolf/xml-navigator/actions/workflows/static-analysis.yml)
-[![Test Coverage](https://codecov.io/github/SbWereWolf/xml-navigator/graph/badge.svg)](https://codecov.io/github/SbWereWolf/xml-navigator)
+[![Test Coverage](https://codecov.io/github/SbWereWolf/xml-navigator/graph/badge.svg?token=Q0BQ2COFTC)](https://codecov.io/github/SbWereWolf/xml-navigator)
+
 
 **XmlExtractKit for PHP: Stream large XML, extract only what matters,
 and get plain PHP arrays.**
