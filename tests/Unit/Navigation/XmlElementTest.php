@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Unit\Navigation;
+namespace SbWereWolf\XmlNavigator\Test\Unit\Navigation;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;

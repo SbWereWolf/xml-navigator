@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Unit\Conversion;
+namespace SbWereWolf\XmlNavigator\Test\Unit\Conversion;
 
 use PHPUnit\Framework\TestCase;
 use SbWereWolf\XmlNavigator\Conversion\XmlConverter;

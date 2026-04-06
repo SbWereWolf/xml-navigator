@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Integration;
+namespace SbWereWolf\XmlNavigator\Test\Integration;
 
 use PHPUnit\Framework\TestCase;
 use SbWereWolf\XmlNavigator\Conversion\FastXmlToArray;

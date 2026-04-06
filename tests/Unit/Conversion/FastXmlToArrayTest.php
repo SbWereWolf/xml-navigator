@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Unit\Conversion;
+namespace SbWereWolf\XmlNavigator\Test\Unit\Conversion;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -224,6 +224,7 @@ final class FastXmlToArrayTest extends TestCase
             FastXmlToArray::class,
             'formatLibxmlErrors'
         );
+        /** @noinspection PhpExpressionResultUnusedInspection */
         $method->setAccessible(true);
 
         self::assertSame('', $method->invoke(null));
@@ -235,6 +236,7 @@ final class FastXmlToArrayTest extends TestCase
             FastXmlToArray::class,
             'parseRootElement'
         );
+        /** @noinspection PhpExpressionResultUnusedInspection */
         $method->setAccessible(true);
 
         $this->expectException(InvalidArgumentException::class);

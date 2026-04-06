@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Unit\Parsing;
+namespace SbWereWolf\XmlNavigator\Test\Unit\Parsing;
 
 use PHPUnit\Framework\TestCase;
 use SbWereWolf\XmlNavigator\Parsing\XmlParser;

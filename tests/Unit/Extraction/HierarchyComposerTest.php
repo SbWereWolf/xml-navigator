@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Unit\Extraction;
+namespace SbWereWolf\XmlNavigator\Test\Unit\Extraction;
 
 use PHPUnit\Framework\TestCase;
 use SbWereWolf\XmlNavigator\Extraction\HierarchyComposer;
@@ -86,6 +86,7 @@ final class HierarchyComposerTest extends TestCase
     {
         $reader = XmlFixture::readerFromFixture('hierarchy-catalog.xml');
 
+        /** @noinspection PhpStatementHasEmptyBodyInspection */
         while ($reader->read()) {
         }
 
@@ -115,6 +116,7 @@ final class HierarchyComposerTest extends TestCase
             ],
             HierarchyComposer::compose($reader)
         );
+        /** @noinspection PhpStatementHasEmptyBodyInspection */
         while ($reader->nodeType !== \XMLReader::ELEMENT && $reader->read()) {
         }
         self::assertSame('next', $reader->name);
