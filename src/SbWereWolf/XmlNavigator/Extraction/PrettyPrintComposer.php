@@ -28,27 +28,64 @@ class PrettyPrintComposer implements Notation
         string $valueIndex = Notation::VAL,
         string $attributesIndex = Notation::ATTR
     ): array {
-        while (
-            $reader->nodeType !== XMLReader::ELEMENT
-            && $reader->read()
-        ) {
+        for ($canRead = true; self::needsReadToReachElement($reader, $canRead);) {
+            $canRead = $reader->read();
         }
 
         if ($reader->nodeType !== XMLReader::ELEMENT) {
             return [];
         }
 
-        $isEmpty = $reader->isEmptyElement;
-        $result = self::composeElement(
+        if ($reader->isEmptyElement) {
+            return self::composeEmptyElement(
+                $reader,
+                $valueIndex,
+                $attributesIndex
+            );
+        }
+
+        return self::composeElement(
             $reader,
             $valueIndex,
             $attributesIndex
         );
-        if ($isEmpty) {
-            $reader->read();
+    }
+
+    private static function needsReadToReachElement(
+        XMLReader $reader,
+        bool $canRead
+    ): bool {
+        if ($reader->nodeType === XMLReader::ELEMENT) {
+            return false;
         }
 
-        return $result;
+        return $canRead;
+    }
+
+    /**
+     * @param string $valueIndex
+     * @param string $attributesIndex
+     * @return PrettyNode
+     */
+    private static function composeEmptyElement(
+        XMLReader $reader,
+        string $valueIndex,
+        string $attributesIndex
+    ): array {
+        $name = $reader->name;
+        $attributes = self::collectAttributes($reader);
+        $reader->read();
+
+        return [
+            $name => self::normalizeValue(
+                [],
+                '',
+                false,
+                $attributes,
+                $valueIndex,
+                $attributesIndex
+            ),
+        ];
     }
 
     /**
@@ -109,11 +146,10 @@ class PrettyPrintComposer implements Notation
                 continue;
             }
 
-            if (
-                $reader->nodeType === XMLReader::END_ELEMENT
-                && $reader->depth === $startDepth
-            ) {
-                break;
+            if ($reader->nodeType === XMLReader::END_ELEMENT) {
+                if ($reader->depth === $startDepth) {
+                    break;
+                }
             }
         }
 
@@ -172,21 +208,17 @@ class PrettyPrintComposer implements Notation
         string $valueIndex,
         string $attributesIndex
     ): string|array {
-        if ($children === [] && $attributes === [] && !$hasValue) {
-            return [];
-        }
+        if ($children === []) {
+            if ($attributes === []) {
+                return $hasValue ? $value : [];
+            }
 
-        if ($children === [] && $attributes === [] && $hasValue) {
-            return $value;
-        }
+            if (!$hasValue) {
+                return [
+                    $attributesIndex => $attributes,
+                ];
+            }
 
-        if ($children === [] && $attributes !== [] && !$hasValue) {
-            return [
-                $attributesIndex => $attributes,
-            ];
-        }
-
-        if ($children === [] && $attributes !== [] && $hasValue) {
             return [
                 $valueIndex => $value,
                 $attributesIndex => $attributes,

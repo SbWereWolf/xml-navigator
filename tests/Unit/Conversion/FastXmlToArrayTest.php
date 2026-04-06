@@ -118,6 +118,10 @@ final class FastXmlToArrayTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionCode(-667);
+        $this->expectExceptionMessage(
+            'Exactly one XML source must be provided: set either ' .
+            '$xmlText or $xmlUri.'
+        );
 
         FastXmlToArray::{$method}();
     }
@@ -141,6 +145,10 @@ final class FastXmlToArrayTest extends TestCase
     ): void {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionCode(-668);
+        $this->expectExceptionMessage(
+            'XML source selection is ambiguous: use either ' .
+            '$xmlText or $xmlUri, not both.'
+        );
 
         FastXmlToArray::{$method}($xmlText, $xmlUri);
     }
@@ -168,6 +176,10 @@ final class FastXmlToArrayTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionCode(-669);
+        $this->expectExceptionMessage(
+            'Unable to parse XML from $xmlText. ' .
+            'Extra content at the end of the document'
+        );
 
         FastXmlToArray::convert('<broken>');
     }
@@ -176,6 +188,10 @@ final class FastXmlToArrayTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionCode(-669);
+        $this->expectExceptionMessage(
+            'Unable to parse XML from $xmlText. ' .
+            'Extra content at the end of the document'
+        );
 
         FastXmlToArray::convert('<root/>junk');
     }
@@ -184,6 +200,10 @@ final class FastXmlToArrayTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionCode(-669);
+        $this->expectExceptionMessage(
+            'Unable to parse XML from $xmlText. ' .
+            'Extra content at the end of the document'
+        );
 
         FastXmlToArray::prettyPrint('<broken>');
     }
@@ -193,6 +213,11 @@ final class FastXmlToArrayTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionCode(-670);
+        $this->expectExceptionMessage(
+            'Unable to parse XML from URI `' .
+            XmlFixture::path('malformed.xml') .
+            '`. Opening and ending tag mismatch: offer line 3 and catalog'
+        );
 
         FastXmlToArray::{$method}('', XmlFixture::path('malformed.xml'));
     }
@@ -212,6 +237,9 @@ final class FastXmlToArrayTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionCode(-671);
+        $this->expectExceptionMessage(
+            'Unable to open XML source from URI `/definitely/missing.xml`.'
+        );
 
         FastXmlToArray::convert('', '/definitely/missing.xml');
     }
@@ -241,6 +269,10 @@ final class FastXmlToArrayTest extends TestCase
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionCode(-669);
+        $this->expectExceptionMessage(
+            'Unable to parse XML from $xmlText. ' .
+            'Premature end of data in tag broken line 1'
+        );
 
         $method->invoke(
             null,

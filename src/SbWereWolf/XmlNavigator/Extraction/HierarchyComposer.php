@@ -29,7 +29,8 @@ class HierarchyComposer implements Notation
         string $nameIndex = Notation::NAME,
         string $elementsIndex = Notation::SEQUENCE
     ): array {
-        while ($reader->nodeType !== XMLReader::ELEMENT && $reader->read()) {
+        for ($canRead = true; self::needsReadToReachElement($reader, $canRead);) {
+            $canRead = $reader->read();
         }
 
         if ($reader->nodeType !== XMLReader::ELEMENT) {
@@ -49,6 +50,17 @@ class HierarchyComposer implements Notation
         }
 
         return $result;
+    }
+
+    private static function needsReadToReachElement(
+        XMLReader $reader,
+        bool $canRead
+    ): bool {
+        if ($reader->nodeType === XMLReader::ELEMENT) {
+            return false;
+        }
+
+        return $canRead;
     }
 
     /**
@@ -107,11 +119,10 @@ class HierarchyComposer implements Notation
                 continue;
             }
 
-            if (
-                $reader->nodeType === XMLReader::END_ELEMENT
-                && $reader->depth === $startDepth
-            ) {
-                break;
+            if ($reader->nodeType === XMLReader::END_ELEMENT) {
+                if ($reader->depth === $startDepth) {
+                    break;
+                }
             }
         }
 

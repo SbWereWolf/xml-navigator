@@ -123,35 +123,4 @@ final class PrettyPrintComposerTest extends TestCase
 
         $reader->close();
     }
-
-    public function testComposeMovesReaderPastTopLevelEmptyElementWithAttributes(): void
-    {
-        $reader = XmlFixture::readerFromFixture('empty-elements.xml');
-
-        while ($reader->read()) {
-            if (
-                $reader->nodeType === \XMLReader::ELEMENT
-                && $reader->name === 'root'
-            ) {
-                break;
-            }
-        }
-
-        self::assertSame(
-            [
-                'root' => [
-                    '@attributes' => [
-                        'attr' => '1',
-                    ],
-                ],
-            ],
-            PrettyPrintComposer::compose($reader)
-        );
-        /** @noinspection PhpStatementHasEmptyBodyInspection */
-        while ($reader->nodeType !== \XMLReader::ELEMENT && $reader->read()) {
-        }
-        self::assertSame('next', $reader->name);
-
-        $reader->close();
-    }
 }

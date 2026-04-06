@@ -17,50 +17,60 @@ final class DocumentationWorkflowsTest extends TestCase
     {
         $reader = XmlFixture::readerFromFixture('stream-catalog.xml');
 
-        $offers = iterator_to_array(
-            FastXmlParser::extractHierarchy(
-                $reader,
-                static fn (XMLReader $cursor): bool =>
-                    $cursor->nodeType === XMLReader::ELEMENT
-                    && $cursor->name === 'offer'
-            ),
-            false
+        $offers = FastXmlParser::extractHierarchy(
+            $reader,
+            static fn (XMLReader $cursor): bool =>
+                $cursor->nodeType === XMLReader::ELEMENT
+                && $cursor->name === 'offer'
         );
+
+        self::assertTrue($offers->valid());
+        $firstOffer = $offers->current();
+        $offers->next();
+
+        self::assertTrue($offers->valid());
+        $secondOffer = $offers->current();
+        $offers->next();
 
         $reader->close();
 
-        self::assertCount(2, $offers);
-        self::assertSame('offer', $offers[0]['n']);
-        self::assertSame('1001', $offers[0]['a']['id']);
-        self::assertSame('Keyboard', $offers[0]['s'][0]['v']);
-        self::assertSame('Mouse', $offers[1]['s'][0]['v']);
+        self::assertFalse($offers->valid());
+        self::assertSame('offer', $firstOffer['n']);
+        self::assertSame('1001', $firstOffer['a']['id']);
+        self::assertSame('Keyboard', $firstOffer['s'][0]['v']);
+        self::assertSame('Mouse', $secondOffer['s'][0]['v']);
     }
 
     public function testStreamLargeXmlWithCustomHierarchyKeys(): void
     {
         $reader = XmlFixture::readerFromFixture('stream-catalog.xml');
 
-        $offers = iterator_to_array(
-            FastXmlParser::extractHierarchy(
-                $reader,
-                static fn (XMLReader $cursor): bool =>
-                    $cursor->nodeType === XMLReader::ELEMENT
-                    && $cursor->name === 'offer',
-                'value',
-                'attributes',
-                'name',
-                'children',
-            ),
-            false
+        $offers = FastXmlParser::extractHierarchy(
+            $reader,
+            static fn (XMLReader $cursor): bool =>
+                $cursor->nodeType === XMLReader::ELEMENT
+                && $cursor->name === 'offer',
+            'value',
+            'attributes',
+            'name',
+            'children',
         );
+
+        self::assertTrue($offers->valid());
+        $firstOffer = $offers->current();
+        $offers->next();
+
+        self::assertTrue($offers->valid());
+        $secondOffer = $offers->current();
+        $offers->next();
 
         $reader->close();
 
-        self::assertCount(2, $offers);
-        self::assertSame('offer', $offers[0]['name']);
-        self::assertSame('1001', $offers[0]['attributes']['id']);
-        self::assertSame('Keyboard', $offers[0]['children'][0]['value']);
-        self::assertSame('Mouse', $offers[1]['children'][0]['value']);
+        self::assertFalse($offers->valid());
+        self::assertSame('offer', $firstOffer['name']);
+        self::assertSame('1001', $firstOffer['attributes']['id']);
+        self::assertSame('Keyboard', $firstOffer['children'][0]['value']);
+        self::assertSame('Mouse', $secondOffer['children'][0]['value']);
     }
 
     public function testConvertWholeDocumentAndNavigateWithXmlElement(): void

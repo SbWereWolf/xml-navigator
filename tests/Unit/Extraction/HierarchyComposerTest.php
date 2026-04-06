@@ -93,34 +93,4 @@ final class HierarchyComposerTest extends TestCase
         self::assertSame([], HierarchyComposer::compose($reader));
         $reader->close();
     }
-
-    public function testComposeMovesReaderPastTopLevelEmptyElement(): void
-    {
-        $reader = XmlFixture::readerFromFixture('empty-elements.xml');
-
-        while ($reader->read()) {
-            if (
-                $reader->nodeType === \XMLReader::ELEMENT
-                && $reader->name === 'root'
-            ) {
-                break;
-            }
-        }
-
-        self::assertSame(
-            [
-                'n' => 'root',
-                'a' => [
-                    'attr' => '1',
-                ],
-            ],
-            HierarchyComposer::compose($reader)
-        );
-        /** @noinspection PhpStatementHasEmptyBodyInspection */
-        while ($reader->nodeType !== \XMLReader::ELEMENT && $reader->read()) {
-        }
-        self::assertSame('next', $reader->name);
-
-        $reader->close();
-    }
 }

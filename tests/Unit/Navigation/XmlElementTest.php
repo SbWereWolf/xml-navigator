@@ -152,6 +152,10 @@ final class XmlElementTest extends TestCase
                 self::fail('Expected InvalidArgumentException was not thrown.');
             } catch (InvalidArgumentException $exception) {
                 self::assertSame(-666, $exception->getCode());
+                self::assertSame(
+                    '$initial array MUST BE like [ `n`=>string, `v`=>string, `a`=>[], `s`=>[] ]',
+                    $exception->getMessage()
+                );
             }
         }
     }
