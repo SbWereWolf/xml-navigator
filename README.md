@@ -1,9 +1,8 @@
 # XmlExtractKit
 
-[![Packagist Version](https://img.shields.io/packagist/v/sbwerewolf/xml-navigator?label=packagist)](https://packagist.org/packages/sbwerewolf/xml-navigator)
-[![Packagist Downloads](https://img.shields.io/packagist/dt/sbwerewolf/xml-navigator)](https://packagist.org/packages/sbwerewolf/xml-navigator)
 [![PHP 8.3+](https://img.shields.io/badge/PHP-8.3%2B-777BB4)](https://www.php.net/)
-[![Test Coverage](https://codecov.io/github/SbWereWolf/xml-navigator/graph/badge.svg?token=Q0BQ2COFTC)](https://codecov.io/github/SbWereWolf/xml-navigator)
+[![Static Analysis](https://github.com/SbWereWolf/xml-navigator/actions/workflows/static-analysis.yml/badge.svg?branch=php8.3)](https://github.com/SbWereWolf/xml-navigator/actions/workflows/static-analysis.yml?query=branch%3Aphp8.3)
+[![Test Coverage](https://codecov.io/github/SbWereWolf/xml-navigator/graph/badge.svg?token=Q0BQ2COFTC&branch=php8.3)](https://codecov.io/github/SbWereWolf/xml-navigator/tree/php8.3)
 
 
 **XmlExtractKit for PHP: Stream large XML, extract only what matters,
@@ -19,7 +18,7 @@ large XML → selected nodes → plain PHP arrays
 composer require sbwerewolf/xml-navigator
 ```
 
-For local test and coverage dependencies on a standard PHP 8.3 setup,
+For local test, coverage, and static-analysis dependencies for this branch,
 see [`tests/ENVIRONMENT.md`](tests/ENVIRONMENT.md).
 
 ## Why this package?
@@ -151,7 +150,7 @@ array (
 
 ## Code test coverage
 
-![Codecov graph](https://codecov.io/github/SbWereWolf/xml-navigator/graphs/tree.svg?token=Q0BQ2COFTC)
+![Codecov graph](https://codecov.io/github/SbWereWolf/xml-navigator/graphs/tree.svg?token=Q0BQ2COFTC&branch=php8.3)
 
 
 ## Working examples

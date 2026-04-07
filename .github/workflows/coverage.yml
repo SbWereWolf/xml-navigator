@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ php8.3 ]
   pull_request:
-    branches: [ main ]
+    branches: [ php8.3 ]
 
 jobs:
   tests:
@@ -45,6 +45,8 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage.xml
+          flags: php8.3
+          name: php8.3
           fail_ci_if_error: true
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
