@@ -13,6 +13,13 @@
     "feed-parser",
     "integration"
   ],
+  "homepage": "https://github.com/SbWereWolf/xml-navigator",
+  "support": {
+    "issues": "https://github.com/SbWereWolf/xml-navigator/issues",
+    "source": "https://github.com/SbWereWolf/xml-navigator",
+    "docs": "https://github.com/SbWereWolf/xml-navigator#readme",
+    "chat": "https://t.me/SbWereWolf"
+  },
   "authors": [
     {
       "name": "Nicholas Volkhin",
