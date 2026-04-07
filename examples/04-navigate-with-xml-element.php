@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 use SbWereWolf\XmlNavigator\Conversion\FastXmlToArray;
 use SbWereWolf\XmlNavigator\Navigation\XmlElement;
 
@@ -29,7 +27,7 @@ foreach ($offer->attributes() as $attribute) {
 }
 
 $tagValues = array_map(
-    static fn (XmlElement $tag): string => $tag->value(),
+    static function (XmlElement $tag) { return $tag->value(); },
     $offer->elements('tag')
 );
 

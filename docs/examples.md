@@ -112,7 +112,8 @@ file_put_contents($uri, <<<'XML'
     <price>19.90</price>
   </offer>
 </catalog>
-XML);
+XML
+);
 
 $reader = XMLReader::open($uri);
 
@@ -122,9 +123,10 @@ if ($reader === false) {
 
 $offers = FastXmlParser::extractHierarchy(
     $reader,
-    static fn (XMLReader $cursor): bool =>
-        $cursor->nodeType === XMLReader::ELEMENT
-        && $cursor->name === 'offer'
+    static function (XMLReader $cursor) {
+        return $cursor->nodeType === XMLReader::ELEMENT
+            && $cursor->name === 'offer';
+        }
 );
 
 foreach ($offers as $offer) {
@@ -159,7 +161,8 @@ file_put_contents($uri, <<<'XML'
     <price>19.90</price>
   </offer>
 </catalog>
-XML);
+XML
+);
 
 $reader = XMLReader::open($uri);
 
@@ -169,9 +172,10 @@ if ($reader === false) {
 
 $offers = FastXmlParser::extractHierarchy(
     $reader,
-    static fn (XMLReader $cursor): bool =>
-        $cursor->nodeType === XMLReader::ELEMENT
-        && $cursor->name === 'offer',
+    static function (XMLReader $cursor) {
+        return $cursor->nodeType === XMLReader::ELEMENT
+            && $cursor->name === 'offer';
+        },
     'value',
     'attributes',
     'name',
@@ -217,7 +221,7 @@ foreach ($offer->attributes() as $attribute) {
 }
 
 $tagValues = array_map(
-    static fn (XmlElement $tag): string => $tag->value(),
+    static function (XmlElement $tag) { return $tag->value(); },
     $offer->elements('tag')
 );
 
@@ -253,10 +257,10 @@ Custom key names for one-shot conversion.
 use SbWereWolf\XmlNavigator\Conversion\XmlConverter;
 
 $converter = new XmlConverter(
-    val: 'value',
-    attr: 'attributes',
-    name: 'name',
-    seq: 'children',
+    'value',
+    'attributes',
+    'name',
+    'children'
 );
 
 $hierarchy = $converter->toHierarchyOfElements(
@@ -357,7 +361,8 @@ file_put_contents($uri, <<<'XML'
     <price>19.90</price>
   </offer>
 </catalog>
-XML);
+XML
+);
 
 $reader = XMLReader::open($uri);
 
@@ -367,7 +372,7 @@ if ($reader === false) {
 
 $offers = FastXmlParser::extractPrettyPrint(
     $reader,
-    static fn (XMLReader $cursor): bool => $cursor->name === 'offer'
+    static function (XMLReader $cursor) { return $cursor->name === 'offer'; }
 );
 
 foreach ($offers as $offer) {

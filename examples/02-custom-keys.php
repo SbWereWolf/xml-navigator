@@ -1,16 +1,14 @@
 <?php
 
-declare(strict_types=1);
-
 use SbWereWolf\XmlNavigator\Conversion\XmlConverter;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
 $converter = new XmlConverter(
-    val: 'value',
-    attr: 'attributes',
-    name: 'name',
-    seq: 'children',
+    'value',
+    'attributes',
+    'name',
+    'children'
 );
 
 $hierarchy = $converter->toHierarchyOfElements(
