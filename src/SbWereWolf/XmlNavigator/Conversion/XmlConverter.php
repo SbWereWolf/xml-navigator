@@ -50,8 +50,8 @@ class XmlConverter implements IXmlConverter
         string $attr = Notation::ATTRIBUTES,
         string $name = Notation::NAME,
         string $seq = Notation::SEQUENCE,
-        string|null $encoding = null,
-        int $flags = LIBXML_BIGLINES | LIBXML_COMPACT,
+        ?string $encoding = null,
+        int $flags = LIBXML_BIGLINES | LIBXML_COMPACT
     ) {
         $this->name = $name;
         $this->val = $val;
@@ -66,7 +66,7 @@ class XmlConverter implements IXmlConverter
      */
     public function toPrettyPrint(
         string $xmlText = '',
-        string $xmlUri = '',
+        string $xmlUri = ''
     ): array {
         $isPrevious = $this->isPrevious($xmlText, $xmlUri);
         if (!$isPrevious || count($this->prettyXml) === 0) {
@@ -92,7 +92,7 @@ class XmlConverter implements IXmlConverter
      */
     public function toHierarchyOfElements(
         string $xmlText = '',
-        string $xmlUri = '',
+        string $xmlUri = ''
     ): array {
         $isPrevious = $this->isPrevious($xmlText, $xmlUri);
         if (!$isPrevious || count($this->xmlStructure) === 0) {

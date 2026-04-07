@@ -15,10 +15,10 @@ final class XmlParserTest extends TestCase
     {
         $reader = XmlFixture::readerFromFixture('stream-catalog.xml');
         $parser = new XmlParser(
-            val: 'value',
-            attr: 'attributes',
-            name: 'name',
-            seq: 'children',
+            'value',
+            'attributes',
+            'name',
+            'children'
         );
 
         $actual = iterator_to_array(
@@ -81,10 +81,10 @@ final class XmlParserTest extends TestCase
     public function testExtractHierarchyReusesConfiguredParserAcrossReaders(): void
     {
         $parser = new XmlParser(
-            val: 'value',
-            attr: 'attributes',
-            name: 'name',
-            seq: 'children',
+            'value',
+            'attributes',
+            'name',
+            'children'
         );
 
         $firstReader = XmlFixture::readerFromFixture('stream-catalog.xml');
@@ -150,8 +150,8 @@ final class XmlParserTest extends TestCase
     {
         $reader = XmlFixture::readerFromFixture('stream-catalog.xml');
         $parser = new XmlParser(
-            val: 'value',
-            attr: 'attributes',
+            'value',
+            'attributes'
         );
 
         $actual = iterator_to_array(

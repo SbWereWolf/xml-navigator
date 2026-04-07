@@ -13,10 +13,10 @@ final class XmlConverterTest extends TestCase
     public function testToHierarchyOfElementsSupportsCustomKeys(): void
     {
         $converter = new XmlConverter(
-            val: 'value',
-            attr: 'attributes',
-            name: 'name',
-            seq: 'children',
+            'value',
+            'attributes',
+            'name',
+            'children'
         );
 
         self::assertSame(
@@ -91,10 +91,10 @@ final class XmlConverterTest extends TestCase
     public function testToPrettyPrintSupportsCustomKeys(): void
     {
         $converter = new XmlConverter(
-            val: 'value',
-            attr: 'attributes',
-            name: 'name',
-            seq: 'children',
+            'value',
+            'attributes',
+            'name',
+            'children'
         );
 
         self::assertSame(
@@ -138,8 +138,8 @@ final class XmlConverterTest extends TestCase
     public function testChangingXmlTextInvalidatesPrettyPrintCache(): void
     {
         $converter = new XmlConverter(
-            val: 'value',
-            attr: 'attributes',
+            'value',
+            'attributes'
         );
 
         self::assertSame(
@@ -193,10 +193,10 @@ final class XmlConverterTest extends TestCase
     public function testSwitchingBetweenHierarchyAndPrettyPrintDoesNotLeakState(): void
     {
         $converter = new XmlConverter(
-            val: 'value',
-            attr: 'attributes',
-            name: 'name',
-            seq: 'children',
+            'value',
+            'attributes',
+            'name',
+            'children'
         );
 
         $pretty = $converter->toPrettyPrint(

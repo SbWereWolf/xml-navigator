@@ -173,7 +173,7 @@ class PrettyPrintComposer implements Notation
     private static function appendChild(
         array &$target,
         string $childName,
-        string|array $childValue
+        $childValue
     ): void {
         if (!array_key_exists($childName, $target)) {
             $target[$childName] = $childValue;
@@ -207,7 +207,7 @@ class PrettyPrintComposer implements Notation
         array $attributes,
         string $valueIndex,
         string $attributesIndex
-    ): string|array {
+    ) {
         if ($children === []) {
             if ($attributes === []) {
                 return $hasValue ? $value : [];

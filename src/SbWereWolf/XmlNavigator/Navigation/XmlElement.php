@@ -51,7 +51,7 @@ class XmlElement implements IXmlElement
         string $name = Notation::NAME,
         string $val = Notation::VALUE,
         string $attr = Notation::ATTRIBUTES,
-        string $seq = Notation::SEQUENCE,
+        string $seq = Notation::SEQUENCE
     ) {
         $elementName = $initial[$name] ?? null;
         $elementValue = $initial[$val] ?? '';
@@ -222,10 +222,10 @@ class XmlElement implements IXmlElement
     }
 
     /**
-     * @param mixed $value
+     * @param mixed $value Value that may contain XML attributes
      * @phpstan-assert-if-true XmlAttributes $value
      */
-    private static function isXmlAttributes(mixed $value): bool
+    private static function isXmlAttributes($value): bool
     {
         if (!is_array($value)) {
             return false;
@@ -241,10 +241,10 @@ class XmlElement implements IXmlElement
     }
 
     /**
-     * @param mixed $value
+     * @param mixed $value Value that may contain a list of child elements
      * @phpstan-assert-if-true list<array<string, mixed>> $value
      */
-    private static function isHierarchySequence(mixed $value): bool
+    private static function isHierarchySequence($value): bool
     {
         if (!is_array($value) || !self::isList($value)) {
             return false;

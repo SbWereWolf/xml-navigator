@@ -52,7 +52,7 @@
     "sbwerewolf/json-serialize-trait": "^1"
   },
   "require": {
-    "php": ">=8.0 <8.3",
+    "php": ">=7.4 <8.0",
     "ext-xmlreader": "*",
     "ext-libxml": "*"
   }

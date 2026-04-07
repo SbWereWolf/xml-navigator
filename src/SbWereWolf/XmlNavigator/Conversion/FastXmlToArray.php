@@ -27,19 +27,19 @@ class FastXmlToArray implements IFastXmlToArray
         string $attr = Notation::ATTRIBUTES,
         string $name = Notation::NAME,
         string $seq = Notation::SEQUENCE,
-        string|null $encoding = null,
-        int $flags = LIBXML_BIGLINES | LIBXML_COMPACT,
+        ?string $encoding = null,
+        int $flags = LIBXML_BIGLINES | LIBXML_COMPACT
     ): array {
         /** @var \Closure(XMLReader):array<mixed, mixed> $parse */
         $parse = static function (
-            XMLReader $reader,
+            XMLReader $reader
         ) use (
             $xmlText,
             $xmlUri,
             $val,
             $attr,
             $name,
-            $seq,
+            $seq
         ): array {
             return self::requireArrayResult(
                 FastXmlParser::extractHierarchy(
@@ -76,17 +76,17 @@ class FastXmlToArray implements IFastXmlToArray
         string $xmlUri = '',
         string $val = Notation::VAL,
         string $attr = Notation::ATTR,
-        string|null $encoding = null,
-        int $flags = LIBXML_BIGLINES | LIBXML_COMPACT,
+        ?string $encoding = null,
+        int $flags = LIBXML_BIGLINES | LIBXML_COMPACT
     ): array {
         /** @var \Closure(XMLReader):array<mixed, mixed> $parse */
         $parse = static function (
-            XMLReader $reader,
+            XMLReader $reader
         ) use (
             $xmlText,
             $xmlUri,
             $val,
-            $attr,
+            $attr
         ): array {
             return self::requireArrayResult(
                 FastXmlParser::extractPrettyPrint(
@@ -122,7 +122,7 @@ class FastXmlToArray implements IFastXmlToArray
         string $xmlUri,
         ?string $encoding,
         int $flags,
-        \Closure $parse,
+        \Closure $parse
     ): array {
         $reader = null;
         $hadInternalErrors = libxml_use_internal_errors(true);
@@ -161,8 +161,8 @@ class FastXmlToArray implements IFastXmlToArray
     private static function createXmlReader(
         string $xmlText,
         string $xmlUri,
-        string|null $encoding,
-        int $flags,
+        ?string $encoding,
+        int $flags
     ): XMLReader {
         if ($xmlText === '' && $xmlUri === '') {
             throw new InvalidArgumentException(
@@ -184,7 +184,7 @@ class FastXmlToArray implements IFastXmlToArray
             $reader = @XMLReader::XML(
                 $xmlText,
                 $encoding,
-                $flags,
+                $flags
             );
             return $reader;
         }
@@ -192,7 +192,7 @@ class FastXmlToArray implements IFastXmlToArray
         $reader = @XMLReader::open(
             $xmlUri,
             $encoding,
-            $flags,
+            $flags
         );
         if (!$reader instanceof XMLReader) {
             throw new InvalidArgumentException(
@@ -223,11 +223,11 @@ class FastXmlToArray implements IFastXmlToArray
     }
 
     /**
-     * @param mixed $result
+     * @param mixed $result Parsed root element result
      * @return array<mixed, mixed>
      */
     private static function requireArrayResult(
-        mixed $result,
+        $result,
         string $xmlText,
         string $xmlUri
     ): array {
