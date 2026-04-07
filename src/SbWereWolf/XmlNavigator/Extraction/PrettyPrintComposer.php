@@ -183,7 +183,7 @@ class PrettyPrintComposer implements Notation
         if (
             is_array($target[$childName])
             && $target[$childName] !== []
-            && array_is_list($target[$childName])
+            && self::isList($target[$childName])
         ) {
             $target[$childName][] = $childValue;
             return;
@@ -255,5 +255,10 @@ class PrettyPrintComposer implements Notation
         }
 
         return $attributes;
+    }
+
+    private static function isList(array $value): bool
+    {
+        return $value === array_values($value);
     }
 }

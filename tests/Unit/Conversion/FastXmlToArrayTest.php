@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace SbWereWolf\XmlNavigator\Test\Unit\Conversion;
 
 use InvalidArgumentException;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 use SbWereWolf\XmlNavigator\Conversion\FastXmlToArray;
@@ -113,7 +112,9 @@ final class FastXmlToArrayTest extends TestCase
         self::assertSame($expected, FastXmlToArray::prettyPrint('', $xmlFile));
     }
 
-    #[DataProvider('missingSourceProvider')]
+    /**
+     * @dataProvider missingSourceProvider
+     */
     public function testMethodsRejectMissingXmlSource(string $method): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -137,7 +138,9 @@ final class FastXmlToArrayTest extends TestCase
         ];
     }
 
-    #[DataProvider('ambiguousSourceProvider')]
+    /**
+     * @dataProvider ambiguousSourceProvider
+     */
     public function testMethodsRejectAmbiguousXmlSource(
         string $method,
         string $xmlText,
@@ -208,7 +211,9 @@ final class FastXmlToArrayTest extends TestCase
         FastXmlToArray::prettyPrint('<broken>');
     }
 
-    #[DataProvider('malformedUriProvider')]
+    /**
+     * @dataProvider malformedUriProvider
+     */
     public function testMethodsRejectMalformedXmlFile(string $method): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -266,28 +271,39 @@ final class FastXmlToArrayTest extends TestCase
         );
         /** @noinspection PhpExpressionResultUnusedInspection */
         $method->setAccessible(true);
+        try {
+            $method->invoke(
+                null,
+                '<root/>',
+                '',
+                null,
+                LIBXML_BIGLINES | LIBXML_COMPACT,
+                static function (\XMLReader $reader): array {
+                    $dom = new \DOMDocument();
+                    @$dom->loadXML('<broken>');
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionCode(-669);
-        $this->expectExceptionMessage(
-            'Unable to parse XML from $xmlText. ' .
-            'Premature end of data in tag broken line 1'
-        );
-
-        $method->invoke(
-            null,
-            '<root/>',
-            '',
-            null,
-            LIBXML_BIGLINES | LIBXML_COMPACT,
-            static function (\XMLReader $reader): array {
-                $dom = new \DOMDocument();
-                @$dom->loadXML('<broken>');
-
-                return [
-                    'n' => $reader->name,
-                ];
-            }
-        );
+                    return [
+                        'n' => $reader->name,
+                    ];
+                }
+            );
+            self::fail('Expected parsing exception was not thrown.');
+        } catch (InvalidArgumentException $exception) {
+            self::assertSame(-669, $exception->getCode());
+            self::assertStringContainsString(
+                'Unable to parse XML from $xmlText.',
+                $exception->getMessage()
+            );
+            self::assertTrue(
+                strpos(
+                    $exception->getMessage(),
+                    'Premature end of data in tag broken line 1'
+                ) !== false
+                || strpos(
+                    $exception->getMessage(),
+                    "EndTag: '</' not found"
+                ) !== false
+            );
+        }
     }
 }

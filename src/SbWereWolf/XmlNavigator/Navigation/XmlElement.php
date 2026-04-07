@@ -246,7 +246,7 @@ class XmlElement implements IXmlElement
      */
     private static function isHierarchySequence(mixed $value): bool
     {
-        if (!is_array($value) || !array_is_list($value)) {
+        if (!is_array($value) || !self::isList($value)) {
             return false;
         }
 
@@ -257,5 +257,10 @@ class XmlElement implements IXmlElement
         }
 
         return true;
+    }
+
+    private static function isList(array $value): bool
+    {
+        return $value === array_values($value);
     }
 }
