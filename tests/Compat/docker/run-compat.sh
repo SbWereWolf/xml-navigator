@@ -13,6 +13,8 @@ shift
 
 image_tag="xml-browser-compat:${php_image//[:\/]/-}"
 
+docker image rm -f "$image_tag" >/dev/null 2>&1 || true
+
 docker build \
     --build-arg "PHP_IMAGE=$php_image" \
     --build-arg "XDEBUG_VERSION=$xdebug_version" \

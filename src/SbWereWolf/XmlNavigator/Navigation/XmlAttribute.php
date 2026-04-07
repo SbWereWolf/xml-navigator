@@ -9,8 +9,10 @@ namespace SbWereWolf\XmlNavigator\Navigation;
  */
 class XmlAttribute implements IXmlAttribute
 {
-    private string $name;
-    private string $value;
+    /** @var string */
+    private $name;
+    /** @var string */
+    private $value;
 
     /**
      * @param string $name Attribute name

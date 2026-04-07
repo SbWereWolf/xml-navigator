@@ -16,10 +16,14 @@ use XMLReader;
  */
 class XmlParser
 {
-    private string $val;
-    private string $attr;
-    private string $name;
-    private string $seq;
+    /** @var string */
+    private $val;
+    /** @var string */
+    private $attr;
+    /** @var string */
+    private $name;
+    /** @var string */
+    private $seq;
 
     /**
      * @param string $val

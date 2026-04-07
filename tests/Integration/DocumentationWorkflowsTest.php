@@ -19,9 +19,10 @@ final class DocumentationWorkflowsTest extends TestCase
 
         $offers = FastXmlParser::extractHierarchy(
             $reader,
-            static fn (XMLReader $cursor): bool =>
-                $cursor->nodeType === XMLReader::ELEMENT
-                && $cursor->name === 'offer'
+            static function (XMLReader $cursor): bool {
+                return $cursor->nodeType === XMLReader::ELEMENT
+                    && $cursor->name === 'offer';
+            }
         );
 
         self::assertTrue($offers->valid());
@@ -47,9 +48,10 @@ final class DocumentationWorkflowsTest extends TestCase
 
         $offers = FastXmlParser::extractHierarchy(
             $reader,
-            static fn (XMLReader $cursor): bool =>
-                $cursor->nodeType === XMLReader::ELEMENT
-                && $cursor->name === 'offer',
+            static function (XMLReader $cursor): bool {
+                return $cursor->nodeType === XMLReader::ELEMENT
+                    && $cursor->name === 'offer';
+            },
             'value',
             'attributes',
             'name',
@@ -92,7 +94,9 @@ final class DocumentationWorkflowsTest extends TestCase
         self::assertSame(
             ['office', 'usb'],
             array_map(
-                static fn (XmlElement $tag): string => $tag->value(),
+                static function (XmlElement $tag): string {
+                    return $tag->value();
+                },
                 $firstOffer->elements('tag')
             )
         );

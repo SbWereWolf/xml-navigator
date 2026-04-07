@@ -24,7 +24,9 @@ final class XmlParserTest extends TestCase
         $actual = iterator_to_array(
             $parser->extractHierarchy(
                 $reader,
-                static fn (XMLReader $cursor): bool => $cursor->name === 'offer'
+                static function (XMLReader $cursor): bool {
+                    return $cursor->name === 'offer';
+                }
             ),
             false
         );
@@ -93,14 +95,18 @@ final class XmlParserTest extends TestCase
         $first = iterator_to_array(
             $parser->extractHierarchy(
                 $firstReader,
-                static fn (XMLReader $cursor): bool => $cursor->name === 'offer'
+                static function (XMLReader $cursor): bool {
+                    return $cursor->name === 'offer';
+                }
             ),
             false
         );
         $second = iterator_to_array(
             $parser->extractHierarchy(
                 $secondReader,
-                static fn (XMLReader $cursor): bool => $cursor->name === 'service'
+                static function (XMLReader $cursor): bool {
+                    return $cursor->name === 'service';
+                }
             ),
             false
         );
@@ -136,7 +142,9 @@ final class XmlParserTest extends TestCase
         $actual = iterator_to_array(
             $parser->extractHierarchy(
                 $reader,
-                static fn (XMLReader $cursor): bool => $cursor->name === 'missing'
+                static function (XMLReader $cursor): bool {
+                    return $cursor->name === 'missing';
+                }
             ),
             false
         );
@@ -157,7 +165,9 @@ final class XmlParserTest extends TestCase
         $actual = iterator_to_array(
             $parser->extractPrettyPrint(
                 $reader,
-                static fn (XMLReader $cursor): bool => $cursor->name === 'offer'
+                static function (XMLReader $cursor): bool {
+                    return $cursor->name === 'offer';
+                }
             ),
             false
         );

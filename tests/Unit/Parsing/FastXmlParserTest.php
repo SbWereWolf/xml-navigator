@@ -18,9 +18,10 @@ final class FastXmlParserTest extends TestCase
         $actual = iterator_to_array(
             FastXmlParser::extractHierarchy(
                 $reader,
-                static fn (XMLReader $cursor): bool =>
-                    $cursor->nodeType === XMLReader::ELEMENT
-                    && $cursor->name === 'offer'
+                static function (XMLReader $cursor): bool {
+                    return $cursor->nodeType === XMLReader::ELEMENT
+                        && $cursor->name === 'offer';
+                }
             ),
             false
         );
@@ -81,7 +82,9 @@ final class FastXmlParserTest extends TestCase
         $actual = iterator_to_array(
             FastXmlParser::extractHierarchy(
                 $reader,
-                static fn (XMLReader $cursor): bool => $cursor->name === 'offer',
+                static function (XMLReader $cursor): bool {
+                    return $cursor->name === 'offer';
+                },
                 'value',
                 'attributes',
                 'name',
@@ -146,8 +149,9 @@ final class FastXmlParserTest extends TestCase
         $actual = iterator_to_array(
             FastXmlParser::extractHierarchy(
                 $reader,
-                static fn (XMLReader $cursor): bool =>
-                    $cursor->name === 'missing'
+                static function (XMLReader $cursor): bool {
+                    return $cursor->name === 'missing';
+                }
             ),
             false
         );
@@ -164,9 +168,10 @@ final class FastXmlParserTest extends TestCase
         $actual = iterator_to_array(
             FastXmlParser::extractPrettyPrint(
                 $reader,
-                static fn (XMLReader $cursor): bool =>
-                    $cursor->nodeType === XMLReader::ELEMENT
-                    && $cursor->name === 'offer'
+                static function (XMLReader $cursor): bool {
+                    return $cursor->nodeType === XMLReader::ELEMENT
+                        && $cursor->name === 'offer';
+                }
             ),
             false
         );
@@ -217,8 +222,9 @@ final class FastXmlParserTest extends TestCase
         $actual = iterator_to_array(
             FastXmlParser::extractPrettyPrint(
                 $reader,
-                static fn (XMLReader $cursor): bool =>
-                    $cursor->name === 'missing'
+                static function (XMLReader $cursor): bool {
+                    return $cursor->name === 'missing';
+                }
             ),
             false
         );

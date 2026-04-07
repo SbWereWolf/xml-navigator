@@ -18,26 +18,27 @@ use SbWereWolf\XmlNavigator\General\Notation;
  */
 class XmlElement implements IXmlElement
 {
-    private static bool $trustChildData = false;
+    /** @var bool */
+    private static $trustChildData = false;
 
     /** @var HierarchyNode Serialized XML element representation */
-    private array $data;
+    private $data;
     /** @var string Index for the element name */
-    private string $name;
+    private $name;
     /** @var string Index for the element value */
-    private string $val;
+    private $val;
     /** @var string index for element attributes */
-    private string $attr;
+    private $attr;
     /** @var string Index for child elements */
-    private string $seq;
+    private $seq;
     /** @var string XML element name */
-    private string $elementName;
+    private $elementName;
     /** @var string XML element value */
-    private string $elementValue;
+    private $elementValue;
     /** @var XmlAttributes XML element attributes */
-    private array $attributesData;
+    private $attributesData;
     /** @var list<array<string, mixed>> Child elements */
-    private array $sequenceData;
+    private $sequenceData;
 
     /**
      * @param HierarchyNode $initial Serialized XML element payload

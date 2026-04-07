@@ -60,7 +60,9 @@ final class XmlElementTest extends TestCase
         self::assertTrue($offer->hasElement('price'));
 
         $names = array_map(
-            static fn (XmlElement $element): string => $element->name(),
+            static function (XmlElement $element): string {
+                return $element->name();
+            },
             $offer->elements()
         );
 
@@ -68,7 +70,9 @@ final class XmlElementTest extends TestCase
         self::assertSame(
             ['office', 'usb'],
             array_map(
-                static fn (XmlElement $tag): string => $tag->value(),
+                static function (XmlElement $tag): string {
+                    return $tag->value();
+                },
                 $offer->elements('tag')
             )
         );

@@ -16,26 +16,26 @@ class XmlConverter implements IXmlConverter
 {
     /** @var HierarchyNode
      *      Normalized XML document structure */
-    private array $xmlStructure = [];
+    private $xmlStructure = [];
     /** @var PrettyNode
      *       Readable XML document representation */
-    private array $prettyXml = [];
+    private $prettyXml = [];
     /** @var string Index for the element name */
-    private string $name;
+    private $name;
     /** @var string Index for the element value */
-    private string $val;
+    private $val;
     /** @var string Index for element attributes */
-    private string $attr;
+    private $attr;
     /** @var string  Index for child elements */
-    private string $seq;
+    private $seq;
     /** @var string|null XML document encoding */
-    private ?string $encoding;
+    private $encoding;
     /** @var int Bitmask built from LIBXML_* constants */
-    private int $flags;
+    private $flags;
     /** @var string Previous text of XML document */
-    private string $previousXmlText = '';
+    private $previousXmlText = '';
     /** @var string Previous path or link to XML document */
-    private string $previousXmlUri = '';
+    private $previousXmlUri = '';
 
     /**
      * @param string $val index for the element value

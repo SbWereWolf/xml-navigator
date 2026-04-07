@@ -44,8 +44,9 @@ class FastXmlToArray implements IFastXmlToArray
             return self::requireArrayResult(
                 FastXmlParser::extractHierarchy(
                     $reader,
-                    static fn (XMLReader $cursor): bool =>
-                        $cursor->nodeType === XMLReader::ELEMENT,
+                    static function (XMLReader $cursor): bool {
+                        return $cursor->nodeType === XMLReader::ELEMENT;
+                    },
                     $val,
                     $attr,
                     $name,
@@ -91,8 +92,9 @@ class FastXmlToArray implements IFastXmlToArray
             return self::requireArrayResult(
                 FastXmlParser::extractPrettyPrint(
                     $reader,
-                    static fn (XMLReader $cursor): bool =>
-                        $cursor->nodeType === XMLReader::ELEMENT,
+                    static function (XMLReader $cursor): bool {
+                        return $cursor->nodeType === XMLReader::ELEMENT;
+                    },
                     $val,
                     $attr,
                 )->current(),
@@ -246,8 +248,9 @@ class FastXmlToArray implements IFastXmlToArray
         }
 
         $messages = array_map(
-            static fn (\LibXMLError $error): string =>
-                trim($error->message),
+            static function (\LibXMLError $error): string {
+                return trim($error->message);
+            },
             $errors
         );
 
