@@ -33,9 +33,10 @@ if ($reader === false) {
 foreach (
     FastXmlParser::extractHierarchy(
         $reader,
-        static fn (XMLReader $cursor): bool =>
-            $cursor->nodeType === XMLReader::ELEMENT
-            && $cursor->name === 'offer'
+        static function (XMLReader $cursor): bool {
+            return $cursor->nodeType === XMLReader::ELEMENT
+                && $cursor->name === 'offer';
+            }
     ) as $offer
 ) {
     var_export($offer);

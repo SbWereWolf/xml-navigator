@@ -29,7 +29,7 @@ foreach ($offer->attributes() as $attribute) {
 }
 
 $tagValues = array_map(
-    static fn (XmlElement $tag): string => $tag->value(),
+    static function (XmlElement $tag): string { return $tag->value(); },
     $offer->elements('tag')
 );
 
