@@ -144,10 +144,10 @@ array keys once and reuse that notation.
 use SbWereWolf\XmlNavigator\Conversion\XmlConverter;
 
 $converter = new XmlConverter(
-    val: 'value',
-    attr: 'attributes',
-    name: 'name',
-    seq: 'children',
+    'value',
+    'attributes',
+    'name',
+    'children'
 );
 
 $result = $converter->toHierarchyOfElements(
@@ -173,8 +173,8 @@ Result:
 use SbWereWolf\XmlNavigator\Conversion\XmlConverter;
 
 $converter = new XmlConverter(
-    val: 'value',
-    attr: 'attributes',
+    'value',
+    'attributes'
 );
 
 $result = $converter->toPrettyPrint(
@@ -381,10 +381,10 @@ $reader = XMLReader::XML(<<<'XML'
 XML);
 
 $parser = new XmlParser(
-    val: 'value',
-    attr: 'attributes',
-    name: 'name',
-    seq: 'children',
+    'value',
+    'attributes',
+    'name',
+    'children',
 );
 
 $rows = iterator_to_array(
@@ -442,8 +442,8 @@ $reader = XMLReader::XML(<<<'XML'
 XML);
 
 $parser = new XmlParser(
-    val: 'value',
-    attr: 'attributes',
+    'value',
+    'attributes',
 );
 
 $items = iterator_to_array(

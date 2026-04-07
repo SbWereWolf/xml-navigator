@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ php7.4 ]
   pull_request:
-    branches: [ main ]
+    branches: [ php7.4 ]
 
 jobs:
   tests:
@@ -15,10 +15,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup PHP 8.3 with Xdebug
+      - name: Setup PHP 7.4 with Xdebug
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: '7.4'
           tools: composer:v2
           coverage: xdebug
 
@@ -45,6 +45,8 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage.xml
+          flags: php7.4
+          name: php7.4
           fail_ci_if_error: true
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

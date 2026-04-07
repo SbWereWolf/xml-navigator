@@ -253,10 +253,10 @@ Custom key names for one-shot conversion.
 use SbWereWolf\XmlNavigator\Conversion\XmlConverter;
 
 $converter = new XmlConverter(
-    val: 'value',
-    attr: 'attributes',
-    name: 'name',
-    seq: 'children',
+    'value',
+    'attributes',
+    'name',
+    'children'
 );
 
 $hierarchy = $converter->toHierarchyOfElements(
