@@ -139,6 +139,7 @@ array (
 ```
 
 ## Index
+- [PHP compatibility](docs/php-compatibility.md)
 - [Turn XML into arrays with custom keys](#turn-xml-into-arrays-with-custom-keys)
 - [Extract only the needed elements from large XML without loading the whole document](#extract-only-the-needed-elements-from-large-xml-without-loading-the-whole-document)
 - [Convert XML to a traversable array and walk it with `XmlElement`](#convert-xml-to-a-traversable-array-and-walk-it-with-xmlelement)
