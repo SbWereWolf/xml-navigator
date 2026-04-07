@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace SbWereWolf\XmlNavigator\Navigation;
 
 /**
- * Объект для XML атрибута
+ * XML attribute value object
  */
 class XmlAttribute implements IXmlAttribute
 {
@@ -13,8 +13,8 @@ class XmlAttribute implements IXmlAttribute
     private string $value;
 
     /**
-     * @param string $name Имя атрибута
-     * @param string $value Значение атрибута
+     * @param string $name Attribute name
+     * @param string $value Attribute value
      */
     public function __construct(string $name, string $value)
     {

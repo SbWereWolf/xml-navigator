@@ -7,7 +7,7 @@ namespace SbWereWolf\XmlNavigator\Conversion;
 use SbWereWolf\XmlNavigator\General\Notation;
 
 /**
- * Интерфейс для статического преобразователя XML документа в PHP массив
+ * Contract for static XML document converters that return PHP arrays
  *
  * @phpstan-type XmlAttributes array<string, string>
  * @phpstan-type HierarchyNode array<string, string|XmlAttributes|list<array<string, mixed>>>

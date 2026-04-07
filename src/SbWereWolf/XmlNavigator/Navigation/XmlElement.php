@@ -10,7 +10,7 @@ use SbWereWolf\XmlNavigator\Conversion\IFastXmlToArray;
 use SbWereWolf\XmlNavigator\General\Notation;
 
 /**
- * Объект для XML элемента
+ * XML element value object
  *
  * @phpstan-import-type HierarchyNode from IFastXmlToArray
  * @phpstan-import-type XmlAttributes from IFastXmlToArray
@@ -20,32 +20,31 @@ class XmlElement implements IXmlElement
 {
     private static bool $trustChildData = false;
 
-    /** @var HierarchyNode Сериализуемое представление XML элемента */
+    /** @var HierarchyNode Serialized XML element representation */
     private array $data;
-    /** @var string Индекс имени элемента */
+    /** @var string Index for the element name */
     private string $name;
-    /** @var string Индекс значения элемента */
+    /** @var string Index for the element value */
     private string $val;
-    /** @var string Индекс для атрибутов элемента */
+    /** @var string index for element attributes */
     private string $attr;
-    /** @var string Индекс для вложенных элементов */
+    /** @var string Index for child elements */
     private string $seq;
-    /** @var string Имя XML элемента */
+    /** @var string XML element name */
     private string $elementName;
-    /** @var string Значение XML элемента */
+    /** @var string XML element value */
     private string $elementValue;
-    /** @var XmlAttributes Атрибуты XML элемента */
+    /** @var XmlAttributes XML element attributes */
     private array $attributesData;
-    /** @var list<array<string, mixed>> Дочерние элементы */
+    /** @var list<array<string, mixed>> Child elements */
     private array $sequenceData;
 
     /**
-     * @param HierarchyNode $initial Массив со свойствами
-     *                                              XML элемента
-     * @param string $name Индекс для имени
-     * @param string $val Индекс для значения
-     * @param string $attr Индекс для атрибутов
-     * @param string $seq Индекс для вложенных элементов
+     * @param HierarchyNode $initial Serialized XML element payload
+     * @param string $name index for the element name
+     * @param string $val index for the element value
+     * @param string $attr index for element attributes
+     * @param string $seq Index for child elements
      */
     public function __construct(
         array $initial,

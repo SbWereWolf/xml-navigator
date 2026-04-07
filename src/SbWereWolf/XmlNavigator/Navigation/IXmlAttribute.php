@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace SbWereWolf\XmlNavigator\Navigation;
 
 /**
- * Интерфейс для объекта XML атрибута
+ * Contract for an XML attribute object
  */
 interface IXmlAttribute
 {

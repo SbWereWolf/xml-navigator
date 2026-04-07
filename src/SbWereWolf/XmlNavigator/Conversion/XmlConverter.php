@@ -7,7 +7,7 @@ namespace SbWereWolf\XmlNavigator\Conversion;
 use SbWereWolf\XmlNavigator\General\Notation;
 
 /**
- * Конвертер XML документа в PHP массив
+ * Converts an XML document into a PHP array
  *
  * @phpstan-import-type HierarchyNode from IFastXmlToArray
  * @phpstan-import-type PrettyNode from IFastXmlToArray
@@ -15,22 +15,22 @@ use SbWereWolf\XmlNavigator\General\Notation;
 class XmlConverter implements IXmlConverter
 {
     /** @var HierarchyNode
-     *      Структура XML документа в нормализованном виде */
+     *      Normalized XML document structure */
     private array $xmlStructure = [];
     /** @var PrettyNode
-     *       XML документа в виде удобном для чтения */
+     *       Readable XML document representation */
     private array $prettyXml = [];
-    /** @var string Индекс для Имени */
+    /** @var string Index for the element name */
     private string $name;
-    /** @var string Индекс для Значения */
+    /** @var string Index for the element value */
     private string $val;
-    /** @var string Индекс для Атрибутов */
+    /** @var string Index for element attributes */
     private string $attr;
-    /** @var string  Индекс для вложенных элементов */
+    /** @var string  Index for child elements */
     private string $seq;
-    /** @var string|null Кодировка XML Документа */
+    /** @var string|null XML document encoding */
     private ?string $encoding;
-    /** @var int Битовая маска из констант LIBXML_* */
+    /** @var int Bitmask built from LIBXML_* constants */
     private int $flags;
     /** @var string Previous text of XML document */
     private string $previousXmlText = '';
@@ -38,10 +38,10 @@ class XmlConverter implements IXmlConverter
     private string $previousXmlUri = '';
 
     /**
-     * @param string $val Индекс для значения
-     * @param string $attr Индекс для атрибутов
-     * @param string $name Индекс для имени
-     * @param string $seq Индекс для вложенных элементов
+     * @param string $val index for the element value
+     * @param string $attr index for element attributes
+     * @param string $name index for the element name
+     * @param string $seq Index for child elements
      * @param string|null $encoding
      * @param int $flags
      */

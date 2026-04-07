@@ -8,7 +8,7 @@ use Generator;
 use SbWereWolf\XmlNavigator\Conversion\IFastXmlToArray;
 
 /**
- * Интерфейс для объекта XML элемента
+ * Contract for an XML element object
  *
  * @phpstan-import-type HierarchyNode from IFastXmlToArray
  */

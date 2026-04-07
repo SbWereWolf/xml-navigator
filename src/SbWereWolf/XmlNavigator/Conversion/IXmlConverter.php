@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace SbWereWolf\XmlNavigator\Conversion;
 
 /**
- * Интерфейс для конвертеров XML документов в PHP массивы
+ * Contract for XML document converters that return PHP arrays
  *
  * @phpstan-import-type HierarchyNode from IFastXmlToArray
  * @phpstan-import-type PrettyNode from IFastXmlToArray

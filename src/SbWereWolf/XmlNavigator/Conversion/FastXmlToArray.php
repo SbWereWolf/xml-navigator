@@ -10,7 +10,7 @@ use SbWereWolf\XmlNavigator\Parsing\FastXmlParser;
 use XMLReader;
 
 /**
- * Статический конвертер XML документа в PHP массив
+ * Converts an XML document into a PHP array with static methods
  *
  * @phpstan-import-type HierarchyNode from IFastXmlToArray
  * @phpstan-import-type PrettyNode from IFastXmlToArray

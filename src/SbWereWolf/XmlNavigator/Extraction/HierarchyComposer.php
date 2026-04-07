@@ -8,7 +8,7 @@ use SbWereWolf\XmlNavigator\General\Notation;
 use XMLReader;
 
 /**
- * Статический конвертер XML элемента в PHP массив
+ * Converts an XML element into a PHP array
  *
  * @phpstan-import-type HierarchyNode from \SbWereWolf\XmlNavigator\Conversion\IFastXmlToArray
  */
