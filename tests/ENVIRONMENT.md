@@ -1,27 +1,27 @@
-# Test Environment for Standard PHP 8.4
+# Test Environment for Standard PHP 8.3
 
-This repository expects a standard PHP 8.4 CLI environment with the
-dependencies required for XML processing, PHPUnit, static analysis, and
+This repository expects a standard PHP 8.3 CLI environment with the
+dependencies required for XML processing, PHPUnit, style fixing, and
 coverage.
 
 ## Required dependencies
 
 At minimum, make sure the system provides:
 
-- PHP 8.4 CLI
+- PHP 8.3 CLI
 - XML / XMLReader support
 - Composer
 - Xdebug
 
 Typical package names on Linux distributions look like:
 
-- `php8.4-cli`
-- `php8.4-xml`
-- `php8.4-xdebug`
+- `php8.3-cli`
+- `php8.3-xml`
+- `php8.3-xdebug`
 - `composer`
 
 Exact package names can differ by platform or package manager, but the
-runtime expectation stays the same: `php` must be a PHP 8.4 CLI binary
+runtime expectation stays the same: `php` must be a PHP 8.3 CLI binary
 with `xmlreader` and `xdebug` available.
 
 ## How coverage works in this repository
@@ -53,7 +53,7 @@ outside the repository commands.
 
 ### Linux
 
-- install the PHP 8.4 CLI, XML, and Xdebug packages provided by your
+- install the PHP 8.3 CLI, XML, and Xdebug packages provided by your
   distribution or PPA;
 - enable the Xdebug extension for CLI PHP using the standard mechanism
   of that distribution;
@@ -61,14 +61,14 @@ outside the repository commands.
 
 ### macOS
 
-- install PHP 8.4 and Xdebug using your package manager or the standard
+- install PHP 8.3 and Xdebug using your package manager or the standard
   PHP distribution you use locally;
 - make sure the CLI `php` command loads Xdebug in its default config;
 - verify with `php --ri xdebug`.
 
 ### Windows
 
-- use a PHP 8.4 build that includes or supports Xdebug;
+- use a PHP 8.3 build that includes or supports Xdebug;
 - enable Xdebug in the normal CLI PHP configuration;
 - verify with `php --ri xdebug`.
 
@@ -89,7 +89,7 @@ Then run:
 ```bash
 composer test
 composer test-coverage
-composer phpstan-check
+composer fix-style
 ```
 
 If `composer test-coverage` fails because Xdebug is missing, fix the

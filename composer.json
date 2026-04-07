@@ -43,36 +43,17 @@
   "scripts": {
     "test": "php ./vendor/phpunit/phpunit/phpunit --configuration ./continuous-integration/phpunit/phpunit.xml --testdox --colors=always",
     "test-coverage": "php -d xdebug.mode=coverage ./vendor/phpunit/phpunit/phpunit --configuration ./continuous-integration/phpunit/phpunit.xml --testdox --colors=always --coverage-html ./continuous-integration/autotests-coverage-report --coverage-filter ./src",
-    "test:coverage:infection": "php -d xdebug.mode=coverage ./vendor/phpunit/phpunit/phpunit --configuration ./continuous-integration/phpunit/phpunit.xml --coverage-filter ./src --coverage-xml continuous-integration/infection/coverage/coverage-xml --log-junit continuous-integration/infection/coverage/junit.xml",
-    "mutate": [
-      "Composer\\Config::disableProcessTimeout",
-      "vendor/bin/infection --configuration=infection.json5 --threads=max --show-mutations=0"
-    ],
-    "mutate:changed": "vendor/bin/infection --configuration=infection.json5 --git-diff-lines --show-mutations=0",
-    "phpstan-check": "php ./vendor/bin/phpstan analyse -vvv --configuration continuous-integration/phpstan/phpstan.neon",
-    "phpstan-suppress": "php ./vendor/bin/phpstan analyse -vvv --configuration continuous-integration/phpstan/phpstan.neon --generate-baseline continuous-integration/phpstan/ignore-errors/baseline.neon",
-    "check-style": "php ./vendor/bin/phpcs --standard=continuous-integration/phpcs/phpcs.xml -v",
     "fix-style": "php ./vendor/bin/phpcbf --standard=continuous-integration/phpcs/phpcs.xml -v"
   },
   "require-dev": {
-    "buggregator/trap": "^1.15",
-    "phpstan/extension-installer": "^1.4",
-    "phpstan/phpstan": "^2.1",
-    "phpstan/phpstan-strict-rules": "^2.0",
-    "phpunit/phpunit": "^13",
+    "phpunit/phpunit": "^11.5",
     "squizlabs/php_codesniffer": "^4.0",
-    "infection/infection": "^0.32.6"
-  },
-  "require": {
-    "php": ">=8.4",
-    "ext-xmlreader": "*",
-    "ext-libxml": "*",
     "sbwerewolf/json-serialize-trait": "^1"
   },
-  "config": {
-    "allow-plugins": {
-      "phpstan/extension-installer": true,
-      "infection/extension-installer": true
-    }
-  }
+  "require": {
+    "php": ">=8.3",
+    "ext-xmlreader": "*",
+    "ext-libxml": "*"
+  },
+  "config": {}
 }

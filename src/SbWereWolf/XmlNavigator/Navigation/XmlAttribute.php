@@ -4,16 +4,11 @@ declare(strict_types=1);
 
 namespace SbWereWolf\XmlNavigator\Navigation;
 
-use JsonSerializable;
-use SbWereWolf\JsonSerializable\JsonSerializeTrait;
-
 /**
  * Объект для XML атрибута
  */
-class XmlAttribute implements IXmlAttribute, JsonSerializable
+class XmlAttribute implements IXmlAttribute
 {
-    use JsonSerializeTrait;
-
     private string $name;
     private string $value;
 

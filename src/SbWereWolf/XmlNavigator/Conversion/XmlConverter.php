@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace SbWereWolf\XmlNavigator\Conversion;
 
-use JsonSerializable;
-use SbWereWolf\JsonSerializable\JsonSerializeTrait;
 use SbWereWolf\XmlNavigator\General\Notation;
 
 /**
@@ -14,10 +12,8 @@ use SbWereWolf\XmlNavigator\General\Notation;
  * @phpstan-import-type HierarchyNode from IFastXmlToArray
  * @phpstan-import-type PrettyNode from IFastXmlToArray
  */
-class XmlConverter implements IXmlConverter, JsonSerializable
+class XmlConverter implements IXmlConverter
 {
-    use JsonSerializeTrait;
-
     /** @var HierarchyNode
      *      Структура XML документа в нормализованном виде */
     private array $xmlStructure = [];

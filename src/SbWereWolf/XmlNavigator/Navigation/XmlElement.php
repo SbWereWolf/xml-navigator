@@ -6,8 +6,6 @@ namespace SbWereWolf\XmlNavigator\Navigation;
 
 use Generator;
 use InvalidArgumentException;
-use JsonSerializable;
-use SbWereWolf\JsonSerializable\JsonSerializeTrait;
 use SbWereWolf\XmlNavigator\Conversion\IFastXmlToArray;
 use SbWereWolf\XmlNavigator\General\Notation;
 
@@ -18,10 +16,8 @@ use SbWereWolf\XmlNavigator\General\Notation;
  * @phpstan-import-type XmlAttributes from IFastXmlToArray
  * @phpstan-consistent-constructor
  */
-class XmlElement implements IXmlElement, JsonSerializable
+class XmlElement implements IXmlElement
 {
-    use JsonSerializeTrait;
-
     private static bool $trustChildData = false;
 
     /** @var HierarchyNode Сериализуемое представление XML элемента */
