@@ -42,7 +42,7 @@ class XmlConverter implements IXmlConverter
      * @param string $attr index for element attributes
      * @param string $name index for the element name
      * @param string $seq Index for child elements
-     * @param string|null $encoding
+     * @param string|null $encoding XML document encoding or `null`
      * @param int $flags
      */
     public function __construct(
@@ -50,7 +50,7 @@ class XmlConverter implements IXmlConverter
         string $attr = Notation::ATTRIBUTES,
         string $name = Notation::NAME,
         string $seq = Notation::SEQUENCE,
-        ?string $encoding = null,
+        $encoding = null,
         int $flags = LIBXML_BIGLINES | LIBXML_COMPACT
     ) {
         $this->name = $name;
@@ -77,7 +77,7 @@ class XmlConverter implements IXmlConverter
                     $this->val,
                     $this->attr,
                     $this->encoding,
-                    $this->flags,
+                    $this->flags
                 );
 
             $this->previousXmlText = $xmlText;
@@ -105,7 +105,7 @@ class XmlConverter implements IXmlConverter
                     $this->name,
                     $this->seq,
                     $this->encoding,
-                    $this->flags,
+                    $this->flags
                 );
 
             $this->previousXmlText = $xmlText;

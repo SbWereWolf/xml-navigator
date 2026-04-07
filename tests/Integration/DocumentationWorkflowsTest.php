@@ -13,7 +13,7 @@ use XMLReader;
 
 final class DocumentationWorkflowsTest extends TestCase
 {
-    public function testStreamLargeXmlExtractOnlyOffersAsHierarchy(): void
+    public function testStreamLargeXmlExtractOnlyOffersAsHierarchy()
     {
         $reader = XmlFixture::readerFromFixture('stream-catalog.xml');
 
@@ -42,7 +42,7 @@ final class DocumentationWorkflowsTest extends TestCase
         self::assertSame('Mouse', $secondOffer['s'][0]['v']);
     }
 
-    public function testStreamLargeXmlWithCustomHierarchyKeys(): void
+    public function testStreamLargeXmlWithCustomHierarchyKeys()
     {
         $reader = XmlFixture::readerFromFixture('stream-catalog.xml');
 
@@ -55,7 +55,7 @@ final class DocumentationWorkflowsTest extends TestCase
             'value',
             'attributes',
             'name',
-            'children',
+            'children'
         );
 
         self::assertTrue($offers->valid());
@@ -75,7 +75,7 @@ final class DocumentationWorkflowsTest extends TestCase
         self::assertSame('Mouse', $secondOffer['children'][0]['value']);
     }
 
-    public function testConvertWholeDocumentAndNavigateWithXmlElement(): void
+    public function testConvertWholeDocumentAndNavigateWithXmlElement()
     {
         $root = new XmlElement(
             FastXmlToArray::convert(

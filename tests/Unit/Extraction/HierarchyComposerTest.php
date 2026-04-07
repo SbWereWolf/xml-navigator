@@ -10,7 +10,7 @@ use SbWereWolf\XmlNavigator\Test\Support\XmlFixture;
 
 final class HierarchyComposerTest extends TestCase
 {
-    public function testComposeBuildsNestedHierarchy(): void
+    public function testComposeBuildsNestedHierarchy()
     {
         $reader = XmlFixture::readerFromFixture('hierarchy-catalog.xml');
 
@@ -82,7 +82,7 @@ final class HierarchyComposerTest extends TestCase
         $reader->close();
     }
 
-    public function testComposeReturnsEmptyArrayWhenReaderIsExhausted(): void
+    public function testComposeReturnsEmptyArrayWhenReaderIsExhausted()
     {
         $reader = XmlFixture::readerFromFixture('hierarchy-catalog.xml');
 

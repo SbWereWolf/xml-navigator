@@ -27,7 +27,7 @@ class FastXmlToArray implements IFastXmlToArray
         string $attr = Notation::ATTRIBUTES,
         string $name = Notation::NAME,
         string $seq = Notation::SEQUENCE,
-        ?string $encoding = null,
+        $encoding = null,
         int $flags = LIBXML_BIGLINES | LIBXML_COMPACT
     ): array {
         /** @var \Closure(XMLReader):array<mixed, mixed> $parse */
@@ -50,7 +50,7 @@ class FastXmlToArray implements IFastXmlToArray
                     $val,
                     $attr,
                     $name,
-                    $seq,
+                    $seq
                 )->current(),
                 $xmlText,
                 $xmlUri
@@ -77,7 +77,7 @@ class FastXmlToArray implements IFastXmlToArray
         string $xmlUri = '',
         string $val = Notation::VAL,
         string $attr = Notation::ATTR,
-        ?string $encoding = null,
+        $encoding = null,
         int $flags = LIBXML_BIGLINES | LIBXML_COMPACT
     ): array {
         /** @var \Closure(XMLReader):array<mixed, mixed> $parse */
@@ -96,7 +96,7 @@ class FastXmlToArray implements IFastXmlToArray
                         return $cursor->nodeType === XMLReader::ELEMENT;
                     },
                     $val,
-                    $attr,
+                    $attr
                 )->current(),
                 $xmlText,
                 $xmlUri
@@ -116,13 +116,14 @@ class FastXmlToArray implements IFastXmlToArray
     }
 
     /**
+     * @param string|null $encoding
      * @param \Closure(XMLReader):array<mixed, mixed> $parse
      * @return array<mixed, mixed>
      */
     private static function parseRootElement(
         string $xmlText,
         string $xmlUri,
-        ?string $encoding,
+        $encoding,
         int $flags,
         \Closure $parse
     ): array {
@@ -163,7 +164,7 @@ class FastXmlToArray implements IFastXmlToArray
     private static function createXmlReader(
         string $xmlText,
         string $xmlUri,
-        ?string $encoding,
+        $encoding,
         int $flags
     ): XMLReader {
         if ($xmlText === '' && $xmlUri === '') {

@@ -10,7 +10,7 @@ use SbWereWolf\XmlNavigator\Test\Support\XmlFixture;
 
 final class XmlConverterTest extends TestCase
 {
-    public function testToHierarchyOfElementsSupportsCustomKeys(): void
+    public function testToHierarchyOfElementsSupportsCustomKeys()
     {
         $converter = new XmlConverter(
             'value',
@@ -88,7 +88,7 @@ final class XmlConverterTest extends TestCase
         );
     }
 
-    public function testToPrettyPrintSupportsCustomKeys(): void
+    public function testToPrettyPrintSupportsCustomKeys()
     {
         $converter = new XmlConverter(
             'value',
@@ -124,7 +124,7 @@ final class XmlConverterTest extends TestCase
         );
     }
 
-    public function testRepeatedCallOnSameXmlTextReturnsStableResult(): void
+    public function testRepeatedCallOnSameXmlTextReturnsStableResult()
     {
         $converter = new XmlConverter();
         $xmlText = XmlFixture::read('hierarchy-catalog.xml');
@@ -135,7 +135,7 @@ final class XmlConverterTest extends TestCase
         self::assertSame($first, $second);
     }
 
-    public function testChangingXmlTextInvalidatesPrettyPrintCache(): void
+    public function testChangingXmlTextInvalidatesPrettyPrintCache()
     {
         $converter = new XmlConverter(
             'value',
@@ -171,7 +171,7 @@ final class XmlConverterTest extends TestCase
         );
     }
 
-    public function testChangingXmlUriInvalidatesHierarchyCache(): void
+    public function testChangingXmlUriInvalidatesHierarchyCache()
     {
         $converter = new XmlConverter();
 
@@ -190,7 +190,7 @@ final class XmlConverterTest extends TestCase
         self::assertCount(3, $second['s']);
     }
 
-    public function testSwitchingBetweenHierarchyAndPrettyPrintDoesNotLeakState(): void
+    public function testSwitchingBetweenHierarchyAndPrettyPrintDoesNotLeakState()
     {
         $converter = new XmlConverter(
             'value',

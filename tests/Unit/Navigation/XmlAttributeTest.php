@@ -9,7 +9,7 @@ use SbWereWolf\XmlNavigator\Navigation\XmlAttribute;
 
 final class XmlAttributeTest extends TestCase
 {
-    public function testNameAndValueReturnStoredAttributeData(): void
+    public function testNameAndValueReturnStoredAttributeData()
     {
         $attribute = new XmlAttribute('currency', 'USD');
 

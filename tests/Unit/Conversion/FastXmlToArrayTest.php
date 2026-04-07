@@ -12,7 +12,7 @@ use SbWereWolf\XmlNavigator\Test\Support\XmlFixture;
 
 final class FastXmlToArrayTest extends TestCase
 {
-    public function testConvertSupportsXmlTextAndXmlFile(): void
+    public function testConvertSupportsXmlTextAndXmlFile()
     {
         $xmlText = XmlFixture::read('hierarchy-catalog.xml');
         $xmlFile = XmlFixture::path('hierarchy-catalog.xml');
@@ -83,7 +83,7 @@ final class FastXmlToArrayTest extends TestCase
         self::assertSame($expected, FastXmlToArray::convert('', $xmlFile));
     }
 
-    public function testPrettyPrintSupportsXmlTextAndXmlFile(): void
+    public function testPrettyPrintSupportsXmlTextAndXmlFile()
     {
         $xmlText = XmlFixture::read('repeated-pretty-print.xml');
         $xmlFile = XmlFixture::path('repeated-pretty-print.xml');
@@ -115,7 +115,7 @@ final class FastXmlToArrayTest extends TestCase
     /**
      * @dataProvider missingSourceProvider
      */
-    public function testMethodsRejectMissingXmlSource(string $method): void
+    public function testMethodsRejectMissingXmlSource(string $method)
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionCode(-667);
@@ -145,7 +145,7 @@ final class FastXmlToArrayTest extends TestCase
         string $method,
         string $xmlText,
         string $xmlUri
-    ): void {
+    ) {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionCode(-668);
         $this->expectExceptionMessage(
@@ -175,7 +175,7 @@ final class FastXmlToArrayTest extends TestCase
         ];
     }
 
-    public function testConvertRejectsMalformedXmlText(): void
+    public function testConvertRejectsMalformedXmlText()
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionCode(-669);
@@ -187,7 +187,7 @@ final class FastXmlToArrayTest extends TestCase
         FastXmlToArray::convert('<broken>');
     }
 
-    public function testConvertRejectsXmlTextWithTrailingGarbage(): void
+    public function testConvertRejectsXmlTextWithTrailingGarbage()
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionCode(-669);
@@ -199,7 +199,7 @@ final class FastXmlToArrayTest extends TestCase
         FastXmlToArray::convert('<root/>junk');
     }
 
-    public function testPrettyPrintRejectsMalformedXmlText(): void
+    public function testPrettyPrintRejectsMalformedXmlText()
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionCode(-669);
@@ -214,7 +214,7 @@ final class FastXmlToArrayTest extends TestCase
     /**
      * @dataProvider malformedUriProvider
      */
-    public function testMethodsRejectMalformedXmlFile(string $method): void
+    public function testMethodsRejectMalformedXmlFile(string $method)
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionCode(-670);
@@ -238,7 +238,7 @@ final class FastXmlToArrayTest extends TestCase
         ];
     }
 
-    public function testConvertRejectsUnreadableXmlUri(): void
+    public function testConvertRejectsUnreadableXmlUri()
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionCode(-671);
@@ -249,7 +249,7 @@ final class FastXmlToArrayTest extends TestCase
         FastXmlToArray::convert('', '/definitely/missing.xml');
     }
 
-    public function testFormatLibxmlErrorsReturnsEmptyStringWhenNoErrorsExist(): void
+    public function testFormatLibxmlErrorsReturnsEmptyStringWhenNoErrorsExist()
     {
         libxml_clear_errors();
 
@@ -263,7 +263,7 @@ final class FastXmlToArrayTest extends TestCase
         self::assertSame('', $method->invoke(null));
     }
 
-    public function testParseRootElementRejectsBufferedLibxmlErrorsAfterParse(): void
+    public function testParseRootElementRejectsBufferedLibxmlErrorsAfterParse()
     {
         $method = new ReflectionMethod(
             FastXmlToArray::class,
@@ -290,9 +290,11 @@ final class FastXmlToArrayTest extends TestCase
             self::fail('Expected parsing exception was not thrown.');
         } catch (InvalidArgumentException $exception) {
             self::assertSame(-669, $exception->getCode());
-            self::assertStringContainsString(
-                'Unable to parse XML from $xmlText.',
-                $exception->getMessage()
+            self::assertTrue(
+                strpos(
+                    $exception->getMessage(),
+                    'Unable to parse XML from $xmlText.'
+                ) !== false
             );
             self::assertTrue(
                 strpos(

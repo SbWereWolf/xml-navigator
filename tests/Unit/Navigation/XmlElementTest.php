@@ -13,7 +13,7 @@ use SbWereWolf\XmlNavigator\Test\Support\XmlFixture;
 
 final class XmlElementTest extends TestCase
 {
-    public function testHierarchyRoundtripProvidesStableAccessors(): void
+    public function testHierarchyRoundtripProvidesStableAccessors()
     {
         $payload = FastXmlToArray::convert(
             '',
@@ -39,7 +39,7 @@ final class XmlElementTest extends TestCase
         self::assertSame('eu', $attributes[0]->value());
     }
 
-    public function testNestedElementsCanBePulledAndInspected(): void
+    public function testNestedElementsCanBePulledAndInspected()
     {
         $root = new XmlElement(
             FastXmlToArray::convert(
@@ -78,7 +78,7 @@ final class XmlElementTest extends TestCase
         );
     }
 
-    public function testMissingLookupsReturnStableNegativeResults(): void
+    public function testMissingLookupsReturnStableNegativeResults()
     {
         $element = new XmlElement(
             [
@@ -101,7 +101,7 @@ final class XmlElementTest extends TestCase
         self::assertSame([], iterator_to_array($element->pull('missing'), false));
     }
 
-    public function testGetWithoutNameReturnsEmptyStringWhenAttributesAreAbsent(): void
+    public function testGetWithoutNameReturnsEmptyStringWhenAttributesAreAbsent()
     {
         $element = new XmlElement(
             [
@@ -114,7 +114,7 @@ final class XmlElementTest extends TestCase
         self::assertFalse($element->hasElement());
     }
 
-    public function testConstructorRejectsInvalidPayloadShapes(): void
+    public function testConstructorRejectsInvalidPayloadShapes()
     {
         $invalidPayloads = [
             [

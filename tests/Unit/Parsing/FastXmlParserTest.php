@@ -11,7 +11,7 @@ use XMLReader;
 
 final class FastXmlParserTest extends TestCase
 {
-    public function testExtractHierarchyStreamsOnlyMatchingElements(): void
+    public function testExtractHierarchyStreamsOnlyMatchingElements()
     {
         $reader = XmlFixture::readerFromFixture('stream-catalog.xml');
 
@@ -75,7 +75,7 @@ final class FastXmlParserTest extends TestCase
         );
     }
 
-    public function testExtractHierarchySupportsCustomNotation(): void
+    public function testExtractHierarchySupportsCustomNotation()
     {
         $reader = XmlFixture::readerFromFixture('stream-catalog.xml');
 
@@ -88,7 +88,7 @@ final class FastXmlParserTest extends TestCase
                 'value',
                 'attributes',
                 'name',
-                'children',
+                'children'
             ),
             false
         );
@@ -142,7 +142,7 @@ final class FastXmlParserTest extends TestCase
         );
     }
 
-    public function testExtractHierarchyReturnsEmptyWhenNoElementMatches(): void
+    public function testExtractHierarchyReturnsEmptyWhenNoElementMatches()
     {
         $reader = XmlFixture::readerFromFixture('stream-catalog.xml');
 
@@ -161,7 +161,7 @@ final class FastXmlParserTest extends TestCase
         self::assertSame([], $actual);
     }
 
-    public function testExtractPrettyPrintStreamsMatchingElements(): void
+    public function testExtractPrettyPrintStreamsMatchingElements()
     {
         $reader = XmlFixture::readerFromFixture('stream-catalog.xml');
 
@@ -215,7 +215,7 @@ final class FastXmlParserTest extends TestCase
         );
     }
 
-    public function testExtractPrettyPrintReturnsEmptyWhenNoElementMatches(): void
+    public function testExtractPrettyPrintReturnsEmptyWhenNoElementMatches()
     {
         $reader = XmlFixture::readerFromFixture('stream-catalog.xml');
 

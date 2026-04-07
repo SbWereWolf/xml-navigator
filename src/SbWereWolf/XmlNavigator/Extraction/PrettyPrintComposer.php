@@ -127,7 +127,7 @@ class PrettyPrintComposer implements Notation
                     $attributesIndex
                 );
                 /** @var string $childName */
-                $childName = array_key_first($child);
+                $childName = self::firstKey($child);
                 /** @var PrettyNodeValue $childValue */
                 $childValue = $child[$childName];
                 self::appendChild($children, $childName, $childValue);
@@ -167,6 +167,7 @@ class PrettyPrintComposer implements Notation
 
     /**
      * @param PrettyChildren $target
+     * @param string $childName
      * @param PrettyNodeValue $childValue
      * @param-out PrettyChildren $target
      */
@@ -174,7 +175,7 @@ class PrettyPrintComposer implements Notation
         array &$target,
         string $childName,
         $childValue
-    ): void {
+    ) {
         if (!array_key_exists($childName, $target)) {
             $target[$childName] = $childValue;
             return;
@@ -255,6 +256,19 @@ class PrettyPrintComposer implements Notation
         }
 
         return $attributes;
+    }
+
+    /**
+     * @param array<mixed, mixed> $value
+     * @return string|int|null
+     */
+    private static function firstKey(array $value)
+    {
+        foreach ($value as $key => $_item) {
+            return $key;
+        }
+
+        return null;
     }
 
     private static function isList(array $value): bool

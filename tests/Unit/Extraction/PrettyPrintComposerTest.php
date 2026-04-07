@@ -10,7 +10,7 @@ use SbWereWolf\XmlNavigator\Test\Support\XmlFixture;
 
 final class PrettyPrintComposerTest extends TestCase
 {
-    public function testComposeBuildsPrettyPrintedTree(): void
+    public function testComposeBuildsPrettyPrintedTree()
     {
         $reader = XmlFixture::readerFromFixture('hierarchy-catalog.xml');
 
@@ -62,7 +62,7 @@ final class PrettyPrintComposerTest extends TestCase
         $reader->close();
     }
 
-    public function testComposeReturnsEmptyArrayWhenReaderIsExhausted(): void
+    public function testComposeReturnsEmptyArrayWhenReaderIsExhausted()
     {
         $reader = XmlFixture::readerFromFixture('hierarchy-catalog.xml');
 
@@ -74,7 +74,7 @@ final class PrettyPrintComposerTest extends TestCase
         $reader->close();
     }
 
-    public function testComposeMovesReaderPastTopLevelEmptyElement(): void
+    public function testComposeMovesReaderPastTopLevelEmptyElement()
     {
         $reader = XmlFixture::readerFromFixture('empty-elements.xml');
 
@@ -105,7 +105,7 @@ final class PrettyPrintComposerTest extends TestCase
         $reader->close();
     }
 
-    public function testComposePreservesMixedContentWithAttributesAndChild(): void
+    public function testComposePreservesMixedContentWithAttributesAndChild()
     {
         $reader = XmlFixture::readerFromFixture('mixed-content.xml');
 
@@ -125,7 +125,7 @@ final class PrettyPrintComposerTest extends TestCase
         $reader->close();
     }
 
-    public function testComposeTurnsRepeatedChildTagsIntoList(): void
+    public function testComposeTurnsRepeatedChildTagsIntoList()
     {
         $reader = XmlFixture::readerFromFixture('repeated-pretty-print.xml');
 

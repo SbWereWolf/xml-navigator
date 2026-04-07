@@ -11,7 +11,7 @@ use XMLReader;
 
 final class XmlParserTest extends TestCase
 {
-    public function testExtractHierarchyUsesConfiguredNotation(): void
+    public function testExtractHierarchyUsesConfiguredNotation()
     {
         $reader = XmlFixture::readerFromFixture('stream-catalog.xml');
         $parser = new XmlParser(
@@ -80,7 +80,7 @@ final class XmlParserTest extends TestCase
         );
     }
 
-    public function testExtractHierarchyReusesConfiguredParserAcrossReaders(): void
+    public function testExtractHierarchyReusesConfiguredParserAcrossReaders()
     {
         $parser = new XmlParser(
             'value',
@@ -134,7 +134,7 @@ final class XmlParserTest extends TestCase
         );
     }
 
-    public function testExtractHierarchyReturnsEmptyWhenNoElementMatches(): void
+    public function testExtractHierarchyReturnsEmptyWhenNoElementMatches()
     {
         $reader = XmlFixture::readerFromFixture('stream-catalog.xml');
         $parser = new XmlParser();
@@ -154,7 +154,7 @@ final class XmlParserTest extends TestCase
         self::assertSame([], $actual);
     }
 
-    public function testExtractPrettyPrintUsesConfiguredNotation(): void
+    public function testExtractPrettyPrintUsesConfiguredNotation()
     {
         $reader = XmlFixture::readerFromFixture('stream-catalog.xml');
         $parser = new XmlParser(

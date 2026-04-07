@@ -162,7 +162,7 @@ class XmlElement implements IXmlElement
                     $this->name,
                     $this->val,
                     $this->attr,
-                    $this->seq,
+                    $this->seq
                 );
             } finally {
                 self::$trustChildData = false;

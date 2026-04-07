@@ -1,13 +1,17 @@
 ARG PHP_IMAGE=php:8.0-cli
 FROM ${PHP_IMAGE}
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2.2 /usr/bin/composer /usr/bin/composer
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
 ARG XDEBUG_VERSION=
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
+    || (sed -ri 's@deb.debian.org/debian@archive.debian.org/debian@g; s@security.debian.org/debian-security@archive.debian.org/debian-security@g' /etc/apt/sources.list \
+    && sed -ri '/stretch-updates/d; /debian-security/d' /etc/apt/sources.list \
+    && printf 'Acquire::Check-Valid-Until "false";\nAcquire::AllowInsecureRepositories "true";\nAPT::Get::AllowUnauthenticated "true";\n' > /etc/apt/apt.conf.d/99archive \
+    && apt-get update) \
+    && apt-get install -y --allow-unauthenticated --no-install-recommends \
         git \
         unzip \
         libxml2-dev \
