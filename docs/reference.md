@@ -144,10 +144,10 @@ array keys once and reuse that notation.
 use SbWereWolf\XmlNavigator\Conversion\XmlConverter;
 
 $converter = new XmlConverter(
-    val: 'value',
-    attr: 'attributes',
-    name: 'name',
-    seq: 'children',
+    'value',
+    'attributes',
+    'name',
+    'children'
 );
 
 $result = $converter->toHierarchyOfElements(
@@ -173,8 +173,8 @@ Result:
 use SbWereWolf\XmlNavigator\Conversion\XmlConverter;
 
 $converter = new XmlConverter(
-    val: 'value',
-    attr: 'attributes',
+    'value',
+    'attributes'
 );
 
 $result = $converter->toPrettyPrint(
@@ -228,12 +228,13 @@ $reader = XMLReader::XML(<<<'XML'
   <service id="s-1"><name>Warranty</name></service>
   <offer id="1002"><name>Mouse</name></offer>
 </catalog>
-XML);
+XML
+);
 
 $offers = iterator_to_array(
     FastXmlParser::extractHierarchy(
         $reader,
-        static fn (XMLReader $cursor): bool => $cursor->name === 'offer'
+        static function (XMLReader $cursor): bool { return $cursor->name === 'offer'; }
     ),
     false
 );
@@ -282,12 +283,13 @@ $reader = XMLReader::XML(<<<'XML'
   <item code="B">value-and-attributes</item>
   <item />
 </root>
-XML);
+XML
+);
 
 $items = iterator_to_array(
     FastXmlParser::extractPrettyPrint(
         $reader,
-        static fn (XMLReader $cursor): bool => $cursor->name === 'item'
+        static function (XMLReader $cursor): bool { return $cursor->name === 'item'; }
     ),
     false
 );
@@ -329,12 +331,13 @@ $reader = XMLReader::XML(<<<'XML'
 <catalog>
   <offer id="1001"><name>Keyboard</name></offer>
 </catalog>
-XML);
+XML
+);
 
 $offers = iterator_to_array(
     FastXmlParser::extractHierarchy(
         $reader,
-        static fn (XMLReader $cursor): bool => $cursor->name === 'offer',
+        static function (XMLReader $cursor): bool { return $cursor->name === 'offer'; },
         'value',
         'attributes',
         'name',
@@ -378,19 +381,20 @@ $reader = XMLReader::XML(<<<'XML'
   <row id="1"><value>alpha</value></row>
   <row id="2"><value>beta</value></row>
 </dataset>
-XML);
+XML
+);
 
 $parser = new XmlParser(
-    val: 'value',
-    attr: 'attributes',
-    name: 'name',
-    seq: 'children',
+    'value',
+    'attributes',
+    'name',
+    'children',
 );
 
 $rows = iterator_to_array(
     $parser->extractHierarchy(
         $reader,
-        static fn (XMLReader $cursor): bool => $cursor->name === 'row'
+        static function (XMLReader $cursor): bool { return $cursor->name === 'row'; }
     ),
     false
 );
@@ -439,17 +443,18 @@ $reader = XMLReader::XML(<<<'XML'
   <item code="B">value-and-attributes</item>
   <item />
 </root>
-XML);
+XML
+);
 
 $parser = new XmlParser(
-    val: 'value',
-    attr: 'attributes',
+    'value',
+    'attributes',
 );
 
 $items = iterator_to_array(
     $parser->extractPrettyPrint(
         $reader,
-        static fn (XMLReader $cursor): bool => $cursor->name === 'item'
+        static function (XMLReader $cursor): bool { return $cursor->name === 'item'; }
     ),
     false
 );
@@ -554,10 +559,10 @@ true
 
 ```php
 array_map(
-    static fn ($attribute): array => [
+    static function ($attribute): array { return [
         $attribute->name(),
         $attribute->value(),
-    ],
+    ]; },
     $offer->attributes()
 );
 ```
@@ -599,7 +604,7 @@ true
 
 ```php
 array_map(
-    static fn (XmlElement $tag): string => $tag->value(),
+    static function (XmlElement $tag): string { return $tag->value(); },
     $offer->elements('tag')
 );
 ```

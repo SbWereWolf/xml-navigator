@@ -22,7 +22,8 @@ file_put_contents($uri, <<<'XML'
     <price>19.90</price>
   </offer>
 </catalog>
-XML);
+XML
+);
 
 $reader = XMLReader::open($uri);
 
@@ -32,9 +33,10 @@ if ($reader === false) {
 
 $offers = FastXmlParser::extractHierarchy(
     $reader,
-    static fn (XMLReader $cursor): bool =>
-        $cursor->nodeType === XMLReader::ELEMENT
-        && $cursor->name === 'offer'
+    static function (XMLReader $cursor): bool {
+        return $cursor->nodeType === XMLReader::ELEMENT
+            && $cursor->name === 'offer';
+    }
 );
 
 foreach ($offers as $offer) {

@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ php7.0 ]
   pull_request:
-    branches: [ main ]
+    branches: [ php7.0 ]
 
 jobs:
   tests:
@@ -15,11 +15,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup PHP 8.3 with Xdebug
+      - name: Setup PHP 7.0 with Xdebug
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
-          tools: composer:v2
+          php-version: '7.0'
+          tools: composer:v2.2
           coverage: xdebug
 
       - name: Validate composer.json
@@ -38,13 +38,15 @@ jobs:
           --configuration ./continuous-integration/phpunit/phpunit.xml
           --colors=always
           --coverage-clover coverage.xml
-          --coverage-filter ./src
+          --whitelist ./src
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage.xml
+          flags: php7.0
+          name: php7.0
           fail_ci_if_error: true
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
