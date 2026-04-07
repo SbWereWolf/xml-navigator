@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace SbWereWolf\XmlNavigator\Parsing;
 
 use Generator;
@@ -30,11 +28,11 @@ class FastXmlParser
     public static function extractHierarchy(
         XMLReader $reader,
         callable $detectElement,
-        string $val = Notation::VALUE,
-        string $attr = Notation::ATTRIBUTES,
-        string $name = Notation::NAME,
-        string $seq = Notation::SEQUENCE
-    ): Generator {
+        $val = Notation::VALUE,
+        $attr = Notation::ATTRIBUTES,
+        $name = Notation::NAME,
+        $seq = Notation::SEQUENCE
+    ) {
         while (self::seekSuitable($reader, $detectElement)) {
             yield HierarchyComposer::compose(
                 $reader,
@@ -56,9 +54,9 @@ class FastXmlParser
     public static function extractPrettyPrint(
         XMLReader $reader,
         callable $detectElement,
-        string $val = Notation::VAL,
-        string $attr = Notation::ATTR
-    ): Generator {
+        $val = Notation::VAL,
+        $attr = Notation::ATTR
+    ) {
         while (self::seekSuitable($reader, $detectElement)) {
             yield PrettyPrintComposer::compose(
                 $reader,
@@ -77,7 +75,7 @@ class FastXmlParser
     private static function seekSuitable(
         XMLReader $reader,
         callable $detectElement
-    ): bool {
+    ) {
         do {
             if (
                 $reader->nodeType === XMLReader::ELEMENT

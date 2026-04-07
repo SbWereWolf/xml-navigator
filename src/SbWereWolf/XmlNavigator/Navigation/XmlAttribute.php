@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace SbWereWolf\XmlNavigator\Navigation;
 
 /**
@@ -18,20 +16,20 @@ class XmlAttribute implements IXmlAttribute
      * @param string $name Attribute name
      * @param string $value Attribute value
      */
-    public function __construct(string $name, string $value)
+    public function __construct($name, $value)
     {
         $this->name = $name;
         $this->value = $value;
     }
 
     /* @inheritdoc */
-    public function name(): string
+    public function name()
     {
         return $this->name;
     }
 
     /* @inheritdoc */
-    public function value(): string
+    public function value()
     {
         return $this->value;
     }

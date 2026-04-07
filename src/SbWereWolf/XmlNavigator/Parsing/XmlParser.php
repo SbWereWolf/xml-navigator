@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace SbWereWolf\XmlNavigator\Parsing;
 
 use Generator;
@@ -32,10 +30,10 @@ class XmlParser
      * @param string $seq
      */
     public function __construct(
-        string $val = Notation::VALUE,
-        string $attr = Notation::ATTRIBUTES,
-        string $name = Notation::NAME,
-        string $seq = Notation::SEQUENCE
+        $val = Notation::VALUE,
+        $attr = Notation::ATTRIBUTES,
+        $name = Notation::NAME,
+        $seq = Notation::SEQUENCE
     ) {
         $this->val = $val;
         $this->attr = $attr;
@@ -51,7 +49,7 @@ class XmlParser
     public function extractHierarchy(
         XMLReader $reader,
         callable $detectElement
-    ): Generator {
+    ) {
         $extractor = FastXmlParser::extractHierarchy(
             $reader,
             $detectElement,
@@ -74,7 +72,7 @@ class XmlParser
     public function extractPrettyPrint(
         XMLReader $reader,
         callable $detectElement
-    ): Generator {
+    ) {
         $extractor = FastXmlParser::extractPrettyPrint(
             $reader,
             $detectElement,

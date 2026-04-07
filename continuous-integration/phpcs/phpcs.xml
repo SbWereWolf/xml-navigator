@@ -11,4 +11,7 @@
     <rule ref="PSR12.Functions.ReturnTypeDeclaration.SpaceBeforeReturnType">
         <severity>0</severity>
     </rule>
+    <rule ref="PSR12.Properties.ConstantVisibility.NotFound">
+        <severity>0</severity>
+    </rule>
 </ruleset>

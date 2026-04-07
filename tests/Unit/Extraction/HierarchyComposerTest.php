@@ -1,6 +1,5 @@
 <?php
 
-declare(strict_types=1);
 
 namespace SbWereWolf\XmlNavigator\Test\Unit\Extraction;
 
@@ -94,7 +93,7 @@ final class HierarchyComposerTest extends TestCase
         $reader->close();
     }
 
-    public function testComposeMovesReaderPastTopLevelEmptyElement(): void
+    public function testComposeMovesReaderPastTopLevelEmptyElement()
     {
         $reader = XmlFixture::readerFromFixture('empty-elements.xml');
 

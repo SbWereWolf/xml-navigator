@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace SbWereWolf\XmlNavigator\Navigation;
 
 use Generator;
@@ -49,15 +47,23 @@ class XmlElement implements IXmlElement
      */
     public function __construct(
         array $initial,
-        string $name = Notation::NAME,
-        string $val = Notation::VALUE,
-        string $attr = Notation::ATTRIBUTES,
-        string $seq = Notation::SEQUENCE
+        $name = Notation::NAME,
+        $val = Notation::VALUE,
+        $attr = Notation::ATTRIBUTES,
+        $seq = Notation::SEQUENCE
     ) {
-        $elementName = $initial[$name] ?? null;
-        $elementValue = $initial[$val] ?? '';
-        $attributesData = $initial[$attr] ?? [];
-        $sequenceData = $initial[$seq] ?? [];
+        $elementName = array_key_exists($name, $initial)
+            ? $initial[$name]
+            : null;
+        $elementValue = array_key_exists($val, $initial)
+            ? $initial[$val]
+            : '';
+        $attributesData = array_key_exists($attr, $initial)
+            ? $initial[$attr]
+            : [];
+        $sequenceData = array_key_exists($seq, $initial)
+            ? $initial[$seq]
+            : [];
         $hasValidElementName = is_string($elementName);
         $hasValidElementValue = is_string($elementValue);
         $hasValidAttributes = self::isXmlAttributes($attributesData);
@@ -103,7 +109,7 @@ class XmlElement implements IXmlElement
     /**
      * @return list<IXmlAttribute>
      */
-    public function attributes(): array
+    public function attributes()
     {
         $result = [];
         foreach ($this->attributesData as $name => $value) {
@@ -114,10 +120,12 @@ class XmlElement implements IXmlElement
     }
 
     /* @inheritdoc */
-    public function get(string $name = ''): string
+    public function get($name = '')
     {
         if ('' !== $name) {
-            return $this->attributesData[$name] ?? '';
+            return array_key_exists($name, $this->attributesData)
+                ? $this->attributesData[$name]
+                : '';
         }
 
         $first = reset($this->attributesData);
@@ -131,7 +139,7 @@ class XmlElement implements IXmlElement
     /**
      * @return list<IXmlElement>
      */
-    public function elements(string $name = ''): array
+    public function elements($name = '')
     {
         $result = [];
         foreach ($this->pull($name) as $xmlElement) {
@@ -144,13 +152,16 @@ class XmlElement implements IXmlElement
     /**
      * @return Generator<int, static>
      */
-    public function pull(string $name = ''): Generator
+    public function pull($name = '')
     {
         foreach ($this->sequenceData as $elem) {
             /** @var HierarchyNode $elem */
             if (
                 '' !== $name
-                && (($elem[$this->name] ?? null) !== $name)
+                && (
+                    !array_key_exists($this->name, $elem)
+                    || $elem[$this->name] !== $name
+                )
             ) {
                 continue;
             }
@@ -173,25 +184,25 @@ class XmlElement implements IXmlElement
     }
 
     /* @inheritdoc */
-    public function value(): string
+    public function value()
     {
         return $this->elementValue;
     }
 
     /* @inheritdoc */
-    public function name(): string
+    public function name()
     {
         return $this->elementName;
     }
 
     /* @inheritdoc */
-    public function hasValue(): bool
+    public function hasValue()
     {
         return array_key_exists($this->val, $this->data);
     }
 
     /* @inheritdoc */
-    public function hasAttribute(string $name = ''): bool
+    public function hasAttribute($name = '')
     {
         if ('' === $name) {
             return $this->attributesData !== [];
@@ -201,14 +212,17 @@ class XmlElement implements IXmlElement
     }
 
     /* @inheritdoc */
-    public function hasElement(string $name = ''): bool
+    public function hasElement($name = '')
     {
         if ('' === $name) {
             return $this->sequenceData !== [];
         }
 
         foreach ($this->sequenceData as $elem) {
-            if (($elem[$this->name] ?? null) === $name) {
+            if (
+                array_key_exists($this->name, $elem)
+                && $elem[$this->name] === $name
+            ) {
                 return true;
             }
         }
@@ -217,7 +231,7 @@ class XmlElement implements IXmlElement
     }
 
     /* @inheritdoc */
-    public function serialize(): array
+    public function serialize()
     {
         return $this->data;
     }
@@ -226,7 +240,7 @@ class XmlElement implements IXmlElement
      * @param mixed $value Value that may contain XML attributes
      * @phpstan-assert-if-true XmlAttributes $value
      */
-    private static function isXmlAttributes($value): bool
+    private static function isXmlAttributes($value)
     {
         if (!is_array($value)) {
             return false;
@@ -245,7 +259,7 @@ class XmlElement implements IXmlElement
      * @param mixed $value Value that may contain a list of child elements
      * @phpstan-assert-if-true list<array<string, mixed>> $value
      */
-    private static function isHierarchySequence($value): bool
+    private static function isHierarchySequence($value)
     {
         if (!is_array($value) || !self::isList($value)) {
             return false;
@@ -260,7 +274,7 @@ class XmlElement implements IXmlElement
         return true;
     }
 
-    private static function isList(array $value): bool
+    private static function isList(array $value)
     {
         return $value === array_values($value);
     }

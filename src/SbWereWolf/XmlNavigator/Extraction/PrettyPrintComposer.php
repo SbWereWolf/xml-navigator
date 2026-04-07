@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace SbWereWolf\XmlNavigator\Extraction;
 
 use SbWereWolf\XmlNavigator\General\Notation;
@@ -25,9 +23,9 @@ class PrettyPrintComposer implements Notation
      */
     public static function compose(
         XMLReader $reader,
-        string $valueIndex = Notation::VAL,
-        string $attributesIndex = Notation::ATTR
-    ): array {
+        $valueIndex = Notation::VAL,
+        $attributesIndex = Notation::ATTR
+    ) {
         for ($canRead = true; self::needsReadToReachElement($reader, $canRead);) {
             $canRead = $reader->read();
         }
@@ -53,8 +51,8 @@ class PrettyPrintComposer implements Notation
 
     private static function needsReadToReachElement(
         XMLReader $reader,
-        bool $canRead
-    ): bool {
+        $canRead
+    ) {
         if ($reader->nodeType === XMLReader::ELEMENT) {
             return false;
         }
@@ -69,9 +67,9 @@ class PrettyPrintComposer implements Notation
      */
     private static function composeEmptyElement(
         XMLReader $reader,
-        string $valueIndex,
-        string $attributesIndex
-    ): array {
+        $valueIndex,
+        $attributesIndex
+    ) {
         $name = $reader->name;
         $attributes = self::collectAttributes($reader);
         $reader->read();
@@ -95,9 +93,9 @@ class PrettyPrintComposer implements Notation
      */
     private static function composeElement(
         XMLReader $reader,
-        string $valueIndex,
-        string $attributesIndex
-    ): array {
+        $valueIndex,
+        $attributesIndex
+    ) {
         $name = $reader->name;
         $startDepth = $reader->depth;
         $attributes = self::collectAttributes($reader);
@@ -173,7 +171,7 @@ class PrettyPrintComposer implements Notation
      */
     private static function appendChild(
         array &$target,
-        string $childName,
+        $childName,
         $childValue
     ) {
         if (!array_key_exists($childName, $target)) {
@@ -203,11 +201,11 @@ class PrettyPrintComposer implements Notation
      */
     private static function normalizeValue(
         array $children,
-        string $value,
-        bool $hasValue,
+        $value,
+        $hasValue,
         array $attributes,
-        string $valueIndex,
-        string $attributesIndex
+        $valueIndex,
+        $attributesIndex
     ) {
         if ($children === []) {
             if ($attributes === []) {
@@ -244,7 +242,7 @@ class PrettyPrintComposer implements Notation
     /**
      * @return array<string,string>
      */
-    private static function collectAttributes(XMLReader $reader): array
+    private static function collectAttributes(XMLReader $reader)
     {
         $attributes = [];
         while ($reader->moveToNextAttribute()) {
@@ -271,7 +269,7 @@ class PrettyPrintComposer implements Notation
         return null;
     }
 
-    private static function isList(array $value): bool
+    private static function isList(array $value)
     {
         return $value === array_values($value);
     }

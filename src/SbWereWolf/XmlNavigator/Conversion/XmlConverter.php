@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace SbWereWolf\XmlNavigator\Conversion;
 
 use SbWereWolf\XmlNavigator\General\Notation;
@@ -46,12 +44,12 @@ class XmlConverter implements IXmlConverter
      * @param int $flags
      */
     public function __construct(
-        string $val = Notation::VALUE,
-        string $attr = Notation::ATTRIBUTES,
-        string $name = Notation::NAME,
-        string $seq = Notation::SEQUENCE,
+        $val = Notation::VALUE,
+        $attr = Notation::ATTRIBUTES,
+        $name = Notation::NAME,
+        $seq = Notation::SEQUENCE,
         $encoding = null,
-        int $flags = LIBXML_BIGLINES | LIBXML_COMPACT
+        $flags = LIBXML_BIGLINES | LIBXML_COMPACT
     ) {
         $this->name = $name;
         $this->val = $val;
@@ -65,9 +63,9 @@ class XmlConverter implements IXmlConverter
      * @return PrettyNode
      */
     public function toPrettyPrint(
-        string $xmlText = '',
-        string $xmlUri = ''
-    ): array {
+        $xmlText = '',
+        $xmlUri = ''
+    ) {
         $isPrevious = $this->isPrevious($xmlText, $xmlUri);
         if (!$isPrevious || count($this->prettyXml) === 0) {
             $this->prettyXml =
@@ -91,9 +89,9 @@ class XmlConverter implements IXmlConverter
      * @return HierarchyNode
      */
     public function toHierarchyOfElements(
-        string $xmlText = '',
-        string $xmlUri = ''
-    ): array {
+        $xmlText = '',
+        $xmlUri = ''
+    ) {
         $isPrevious = $this->isPrevious($xmlText, $xmlUri);
         if (!$isPrevious || count($this->xmlStructure) === 0) {
             $this->xmlStructure =
@@ -121,9 +119,9 @@ class XmlConverter implements IXmlConverter
      * @return bool
      */
     private function isPrevious(
-        string $xmlText,
-        string $xmlUri
-    ): bool {
+        $xmlText,
+        $xmlUri
+    ) {
         $isPrevious = true;
         if ($xmlText !== '' && $xmlText !== $this->previousXmlText) {
             $isPrevious = false;

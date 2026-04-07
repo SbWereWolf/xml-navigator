@@ -1,6 +1,5 @@
 <?php
 
-declare(strict_types=1);
 
 namespace SbWereWolf\XmlNavigator\Test\Integration;
 
@@ -19,7 +18,7 @@ final class DocumentationWorkflowsTest extends TestCase
 
         $offers = FastXmlParser::extractHierarchy(
             $reader,
-            static function (XMLReader $cursor): bool {
+            static function (XMLReader $cursor){
                 return $cursor->nodeType === XMLReader::ELEMENT
                     && $cursor->name === 'offer';
             }
@@ -48,7 +47,7 @@ final class DocumentationWorkflowsTest extends TestCase
 
         $offers = FastXmlParser::extractHierarchy(
             $reader,
-            static function (XMLReader $cursor): bool {
+            static function (XMLReader $cursor){
                 return $cursor->nodeType === XMLReader::ELEMENT
                     && $cursor->name === 'offer';
             },
@@ -94,7 +93,7 @@ final class DocumentationWorkflowsTest extends TestCase
         self::assertSame(
             ['office', 'usb'],
             array_map(
-                static function (XmlElement $tag): string {
+                static function (XmlElement $tag){
                     return $tag->value();
                 },
                 $firstOffer->elements('tag')

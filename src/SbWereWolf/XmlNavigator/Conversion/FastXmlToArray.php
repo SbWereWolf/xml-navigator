@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace SbWereWolf\XmlNavigator\Conversion;
 
 use InvalidArgumentException;
@@ -21,15 +19,15 @@ class FastXmlToArray implements IFastXmlToArray
      * @return HierarchyNode
      */
     public static function convert(
-        string $xmlText = '',
-        string $xmlUri = '',
-        string $val = Notation::VALUE,
-        string $attr = Notation::ATTRIBUTES,
-        string $name = Notation::NAME,
-        string $seq = Notation::SEQUENCE,
+        $xmlText = '',
+        $xmlUri = '',
+        $val = Notation::VALUE,
+        $attr = Notation::ATTRIBUTES,
+        $name = Notation::NAME,
+        $seq = Notation::SEQUENCE,
         $encoding = null,
-        int $flags = LIBXML_BIGLINES | LIBXML_COMPACT
-    ): array {
+        $flags = LIBXML_BIGLINES | LIBXML_COMPACT
+    ) {
         /** @var \Closure(XMLReader):array<mixed, mixed> $parse */
         $parse = static function (
             XMLReader $reader
@@ -40,11 +38,11 @@ class FastXmlToArray implements IFastXmlToArray
             $attr,
             $name,
             $seq
-        ): array {
+        ) {
             return self::requireArrayResult(
                 FastXmlParser::extractHierarchy(
                     $reader,
-                    static function (XMLReader $cursor): bool {
+                    static function (XMLReader $cursor) {
                         return $cursor->nodeType === XMLReader::ELEMENT;
                     },
                     $val,
@@ -73,13 +71,13 @@ class FastXmlToArray implements IFastXmlToArray
      * @return PrettyNode
      */
     public static function prettyPrint(
-        string $xmlText = '',
-        string $xmlUri = '',
-        string $val = Notation::VAL,
-        string $attr = Notation::ATTR,
+        $xmlText = '',
+        $xmlUri = '',
+        $val = Notation::VAL,
+        $attr = Notation::ATTR,
         $encoding = null,
-        int $flags = LIBXML_BIGLINES | LIBXML_COMPACT
-    ): array {
+        $flags = LIBXML_BIGLINES | LIBXML_COMPACT
+    ) {
         /** @var \Closure(XMLReader):array<mixed, mixed> $parse */
         $parse = static function (
             XMLReader $reader
@@ -88,11 +86,11 @@ class FastXmlToArray implements IFastXmlToArray
             $xmlUri,
             $val,
             $attr
-        ): array {
+        ) {
             return self::requireArrayResult(
                 FastXmlParser::extractPrettyPrint(
                     $reader,
-                    static function (XMLReader $cursor): bool {
+                    static function (XMLReader $cursor) {
                         return $cursor->nodeType === XMLReader::ELEMENT;
                     },
                     $val,
@@ -121,12 +119,12 @@ class FastXmlToArray implements IFastXmlToArray
      * @return array<mixed, mixed>
      */
     private static function parseRootElement(
-        string $xmlText,
-        string $xmlUri,
+        $xmlText,
+        $xmlUri,
         $encoding,
-        int $flags,
+        $flags,
         \Closure $parse
-    ): array {
+    ) {
         $reader = null;
         $hadInternalErrors = libxml_use_internal_errors(true);
         libxml_clear_errors();
@@ -162,11 +160,11 @@ class FastXmlToArray implements IFastXmlToArray
      * @return XMLReader
      */
     private static function createXmlReader(
-        string $xmlText,
-        string $xmlUri,
+        $xmlText,
+        $xmlUri,
         $encoding,
-        int $flags
-    ): XMLReader {
+        $flags
+    ) {
         if ($xmlText === '' && $xmlUri === '') {
             throw new InvalidArgumentException(
                 'Exactly one XML source must be provided: set either ' .
@@ -208,9 +206,9 @@ class FastXmlToArray implements IFastXmlToArray
     }
 
     private static function buildParsingException(
-        string $xmlText,
-        string $xmlUri
-    ): InvalidArgumentException {
+        $xmlText,
+        $xmlUri
+    ) {
         $details = self::formatLibxmlErrors();
         if ($xmlText !== '') {
             return new InvalidArgumentException(
@@ -231,9 +229,9 @@ class FastXmlToArray implements IFastXmlToArray
      */
     private static function requireArrayResult(
         $result,
-        string $xmlText,
-        string $xmlUri
-    ): array {
+        $xmlText,
+        $xmlUri
+    ) {
         if (!is_array($result) || $result === []) {
             throw self::buildParsingException($xmlText, $xmlUri);
         }
@@ -241,7 +239,7 @@ class FastXmlToArray implements IFastXmlToArray
         return $result;
     }
 
-    private static function formatLibxmlErrors(): string
+    private static function formatLibxmlErrors()
     {
         $errors = libxml_get_errors();
         if ($errors === []) {
@@ -249,7 +247,7 @@ class FastXmlToArray implements IFastXmlToArray
         }
 
         $messages = array_map(
-            static function (\LibXMLError $error): string {
+            static function (\LibXMLError $error) {
                 return trim($error->message);
             },
             $errors

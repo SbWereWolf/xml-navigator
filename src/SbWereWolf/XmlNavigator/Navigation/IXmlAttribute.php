@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace SbWereWolf\XmlNavigator\Navigation;
 
 /**
@@ -10,8 +8,8 @@ namespace SbWereWolf\XmlNavigator\Navigation;
 interface IXmlAttribute
 {
     /** Returns name of attribute */
-    public function name(): string;
+    public function name();
 
     /** Returns value of attribute */
-    public function value(): string;
+    public function value();
 }

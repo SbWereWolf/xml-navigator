@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace SbWereWolf\XmlNavigator\Extraction;
 
 use SbWereWolf\XmlNavigator\General\Notation;
@@ -24,11 +22,11 @@ class HierarchyComposer implements Notation
      */
     public static function compose(
         XMLReader $reader,
-        string $valueIndex = Notation::VALUE,
-        string $attributesIndex = Notation::ATTRIBUTES,
-        string $nameIndex = Notation::NAME,
-        string $elementsIndex = Notation::SEQUENCE
-    ): array {
+        $valueIndex = Notation::VALUE,
+        $attributesIndex = Notation::ATTRIBUTES,
+        $nameIndex = Notation::NAME,
+        $elementsIndex = Notation::SEQUENCE
+    ) {
         for ($canRead = true; self::needsReadToReachElement($reader, $canRead);) {
             $canRead = $reader->read();
         }
@@ -54,8 +52,8 @@ class HierarchyComposer implements Notation
 
     private static function needsReadToReachElement(
         XMLReader $reader,
-        bool $canRead
-    ): bool {
+        $canRead
+    ) {
         if ($reader->nodeType === XMLReader::ELEMENT) {
             return false;
         }
@@ -72,11 +70,11 @@ class HierarchyComposer implements Notation
      */
     private static function composeElement(
         XMLReader $reader,
-        string $elementsIndex,
-        string $nameIndex,
-        string $valueIndex,
-        string $attributesIndex
-    ): array {
+        $elementsIndex,
+        $nameIndex,
+        $valueIndex,
+        $attributesIndex
+    ) {
         $startDepth = $reader->depth;
         $result = [
             $nameIndex => $reader->name,
@@ -142,7 +140,7 @@ class HierarchyComposer implements Notation
     /**
      * @return array<string,string>
      */
-    private static function collectAttributes(XMLReader $reader): array
+    private static function collectAttributes(XMLReader $reader)
     {
         $attributes = [];
         while ($reader->moveToNextAttribute()) {

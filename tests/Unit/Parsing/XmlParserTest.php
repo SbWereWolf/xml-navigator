@@ -1,6 +1,5 @@
 <?php
 
-declare(strict_types=1);
 
 namespace SbWereWolf\XmlNavigator\Test\Unit\Parsing;
 
@@ -24,7 +23,7 @@ final class XmlParserTest extends TestCase
         $actual = iterator_to_array(
             $parser->extractHierarchy(
                 $reader,
-                static function (XMLReader $cursor): bool {
+                static function (XMLReader $cursor){
                     return $cursor->name === 'offer';
                 }
             ),
@@ -95,7 +94,7 @@ final class XmlParserTest extends TestCase
         $first = iterator_to_array(
             $parser->extractHierarchy(
                 $firstReader,
-                static function (XMLReader $cursor): bool {
+                static function (XMLReader $cursor){
                     return $cursor->name === 'offer';
                 }
             ),
@@ -104,7 +103,7 @@ final class XmlParserTest extends TestCase
         $second = iterator_to_array(
             $parser->extractHierarchy(
                 $secondReader,
-                static function (XMLReader $cursor): bool {
+                static function (XMLReader $cursor){
                     return $cursor->name === 'service';
                 }
             ),
@@ -142,7 +141,7 @@ final class XmlParserTest extends TestCase
         $actual = iterator_to_array(
             $parser->extractHierarchy(
                 $reader,
-                static function (XMLReader $cursor): bool {
+                static function (XMLReader $cursor){
                     return $cursor->name === 'missing';
                 }
             ),
@@ -165,7 +164,7 @@ final class XmlParserTest extends TestCase
         $actual = iterator_to_array(
             $parser->extractPrettyPrint(
                 $reader,
-                static function (XMLReader $cursor): bool {
+                static function (XMLReader $cursor){
                     return $cursor->name === 'offer';
                 }
             ),

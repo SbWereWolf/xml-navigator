@@ -1,6 +1,5 @@
 <?php
 
-declare(strict_types=1);
 
 namespace SbWereWolf\XmlNavigator\Test\Support;
 
@@ -9,21 +8,18 @@ use XMLReader;
 
 final class XmlFixture
 {
-    public static function path(string $name): string
-    {
+    public static function path($name){
         return dirname(__DIR__) . '/Fixtures/Xml/' . $name;
     }
 
-    public static function read(string $name): string
-    {
+    public static function read($name){
         $content = file_get_contents(self::path($name));
         Assert::assertNotFalse($content);
 
         return $content;
     }
 
-    public static function readerFromFixture(string $name): XMLReader
-    {
+    public static function readerFromFixture($name){
         $reader = XMLReader::open(self::path($name));
         Assert::assertInstanceOf(XMLReader::class, $reader);
 

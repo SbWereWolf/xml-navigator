@@ -1,6 +1,5 @@
 <?php
 
-declare(strict_types=1);
 
 namespace SbWereWolf\XmlNavigator\Test\Unit\Conversion;
 
@@ -115,7 +114,7 @@ final class FastXmlToArrayTest extends TestCase
     /**
      * @dataProvider missingSourceProvider
      */
-    public function testMethodsRejectMissingXmlSource(string $method)
+    public function testMethodsRejectMissingXmlSource($method)
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionCode(-667);
@@ -130,8 +129,7 @@ final class FastXmlToArrayTest extends TestCase
     /**
      * @return list<array{string}>
      */
-    public static function missingSourceProvider(): array
-    {
+    public static function missingSourceProvider(){
         return [
             ['convert'],
             ['prettyPrint'],
@@ -142,9 +140,9 @@ final class FastXmlToArrayTest extends TestCase
      * @dataProvider ambiguousSourceProvider
      */
     public function testMethodsRejectAmbiguousXmlSource(
-        string $method,
-        string $xmlText,
-        string $xmlUri
+        $method,
+        $xmlText,
+        $xmlUri
     ) {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionCode(-668);
@@ -159,8 +157,7 @@ final class FastXmlToArrayTest extends TestCase
     /**
      * @return list<array{string,string,string}>
      */
-    public static function ambiguousSourceProvider(): array
-    {
+    public static function ambiguousSourceProvider(){
         return [
             [
                 'convert',
@@ -214,7 +211,7 @@ final class FastXmlToArrayTest extends TestCase
     /**
      * @dataProvider malformedUriProvider
      */
-    public function testMethodsRejectMalformedXmlFile(string $method)
+    public function testMethodsRejectMalformedXmlFile($method)
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionCode(-670);
@@ -230,8 +227,7 @@ final class FastXmlToArrayTest extends TestCase
     /**
      * @return list<array{string}>
      */
-    public static function malformedUriProvider(): array
-    {
+    public static function malformedUriProvider(){
         return [
             ['convert'],
             ['prettyPrint'],
@@ -278,7 +274,7 @@ final class FastXmlToArrayTest extends TestCase
                 '',
                 null,
                 LIBXML_BIGLINES | LIBXML_COMPACT,
-                static function (\XMLReader $reader): array {
+                static function (\XMLReader $reader){
                     $dom = new \DOMDocument();
                     @$dom->loadXML('<broken>');
 

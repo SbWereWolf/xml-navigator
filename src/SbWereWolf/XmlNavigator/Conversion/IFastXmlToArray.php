@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace SbWereWolf\XmlNavigator\Conversion;
 
 use SbWereWolf\XmlNavigator\General\Notation;
@@ -28,15 +26,15 @@ interface IFastXmlToArray
      * @return HierarchyNode
      */
     public static function convert(
-        string $xmlText = '',
-        string $xmlUri = '',
-        string $val = Notation::VALUE,
-        string $attr = Notation::ATTRIBUTES,
-        string $name = Notation::NAME,
-        string $seq = Notation::SEQUENCE,
+        $xmlText = '',
+        $xmlUri = '',
+        $val = Notation::VALUE,
+        $attr = Notation::ATTRIBUTES,
+        $name = Notation::NAME,
+        $seq = Notation::SEQUENCE,
         $encoding = null,
-        int $flags = LIBXML_BIGLINES | LIBXML_COMPACT
-    ): array;
+        $flags = LIBXML_BIGLINES | LIBXML_COMPACT
+    );
 
     /** Convert xml document into compact array
      * @param string $xmlText The text of XML document
@@ -48,11 +46,11 @@ interface IFastXmlToArray
      * @return PrettyNode
      */
     public static function prettyPrint(
-        string $xmlText = '',
-        string $xmlUri = '',
-        string $val = Notation::VAL,
-        string $attr = Notation::ATTR,
+        $xmlText = '',
+        $xmlUri = '',
+        $val = Notation::VAL,
+        $attr = Notation::ATTR,
         $encoding = null,
-        int $flags = LIBXML_BIGLINES | LIBXML_COMPACT
-    ): array;
+        $flags = LIBXML_BIGLINES | LIBXML_COMPACT
+    );
 }

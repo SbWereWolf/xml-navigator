@@ -1,6 +1,5 @@
 <?php
 
-declare(strict_types=1);
 
 namespace SbWereWolf\XmlNavigator\Test\Unit\Parsing;
 
@@ -18,7 +17,7 @@ final class FastXmlParserTest extends TestCase
         $actual = iterator_to_array(
             FastXmlParser::extractHierarchy(
                 $reader,
-                static function (XMLReader $cursor): bool {
+                static function (XMLReader $cursor){
                     return $cursor->nodeType === XMLReader::ELEMENT
                         && $cursor->name === 'offer';
                 }
@@ -82,7 +81,7 @@ final class FastXmlParserTest extends TestCase
         $actual = iterator_to_array(
             FastXmlParser::extractHierarchy(
                 $reader,
-                static function (XMLReader $cursor): bool {
+                static function (XMLReader $cursor){
                     return $cursor->name === 'offer';
                 },
                 'value',
@@ -149,7 +148,7 @@ final class FastXmlParserTest extends TestCase
         $actual = iterator_to_array(
             FastXmlParser::extractHierarchy(
                 $reader,
-                static function (XMLReader $cursor): bool {
+                static function (XMLReader $cursor){
                     return $cursor->name === 'missing';
                 }
             ),
@@ -168,7 +167,7 @@ final class FastXmlParserTest extends TestCase
         $actual = iterator_to_array(
             FastXmlParser::extractPrettyPrint(
                 $reader,
-                static function (XMLReader $cursor): bool {
+                static function (XMLReader $cursor){
                     return $cursor->nodeType === XMLReader::ELEMENT
                         && $cursor->name === 'offer';
                 }
@@ -222,7 +221,7 @@ final class FastXmlParserTest extends TestCase
         $actual = iterator_to_array(
             FastXmlParser::extractPrettyPrint(
                 $reader,
-                static function (XMLReader $cursor): bool {
+                static function (XMLReader $cursor){
                     return $cursor->name === 'missing';
                 }
             ),

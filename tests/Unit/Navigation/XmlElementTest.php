@@ -1,6 +1,5 @@
 <?php
 
-declare(strict_types=1);
 
 namespace SbWereWolf\XmlNavigator\Test\Unit\Navigation;
 
@@ -60,7 +59,7 @@ final class XmlElementTest extends TestCase
         self::assertTrue($offer->hasElement('price'));
 
         $names = array_map(
-            static function (XmlElement $element): string {
+            static function (XmlElement $element){
                 return $element->name();
             },
             $offer->elements()
@@ -70,7 +69,7 @@ final class XmlElementTest extends TestCase
         self::assertSame(
             ['office', 'usb'],
             array_map(
-                static function (XmlElement $tag): string {
+                static function (XmlElement $tag){
                     return $tag->value();
                 },
                 $offer->elements('tag')

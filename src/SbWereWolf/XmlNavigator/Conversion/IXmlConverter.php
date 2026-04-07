@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace SbWereWolf\XmlNavigator\Conversion;
 
 /**
@@ -18,9 +16,9 @@ interface IXmlConverter
      * @return PrettyNode
      */
     public function toPrettyPrint(
-        string $xmlText = '',
-        string $xmlUri = ''
-    ): array;
+        $xmlText = '',
+        $xmlUri = ''
+    );
 
     /** Convert xml document into normalized array
      * @param string $xmlText The text of XML document
@@ -28,7 +26,7 @@ interface IXmlConverter
      * @return HierarchyNode
      */
     public function toHierarchyOfElements(
-        string $xmlText = '',
-        string $xmlUri = ''
-    ): array;
+        $xmlText = '',
+        $xmlUri = ''
+    );
 }
