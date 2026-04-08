@@ -74,6 +74,37 @@ final class PrettyPrintComposerTest extends TestCase
         $reader->close();
     }
 
+    public function testComposeMovesReaderPastTopLevelEmptyElement(): void
+    {
+        $reader = XmlFixture::readerFromFixture('empty-elements.xml');
+
+        while ($reader->read()) {
+            if (
+                $reader->nodeType === \XMLReader::ELEMENT
+                && $reader->name === 'root'
+            ) {
+                break;
+            }
+        }
+
+        self::assertSame(
+            [
+                'root' => [
+                    '@attributes' => [
+                        'attr' => '1',
+                    ],
+                ],
+            ],
+            PrettyPrintComposer::compose($reader)
+        );
+
+        while ($reader->nodeType !== \XMLReader::ELEMENT && $reader->read()) {
+        }
+
+        self::assertSame('next', $reader->name);
+        $reader->close();
+    }
+
     public function testComposePreservesMixedContentWithAttributesAndChild(): void
     {
         $reader = XmlFixture::readerFromFixture('mixed-content.xml');
