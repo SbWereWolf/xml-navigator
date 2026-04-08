@@ -32,9 +32,11 @@ jobs:
         run: composer test
 
       - name: Run tests with coverage
+        run: composer test-coverage
+
+      - name: Build Clover coverage report
         run: >-
-          php -d xdebug.mode=coverage
-          ./vendor/phpunit/phpunit/phpunit
+          php ./vendor/phpunit/phpunit/phpunit
           --configuration ./continuous-integration/phpunit/phpunit.xml
           --colors=always
           --coverage-clover coverage.xml

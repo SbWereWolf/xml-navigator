@@ -271,6 +271,9 @@ class PrettyPrintComposer implements Notation
         return null;
     }
 
+    /**
+     * @param array<mixed, mixed> $value
+     */
     private static function isList(array $value): bool
     {
         return $value === array_values($value);
