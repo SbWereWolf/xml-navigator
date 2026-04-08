@@ -17,12 +17,14 @@ RUN apt-get update \
         libxml2-dev \
         $PHPIZE_DEPS \
     && docker-php-ext-install xml \
-    && if [ -n "$XDEBUG_VERSION" ]; then \
+    && if [ "$XDEBUG_VERSION" = "none" ]; then \
+        true; \
+    elif [ -n "$XDEBUG_VERSION" ]; then \
         pecl install xdebug-"$XDEBUG_VERSION"; \
     else \
         pecl install xdebug; \
     fi \
-    && docker-php-ext-enable xdebug \
+    && if php -m | grep -qi '^xdebug$'; then docker-php-ext-enable xdebug; fi \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
