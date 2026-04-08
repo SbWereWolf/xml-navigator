@@ -111,6 +111,42 @@ final class FastXmlToArrayTest extends TestCase
         self::assertSame($expected, FastXmlToArray::prettyPrint('', $xmlFile));
     }
 
+    public function testConvertSupportsExplicitLibxmlFlags()
+    {
+        $xmlText = XmlFixture::read('hierarchy-catalog.xml');
+
+        self::assertSame(
+            'catalog',
+            FastXmlToArray::convert(
+                $xmlText,
+                '',
+                'v',
+                'a',
+                'n',
+                's',
+                null,
+                LIBXML_COMPACT
+            )['n']
+        );
+    }
+
+    public function testPrettyPrintSupportsExplicitLibxmlFlags()
+    {
+        $xmlText = XmlFixture::read('repeated-pretty-print.xml');
+
+        self::assertSame(
+            'value-only',
+            FastXmlToArray::prettyPrint(
+                $xmlText,
+                '',
+                '@value',
+                '@attributes',
+                null,
+                LIBXML_COMPACT
+            )['root']['item'][0]
+        );
+    }
+
     /**
      * @dataProvider missingSourceProvider
      */
@@ -303,6 +339,41 @@ final class FastXmlToArrayTest extends TestCase
                 ) !== false
             );
         }
+    }
+
+    public function testDefaultLibxmlFlagsFallbackToCompactWhenBiglinesMissing()
+    {
+        if (defined('LIBXML_BIGLINES')) {
+            self::markTestSkipped('LIBXML_BIGLINES is available in this runtime.');
+        }
+
+        $method = new ReflectionMethod(
+            FastXmlToArray::class,
+            'defaultLibxmlFlags'
+        );
+        /** @noinspection PhpExpressionResultUnusedInspection */
+        $method->setAccessible(true);
+
+        self::assertSame(LIBXML_COMPACT, $method->invoke(null));
+    }
+
+    public function testDefaultLibxmlFlagsIncludeBiglinesWhenDefined()
+    {
+        if (!defined('LIBXML_BIGLINES')) {
+            define('LIBXML_BIGLINES', 4194304);
+        }
+
+        $method = new ReflectionMethod(
+            FastXmlToArray::class,
+            'defaultLibxmlFlags'
+        );
+        /** @noinspection PhpExpressionResultUnusedInspection */
+        $method->setAccessible(true);
+
+        self::assertSame(
+            LIBXML_COMPACT | LIBXML_BIGLINES,
+            $method->invoke(null)
+        );
     }
 
     /**

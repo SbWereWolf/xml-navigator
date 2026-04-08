@@ -4,6 +4,8 @@
 namespace SbWereWolf\XmlNavigator\Test\Unit\Conversion;
 
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
+use ReflectionProperty;
 use SbWereWolf\XmlNavigator\Conversion\XmlConverter;
 use SbWereWolf\XmlNavigator\Test\Support\XmlFixture;
 
@@ -226,5 +228,43 @@ final class XmlConverterTest extends TestCase
             ],
             $hierarchy
         );
+    }
+
+    public function testConstructorSupportsExplicitLibxmlFlags()
+    {
+        $converter = new XmlConverter(
+            'value',
+            'attributes',
+            'name',
+            'children',
+            null,
+            LIBXML_COMPACT
+        );
+
+        $property = new ReflectionProperty(
+            XmlConverter::class,
+            'flags'
+        );
+        /** @noinspection PhpExpressionResultUnusedInspection */
+        $property->setAccessible(true);
+
+        self::assertSame(LIBXML_COMPACT, $property->getValue($converter));
+    }
+
+    public function testDefaultLibxmlFlagsMatchAvailableConstants()
+    {
+        $method = new ReflectionMethod(
+            XmlConverter::class,
+            'defaultLibxmlFlags'
+        );
+        /** @noinspection PhpExpressionResultUnusedInspection */
+        $method->setAccessible(true);
+
+        $expected = LIBXML_COMPACT;
+        if (defined('LIBXML_BIGLINES')) {
+            $expected |= LIBXML_BIGLINES;
+        }
+
+        self::assertSame($expected, $method->invoke(null));
     }
 }
