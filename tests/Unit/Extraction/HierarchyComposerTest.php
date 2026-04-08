@@ -94,7 +94,7 @@ final class HierarchyComposerTest extends TestCase
         $reader->close();
     }
 
-    public function testComposeMovesReaderPastTopLevelEmptyElement(): void
+    public function testComposeMovesReaderPastTopLevelEmptyElement()
     {
         $reader = XmlFixture::readerFromFixture('empty-elements.xml');
 

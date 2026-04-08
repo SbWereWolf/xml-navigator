@@ -12,8 +12,6 @@ use SbWereWolf\XmlNavigator\General\Notation;
 /**
  * XML element value object
  *
- * @phpstan-import-type HierarchyNode from IFastXmlToArray
- * @phpstan-import-type XmlAttributes from IFastXmlToArray
  * @phpstan-consistent-constructor
  */
 class XmlElement implements IXmlElement
@@ -21,7 +19,7 @@ class XmlElement implements IXmlElement
     /** @var bool */
     private static $trustChildData = false;
 
-    /** @var HierarchyNode Serialized XML element representation */
+    /** @var array<string, mixed> Serialized XML element representation */
     private $data;
     /** @var string Index for the element name */
     private $name;
@@ -35,13 +33,13 @@ class XmlElement implements IXmlElement
     private $elementName;
     /** @var string XML element value */
     private $elementValue;
-    /** @var XmlAttributes XML element attributes */
+    /** @var array<string, string> XML element attributes */
     private $attributesData;
-    /** @var list<array<string, mixed>> Child elements */
+    /** @var array<int, array<string, mixed>> Child elements */
     private $sequenceData;
 
     /**
-     * @param HierarchyNode $initial Serialized XML element payload
+     * @param array<string, mixed> $initial Serialized XML element payload
      * @param string $name index for the element name
      * @param string $val index for the element value
      * @param string $attr index for element attributes
@@ -81,7 +79,7 @@ class XmlElement implements IXmlElement
         }
 
         $keys = [$name, $val, $attr, $seq];
-        /** @var HierarchyNode $data */
+        /** @var array<string, mixed> $data */
         $data = [];
         foreach ($keys as $key) {
             if (array_key_exists($key, $initial)) {
@@ -147,7 +145,6 @@ class XmlElement implements IXmlElement
     public function pull(string $name = ''): Generator
     {
         foreach ($this->sequenceData as $elem) {
-            /** @var HierarchyNode $elem */
             if (
                 '' !== $name
                 && (($elem[$this->name] ?? null) !== $name)
@@ -224,7 +221,7 @@ class XmlElement implements IXmlElement
 
     /**
      * @param mixed $value Value that may contain XML attributes
-     * @phpstan-assert-if-true XmlAttributes $value
+     * @phpstan-assert-if-true array<string, string> $value
      */
     private static function isXmlAttributes($value): bool
     {
@@ -243,7 +240,7 @@ class XmlElement implements IXmlElement
 
     /**
      * @param mixed $value Value that may contain a list of child elements
-     * @phpstan-assert-if-true list<array<string, mixed>> $value
+     * @phpstan-assert-if-true array<int, array<string, mixed>> $value
      */
     private static function isHierarchySequence($value): bool
     {

@@ -9,11 +9,6 @@ use XMLReader;
 
 /**
  * Converts an XML element into a PHP array
- *
- * @phpstan-import-type PrettyNode from \SbWereWolf\XmlNavigator\Conversion\IFastXmlToArray
- * @phpstan-import-type PrettyNodeValue from \SbWereWolf\XmlNavigator\Conversion\IFastXmlToArray
- * @phpstan-import-type XmlAttributes from \SbWereWolf\XmlNavigator\Conversion\IFastXmlToArray
- * @phpstan-type PrettyChildren array<string, PrettyNodeValue>
  */
 class PrettyPrintComposer implements Notation
 {
@@ -21,7 +16,7 @@ class PrettyPrintComposer implements Notation
      * @param XMLReader $reader
      * @param string $valueIndex index for element value
      * @param string $attributesIndex index for attributes collection
-     * @return PrettyNode
+     * @return array<string, mixed>
      */
     public static function compose(
         XMLReader $reader,
@@ -65,7 +60,7 @@ class PrettyPrintComposer implements Notation
     /**
      * @param string $valueIndex
      * @param string $attributesIndex
-     * @return PrettyNode
+     * @return array<string, mixed>
      */
     private static function composeEmptyElement(
         XMLReader $reader,
@@ -91,7 +86,7 @@ class PrettyPrintComposer implements Notation
     /**
      * @param string $valueIndex
      * @param string $attributesIndex
-     * @return PrettyNode
+     * @return array<string, mixed>
      */
     private static function composeElement(
         XMLReader $reader,
@@ -115,7 +110,7 @@ class PrettyPrintComposer implements Notation
             ];
         }
 
-        /** @var PrettyChildren $children */
+        /** @var array<string, mixed> $children */
         $children = [];
         $value = '';
         $hasValue = false;
@@ -128,7 +123,6 @@ class PrettyPrintComposer implements Notation
                 );
                 /** @var string $childName */
                 $childName = self::firstKey($child);
-                /** @var PrettyNodeValue $childValue */
                 $childValue = $child[$childName];
                 self::appendChild($children, $childName, $childValue);
                 continue;
@@ -166,10 +160,10 @@ class PrettyPrintComposer implements Notation
     }
 
     /**
-     * @param PrettyChildren $target
+     * @param array<string, mixed> $target
      * @param string $childName
-     * @param PrettyNodeValue $childValue
-     * @param-out PrettyChildren $target
+     * @param mixed $childValue
+     * @param-out array<string, mixed> $target
      */
     private static function appendChild(
         array &$target,
@@ -197,9 +191,9 @@ class PrettyPrintComposer implements Notation
     }
 
     /**
-     * @param PrettyChildren $children
-     * @param XmlAttributes $attributes
-     * @return PrettyNodeValue
+     * @param array<string, mixed> $children
+     * @param array<string, string> $attributes
+     * @return mixed
      */
     private static function normalizeValue(
         array $children,
@@ -226,7 +220,7 @@ class PrettyPrintComposer implements Notation
             ];
         }
 
-        /** @var array<string, PrettyNodeValue> $result */
+        /** @var array<string, mixed> $result */
         $result = [];
         if ($attributes !== []) {
             $result[$attributesIndex] = $attributes;

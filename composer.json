@@ -48,7 +48,7 @@
   "scripts": {
     "test": "php ./vendor/phpunit/phpunit/phpunit --configuration ./continuous-integration/phpunit/phpunit.xml --testdox",
     "test-coverage": "php ./vendor/phpunit/phpunit/phpunit --configuration ./continuous-integration/phpunit/phpunit.xml --testdox --coverage-html ./continuous-integration/autotests-coverage-report --whitelist ./src",
-    "phpstan-check": "php ./vendor/bin/phpstan analyse -vvv --configuration continuous-integration/phpstan/phpstan.neon",
+    "phpstan-check": "php ./vendor/bin/phpstan analyse -vvv --level 7 src --configuration continuous-integration/phpstan/phpstan.neon",
     "check-style": "php ./vendor/bin/phpcs --standard=continuous-integration/phpcs/phpcs.xml -v",
     "fix-style": "php ./vendor/bin/phpcbf --standard=continuous-integration/phpcs/phpcs.xml -v"
   },

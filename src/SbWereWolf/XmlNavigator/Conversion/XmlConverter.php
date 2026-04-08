@@ -8,16 +8,13 @@ use SbWereWolf\XmlNavigator\General\Notation;
 
 /**
  * Converts an XML document into a PHP array
- *
- * @phpstan-import-type HierarchyNode from IFastXmlToArray
- * @phpstan-import-type PrettyNode from IFastXmlToArray
  */
 class XmlConverter implements IXmlConverter
 {
-    /** @var HierarchyNode
+    /** @var array<string, mixed>
      *      Normalized XML document structure */
     private $xmlStructure = [];
-    /** @var PrettyNode
+    /** @var array<string, mixed>
      *       Readable XML document representation */
     private $prettyXml = [];
     /** @var string Index for the element name */
@@ -62,7 +59,7 @@ class XmlConverter implements IXmlConverter
     }
 
     /**
-     * @return PrettyNode
+     * @return array<string, mixed>
      */
     public function toPrettyPrint(
         string $xmlText = '',
@@ -88,7 +85,7 @@ class XmlConverter implements IXmlConverter
     }
 
     /**
-     * @return HierarchyNode
+     * @return array<string, mixed>
      */
     public function toHierarchyOfElements(
         string $xmlText = '',

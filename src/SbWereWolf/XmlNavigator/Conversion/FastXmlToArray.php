@@ -11,14 +11,11 @@ use XMLReader;
 
 /**
  * Converts an XML document into a PHP array with static methods
- *
- * @phpstan-import-type HierarchyNode from IFastXmlToArray
- * @phpstan-import-type PrettyNode from IFastXmlToArray
  */
 class FastXmlToArray implements IFastXmlToArray
 {
     /**
-     * @return HierarchyNode
+     * @return array<string, mixed>
      */
     public static function convert(
         string $xmlText = '',
@@ -57,7 +54,7 @@ class FastXmlToArray implements IFastXmlToArray
             );
         };
 
-        /** @var HierarchyNode $result */
+        /** @var array<string, mixed> $result */
         $result = self::parseRootElement(
             $xmlText,
             $xmlUri,
@@ -70,7 +67,7 @@ class FastXmlToArray implements IFastXmlToArray
     }
 
     /**
-     * @return PrettyNode
+     * @return array<string, mixed>
      */
     public static function prettyPrint(
         string $xmlText = '',
@@ -103,7 +100,7 @@ class FastXmlToArray implements IFastXmlToArray
             );
         };
 
-        /** @var PrettyNode $result */
+        /** @var array<string, mixed> $result */
         $result = self::parseRootElement(
             $xmlText,
             $xmlUri,
@@ -182,22 +179,30 @@ class FastXmlToArray implements IFastXmlToArray
             );
         }
 
+        $reader = new XMLReader();
+
         if ($xmlText !== '') {
-            /** @var XMLReader $reader */
-            $reader = @XMLReader::XML(
+            $loaded = @$reader->XML(
                 $xmlText,
                 $encoding,
                 $flags
             );
+            if ($loaded !== true) {
+                throw new InvalidArgumentException(
+                    'Unable to parse XML from $xmlText.' . self::formatLibxmlErrors(),
+                    -669
+                );
+            }
+
             return $reader;
         }
 
-        $reader = @XMLReader::open(
+        $opened = @$reader->open(
             $xmlUri,
             $encoding,
             $flags
         );
-        if (!$reader instanceof XMLReader) {
+        if ($opened !== true) {
             throw new InvalidArgumentException(
                 'Unable to open XML source from URI `' . $xmlUri . '`.',
                 -671
@@ -249,8 +254,9 @@ class FastXmlToArray implements IFastXmlToArray
         }
 
         $messages = array_map(
-            static function (\LibXMLError $error): string {
-                return trim($error->message);
+            static function ($error): string {
+                /** @var object $error */
+                return trim((string) $error->message);
             },
             $errors
         );

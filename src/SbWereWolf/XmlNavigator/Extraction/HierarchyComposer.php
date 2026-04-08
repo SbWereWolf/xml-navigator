@@ -91,7 +91,7 @@ class HierarchyComposer implements Notation
             return $result;
         }
 
-        /** @var list<HierarchyNode> $children */
+        /** @var array<int, array<string, mixed>> $children */
         $children = [];
         $value = '';
         $hasValue = false;
