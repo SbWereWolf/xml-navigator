@@ -191,18 +191,11 @@ class FastXmlToArray implements IFastXmlToArray
         $reader = new XMLReader();
 
         if ($xmlText !== '') {
-            $loaded = @$reader->XML(
+            @$reader->XML(
                 $xmlText,
                 $encoding,
                 $flags
             );
-            if ($loaded !== true) {
-                throw new InvalidArgumentException(
-                    'Unable to parse XML from $xmlText.' .
-                    self::formatLibxmlErrors(),
-                    -669
-                );
-            }
 
             return $reader;
         }

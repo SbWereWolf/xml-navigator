@@ -117,10 +117,11 @@ class HierarchyComposer implements Notation
                 continue;
             }
 
-            if ($reader->nodeType === XMLReader::END_ELEMENT) {
-                if ($reader->depth === $startDepth) {
-                    break;
-                }
+            if (
+                $reader->nodeType === XMLReader::END_ELEMENT
+                && $reader->depth === $startDepth
+            ) {
+                break;
             }
         }
 

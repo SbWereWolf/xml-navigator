@@ -4,6 +4,7 @@
 namespace SbWereWolf\XmlNavigator\Test\Unit\Extraction;
 
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 use SbWereWolf\XmlNavigator\Extraction\PrettyPrintComposer;
 use SbWereWolf\XmlNavigator\Test\Support\XmlFixture;
 
@@ -152,5 +153,17 @@ final class PrettyPrintComposerTest extends TestCase
         );
 
         $reader->close();
+    }
+
+    public function testFirstKeyReturnsNullForEmptyArray()
+    {
+        $method = new ReflectionMethod(
+            PrettyPrintComposer::class,
+            'firstKey'
+        );
+        /** @noinspection PhpExpressionResultUnusedInspection */
+        $method->setAccessible(true);
+
+        self::assertNull($method->invoke(null, []));
     }
 }
