@@ -180,22 +180,31 @@ class FastXmlToArray implements IFastXmlToArray
             );
         }
 
+        $reader = new XMLReader();
+
         if ($xmlText !== '') {
-            /** @var XMLReader $reader */
-            $reader = @XMLReader::XML(
+            $loaded = @$reader->XML(
                 $xmlText,
                 $encoding,
                 $flags
             );
+            if ($loaded !== true) {
+                throw new InvalidArgumentException(
+                    'Unable to parse XML from $xmlText.' .
+                    self::formatLibxmlErrors(),
+                    -669
+                );
+            }
+
             return $reader;
         }
 
-        $reader = @XMLReader::open(
+        $opened = @$reader->open(
             $xmlUri,
             $encoding,
             $flags
         );
-        if (!$reader instanceof XMLReader) {
+        if ($opened !== true) {
             throw new InvalidArgumentException(
                 'Unable to open XML source from URI `' . $xmlUri . '`.',
                 -671
