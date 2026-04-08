@@ -20,11 +20,12 @@ RUN apt-get update \
     && if [ "$XDEBUG_VERSION" = "none" ]; then \
         true; \
     elif [ -n "$XDEBUG_VERSION" ]; then \
-        pecl install xdebug-"$XDEBUG_VERSION"; \
+        pecl install xdebug-"$XDEBUG_VERSION" \
+        && docker-php-ext-enable xdebug; \
     else \
-        pecl install xdebug; \
+        pecl install xdebug \
+        && docker-php-ext-enable xdebug; \
     fi \
-    && if php -m | grep -qi '^xdebug$'; then docker-php-ext-enable xdebug; fi \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
