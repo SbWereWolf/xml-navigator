@@ -260,6 +260,9 @@ class XmlElement implements IXmlElement
         return true;
     }
 
+    /**
+     * @param array<mixed, mixed> $value
+     */
     private static function isList(array $value): bool
     {
         return $value === array_values($value);
