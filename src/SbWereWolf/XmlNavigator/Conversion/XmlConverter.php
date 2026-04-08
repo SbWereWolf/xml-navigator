@@ -41,7 +41,7 @@ class XmlConverter implements IXmlConverter
      * @param string $name index for the element name
      * @param string $seq Index for child elements
      * @param string|null $encoding XML document encoding or `null`
-     * @param int $flags
+     * @param int|null $flags
      */
     public function __construct(
         $val = Notation::VALUE,
@@ -49,14 +49,14 @@ class XmlConverter implements IXmlConverter
         $name = Notation::NAME,
         $seq = Notation::SEQUENCE,
         $encoding = null,
-        $flags = LIBXML_BIGLINES | LIBXML_COMPACT
+        $flags = null
     ) {
         $this->name = $name;
         $this->val = $val;
         $this->attr = $attr;
         $this->seq = $seq;
         $this->encoding = $encoding;
-        $this->flags = $flags;
+        $this->flags = $flags === null ? self::defaultLibxmlFlags() : $flags;
     }
 
     /**
@@ -134,5 +134,19 @@ class XmlConverter implements IXmlConverter
             $isPrevious = false;
         }
         return $isPrevious;
+    }
+
+    /**
+     * @return int
+     */
+    private static function defaultLibxmlFlags()
+    {
+        $flags = LIBXML_COMPACT;
+
+        if (defined('LIBXML_BIGLINES')) {
+            $flags |= LIBXML_BIGLINES;
+        }
+
+        return $flags;
     }
 }

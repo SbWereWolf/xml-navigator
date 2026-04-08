@@ -26,8 +26,12 @@ class FastXmlToArray implements IFastXmlToArray
         $name = Notation::NAME,
         $seq = Notation::SEQUENCE,
         $encoding = null,
-        $flags = LIBXML_BIGLINES | LIBXML_COMPACT
+        $flags = null
     ) {
+        if ($flags === null) {
+            $flags = self::defaultLibxmlFlags();
+        }
+
         /** @var \Closure(XMLReader):array<mixed, mixed> $parse */
         $parse = static function (
             XMLReader $reader
@@ -76,8 +80,12 @@ class FastXmlToArray implements IFastXmlToArray
         $val = Notation::VAL,
         $attr = Notation::ATTR,
         $encoding = null,
-        $flags = LIBXML_BIGLINES | LIBXML_COMPACT
+        $flags = null
     ) {
+        if ($flags === null) {
+            $flags = self::defaultLibxmlFlags();
+        }
+
         /** @var \Closure(XMLReader):array<mixed, mixed> $parse */
         $parse = static function (
             XMLReader $reader
@@ -246,6 +254,20 @@ class FastXmlToArray implements IFastXmlToArray
         }
 
         return $result;
+    }
+
+    /**
+     * @return int
+     */
+    private static function defaultLibxmlFlags()
+    {
+        $flags = LIBXML_COMPACT;
+
+        if (defined('LIBXML_BIGLINES')) {
+            $flags |= LIBXML_BIGLINES;
+        }
+
+        return $flags;
     }
 
     private static function formatLibxmlErrors()

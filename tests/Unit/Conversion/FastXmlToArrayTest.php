@@ -273,7 +273,7 @@ final class FastXmlToArrayTest extends TestCase
                 '<root/>',
                 '',
                 null,
-                LIBXML_BIGLINES | LIBXML_COMPACT,
+                self::defaultLibxmlFlags(),
                 static function (\XMLReader $reader){
                     $dom = new \DOMDocument();
                     @$dom->loadXML('<broken>');
@@ -303,5 +303,19 @@ final class FastXmlToArrayTest extends TestCase
                 ) !== false
             );
         }
+    }
+
+    /**
+     * @return int
+     */
+    private static function defaultLibxmlFlags()
+    {
+        $flags = LIBXML_COMPACT;
+
+        if (defined('LIBXML_BIGLINES')) {
+            $flags |= LIBXML_BIGLINES;
+        }
+
+        return $flags;
     }
 }

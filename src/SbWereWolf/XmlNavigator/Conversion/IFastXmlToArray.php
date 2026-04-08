@@ -22,7 +22,7 @@ interface IFastXmlToArray
      * @param string $name index for element name
      * @param string $seq index for child elements collection
      * @param string|null $encoding The document encoding or NULL
-     * @param int $flags A bitmask of the LIBXML_* constants.
+     * @param int|null $flags A bitmask of the LIBXML_* constants.
      * @return HierarchyNode
      */
     public static function convert(
@@ -33,7 +33,7 @@ interface IFastXmlToArray
         $name = Notation::NAME,
         $seq = Notation::SEQUENCE,
         $encoding = null,
-        $flags = LIBXML_BIGLINES | LIBXML_COMPACT
+        $flags = null
     );
 
     /** Convert xml document into compact array
@@ -42,7 +42,7 @@ interface IFastXmlToArray
      * @param string $val index for element value
      * @param string $attr index for element attributes collection
      * @param string|null $encoding The document encoding or NULL
-     * @param int $flags A bitmask of the LIBXML_* constants.
+     * @param int|null $flags A bitmask of the LIBXML_* constants.
      * @return PrettyNode
      */
     public static function prettyPrint(
@@ -51,6 +51,6 @@ interface IFastXmlToArray
         $val = Notation::VAL,
         $attr = Notation::ATTR,
         $encoding = null,
-        $flags = LIBXML_BIGLINES | LIBXML_COMPACT
+        $flags = null
     );
 }
