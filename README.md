@@ -6,7 +6,6 @@
 [![Static Analysis](https://github.com/SbWereWolf/xml-navigator/actions/workflows/static-analysis.yml/badge.svg)](https://github.com/SbWereWolf/xml-navigator/actions/workflows/static-analysis.yml)
 [![Test Coverage](https://codecov.io/github/SbWereWolf/xml-navigator/graph/badge.svg?token=Q0BQ2COFTC)](https://codecov.io/github/SbWereWolf/xml-navigator)
 
-
 **XmlExtractKit for PHP: Stream large XML, extract only what matters,
 and get plain PHP arrays.**
 
